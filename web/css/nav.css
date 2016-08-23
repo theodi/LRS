@@ -1,0 +1,142 @@
+* {
+  font-family: 'helvetica nue', sans-serif;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-tap-highlight-color: transparent;
+  /* For some Androids */
+}
+
+.top-animate {
+  background: #fff !important;
+  top: 13px !important;
+  -webkit-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
+
+.mid-animate {
+  opacity: 0;
+}
+
+.bottom-animate {
+  background: #fff !important;
+  top: 13px !important;
+  -webkit-transform: rotate(-225deg);
+  transform: rotate(-225deg);
+}
+
+.top-menu {
+  top: 5px;
+  width: 25px;
+  height: 2px;
+  border-radius: 10px;
+  background-color: #F9A530;
+}
+
+.mid-menu {
+  top: 13px;
+  width: 25px;
+  height: 2px;
+  border-radius: 10px;
+  background-color: #F9A530;
+}
+
+.bottom-menu {
+  top: 21px;
+  width: 25px;
+  height: 2px;
+  border-radius: 10px;
+  background-color: #F9A530;
+}
+
+.menui {
+  background: white;
+  transition: 0.6s ease;
+  transition-timing-function: cubic-bezier(.75, 0, .29, 1.01);
+  margin-top: 10px;
+  position: absolute;
+}
+.icon {
+  z-index: 999;
+  display: none;
+  width: 32px;
+  float: right;
+  height: 20px;
+}
+@media all and (max-width:767px) {
+   .icon {
+	display: block;
+   }
+   .navbar-inner {
+	display: none;
+   }
+   header {
+	padding: 0px;
+   }
+   header h1 {
+	font-size: 28px;
+	padding: 0px 10px;
+   }
+   #footer {
+	padding-top: 10px;
+	padding-bottom: 20px;
+   }
+   #footer .footer-nav {
+	margin-top: 8px;
+	font-size: 12px;
+   }
+   #footer p.license {
+	margin-top: 0px;
+   }
+   #footer .footer-content h1 {
+	width: 180px;
+	height: 30px;
+	background-size: contain;
+	margin: 0px
+   }
+   #footer p {
+	font-size: 12px;
+   }
+   .dataTables_wrapper .dataTables_length {
+   	display: none;
+   }
+}
+@media all and (max-width:439px) {
+   header {
+	height: 40px;
+   }
+   header h1 {
+	font-size: 20px;
+	line-height: inherit;
+   }
+}
+
+.hamburger {
+  height: inherit;
+}
+
+.mobilenav {
+  font-family: inherit;
+  right: 0;
+  z-index: 999;
+  display: none;
+  position: fixed;
+  width: 100%;
+  max-width: 200px;
+  background: black;
+}
+
+.mobilenav li {
+  list-style-type: none;
+  text-align: center;
+  padding: 10px;
+}
+
+.mobilenav li a {
+  text-decoration: none;
+  font-weight: 300;
+  width: 100%;
+  color: white;
+}
+
+.mobilenav li:first-child {
+  margin-top: 10px;
+}

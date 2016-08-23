@@ -1,0 +1,46 @@
+section {
+	display: inline-block;
+	margin: 10px;
+	text-align: center;
+}
+subsection {
+	display: inline-block;
+        margin: 10px;
+        text-align: center;
+	width: 320px;
+}
+.multiSelection {
+	background-color: white;
+	position: relative;
+}
+.ms1 {
+	top: -105px;
+}
+.ms2 {
+	top: -210px;
+}
+.ms3 {
+	top: -315px;
+}
+.ms4 {
+	top: -420px;
+}
+.ms5 {
+	top: -525px;
+}
+.ms6 {
+	top: -630px;
+}
+.ms7 {
+	top: -735px;
+}
+#questions {
+	display: block;
+	width: 100%;
+	text-align: left;	
+}
+.dc-chart g.row text {
+    fill: black;
+    font-size: 12px;
+    cursor: pointer;
+}
