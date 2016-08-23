@@ -23,7 +23,9 @@ $tracking = getCourseIdentifiers();
 
 $users = "";
 $users = getUsers("elearning",$users);
-$users = getUsers("externalBadges",$users);
+if ($theme == "default") {
+  $users = getUsers("externalBadges",$users);
+}
 $users = getUsers("courseAttendance",$users); 
 $users = removeNullProfiles($users);
 $profile = getLMSProfile($theme);
