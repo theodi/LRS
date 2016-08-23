@@ -1,7 +1,7 @@
 $( document ).ready(function() {
 var parseDate = d3.time.format("%Y-%m-%d").parse;
 var parsenvd3Date = d3.time.format("%d/%m/%Y").parse;
-d3.csv('../api/v1/trained_stats.php', function(data) {
+d3.csv('../api/v1/stats_cache.php', function(data) {
   data.forEach(function(d) {
     d.Date = parseDate(d.Date);
   });
