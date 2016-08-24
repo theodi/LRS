@@ -9,6 +9,10 @@ include_once('header.php');
 if ($_GET["theme"]) {
    	$theme = $_GET["theme"];
 }
+if ($theme == "") {
+	$theme = "default";
+}
+
 $data = getDataFromCollection($collection);
 $courses = getCoursesData();
 
