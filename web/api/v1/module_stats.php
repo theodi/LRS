@@ -6,6 +6,10 @@
     include_once('library/functions.php');
     include_once('header.php');
 
+    if ($_GET["theme"]) {
+    	$theme = $_GET["theme"];
+    }
+
     $count = getNumberOfRecords($collection);
 
     $courses = getCoursesData();

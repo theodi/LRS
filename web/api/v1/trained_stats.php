@@ -5,6 +5,10 @@ $path = "../../";
 set_include_path(get_include_path() . PATH_SEPARATOR . $path);
 include_once('library/functions.php');
 include_once('header.php');
+
+if ($_GET["theme"]) {
+   	$theme = $_GET["theme"];
+}
 $data = getDataFromCollection($collection);
 $courses = getCoursesData();
 
@@ -34,7 +38,6 @@ $count = getNumberOfRecords($collection);
     	$position++;
     }
 
-$theme = "default";
 $users = getUsers("courseAttendance","");
 $users = removeNullProfiles($users);
 $profile = getLMSProfile($theme);
