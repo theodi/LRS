@@ -48,7 +48,11 @@ $profile = getLMSProfile($theme);
 if ($profile != "") {
 	$users = filterClient($users,$profile["client"]);
 }
-$all["trained"]["attendance"] = count($users);
+if (!is_array($users)) {
+	$all["trained"]["attendance"] = 0;
+} else {
+	$all["trained"]["attendance"] = count($users);
+}
 $all["trained"]["eLearning"] = $people_trained;
 $all["modules"]["eLearning"] = $module_completions;
 $all["active"]["eLearning"] = $active;
