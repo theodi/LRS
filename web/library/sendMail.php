@@ -1,7 +1,8 @@
 <?php
+error_reporting(E_ALL & ~E_NOTICE);
 require_once('library/mandrill/Mandrill.php');
 if ($_SERVER["HTTP_HOST"] == "localhost") {
-	include_once('_includes/config-local.inc.php')
+	include_once('_includes/config-local.inc.php');
 } else {
 	include_once('_includes/config.inc.php');
 }
@@ -138,6 +139,7 @@ function sendEmail($id,$email,$eLearning_prefix,$theme) {
 			return false;
 		}
 	} catch(Mandrill_Error $e) {
+		error_log("Didn't send mail " . $e);
 		// Mandrill errors are thrown as exceptions
 		return false;
 		// A mandrill error occurred: Mandrill_Unknown_Subaccount - No subaccount exists with the id 'customer-123'

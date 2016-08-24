@@ -1,7 +1,5 @@
 <?php
 header("Access-Control-Allow-Origin: *");
-$path = "../../";
-set_include_path(get_include_path() . PATH_SEPARATOR . $path);
 if ($_SERVER["HTTP_HOST"] == "localhost") {
   include_once('_includes/config-local.inc.php');
 } else {

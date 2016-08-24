@@ -1,8 +1,9 @@
 <?php
 
 header("Access-Control-Allow-Origin: *");
+
 if ($_SERVER["HTTP_HOST"] == "localhost") {
-	include_once('_includes/config-local.inc.php')
+	include_once('_includes/config-local.inc.php');
 } else {
 	include_once('_includes/config.inc.php');
 }
