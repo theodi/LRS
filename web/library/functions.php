@@ -302,7 +302,7 @@ function filterCourseClient($courses,$filter) {
   }
   return $ret;
 }
-
+ 
 /*
  * getClientMapping($theme)
  * Get a list of courses that a client can see, you can use filter to filter the whole list.
@@ -335,7 +335,7 @@ function getLMSProfile($theme) {
 	global $connection_url, $db_name;
 	$collection = "externalAccess";
 	$query = array('theme' => $theme);
-	$cursor = executeQuery($connection_url,$db_name,$collection,$query);
+	$res = executeQuery($connection_url,$db_name,$collection,$query);
 	foreach ($res as $doc) {
 		return $doc;
 	}

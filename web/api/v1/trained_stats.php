@@ -26,23 +26,23 @@ $all = "";
 $complete = "";
 $collection = "elearning";
 $count = getNumberOfRecords($collection);
-    $data = getDataFromCollection($collection);
-    $position = 0;
-    foreach ($data as $user) {
-		$complete_modules = getCompleteModuleCount($user,$courses);
-		if ($complete_modules > 0) {
-			$people_trained++;
-			$complete[$complete_modules]++;
-			$module_completions+=$complete_modules;
-		} else {
-	        if (isUserActive($user,$courses)) {
-            	$active++;
-        	}
-    	}
-    	$position++;
+$data = getDataFromCollection($collection);
+$position = 0;
+foreach ($data as $user) {
+	$complete_modules = getCompleteModuleCount($user,$courses);
+	if ($complete_modules > 0) {
+	$people_trained++;
+		$complete[$complete_modules]++;
+		$module_completions+=$complete_modules;
+	} else {
+	    if (isUserActive($user,$courses)) {
+         	$active++;
+      	}
     }
+    $position++;
+}
 
-$users = getUsers("courseAttendance","");
+$users = getUsers("courseAttendance",null);
 $users = removeNullProfiles($users);
 $profile = getLMSProfile($theme);
 if ($profile != "") {
