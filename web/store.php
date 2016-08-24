@@ -28,12 +28,13 @@ function store($data) {
 		$data["email_sent"] = "false";
 		$col->save($data);
 	}
-	if (!getMailLock()) {
-		findEmails();
-	}
 
 	$m->close();
 
+	if (!getMailLock()) {
+		findEmails();
+	}
+	
 	return true;
    } catch ( MongoConnectionException $e ) {
 //	return false;

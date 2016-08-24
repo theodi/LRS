@@ -16,6 +16,13 @@ function existsID($id) {
 		$m->close();
 		return true;
 	}
+	$col = $m->selectDB($db_name)->selectCollection("adapt2");
+	$query = array('_id' => $id);
+	$count = $col->count($query);
+	if ($count > 0) {
+		$m->close();
+		return true;
+	}
 	$m->close();
 	return false;
    } catch ( Exception $e ) {
