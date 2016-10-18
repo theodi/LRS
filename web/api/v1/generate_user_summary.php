@@ -22,7 +22,6 @@ if ($theme && $theme != "default") {
   $filter = getClientMapping($theme);
   $courses = filterCourses($courses,$filter);
 }
-
 $tracking = getCourseIdentifiers();
 
 $users = "";
@@ -77,6 +76,7 @@ function filterUsers($users,$filter,$client) {
     $data["eLearning"]["in_progress"] = filterCourseUser($data["eLearning"]["in_progress"],$filter,$email);
     $users[$email] = $data;
   }
+  return $users;
 }
 
 function removeNullProfilesBadges($users) {
