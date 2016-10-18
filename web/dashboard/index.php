@@ -5,6 +5,12 @@
 	include('_includes/header.php');
 	$module = $_GET["module"];
 	$path = "../";
+?>
+	<script>
+	var module = "<?php echo $module; ?>";
+	var theme = "<?php echo $theme; ?>";
+	</script>
+<?php
 	set_include_path(get_include_path() . PATH_SEPARATOR . $path);
 	if ($_GET["format"] == "eLearning") {
 		include('dashboard/board.html');	

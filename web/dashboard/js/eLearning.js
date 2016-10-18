@@ -23,7 +23,7 @@ var timeBar = dc.barChart('#time-bar');
 var questionIDs = [];
 var expansionDone = false;
 
-d3.csv('../data.php?module='+module, function (data) {
+d3.csv('../data.php?module='+module+'&theme='+theme, function (data) {
     var expansion = [];
     var ndx = crossfilter(data);
     var all = ndx.groupAll();

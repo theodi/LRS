@@ -15,6 +15,8 @@ $summary = [];
 $module_data_url_prefix = "http://theodi.github.io/ODI-eLearning/en/";
 $module_data_suffix = "/course/en/components.json";
 
+$theme = $_GET["theme"];
+
 $module = $_GET["module"];
 if (!$module) {
 	exit(0);
@@ -110,7 +112,7 @@ function query() {
 }
 
 function processRecord($doc) {
-	global $module;
+	global $module,$theme;
 	$output = false;
 	$search = "ODI_" . $module . "_";
 	foreach ($doc as $key => $value) {
@@ -119,6 +121,9 @@ function processRecord($doc) {
 			$outkey = str_replace("．",".",$outkey);
 			$output[$outkey] = $doc[$key];
 		}
+	}
+	if ($theme && strtolower($theme) != strtolower($doc["theme"])) {
+			return;
 	}
 	if ($output) {
 		$output["id"] = $doc["_id"];
