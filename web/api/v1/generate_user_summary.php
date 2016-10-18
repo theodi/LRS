@@ -11,9 +11,13 @@ if (!$userData["isAdmin"]) {
     header('Location: /401.php');
     exit();
   }
-} 
+}
 
 $courses = getCoursesData();
+if ($_GET["course"]) {
+  $single_course[] = $_GET["course"];
+  $courses = filterCourses($courses,$single_course);
+}
 if ($theme && $theme != "default") {
   $filter = getClientMapping($theme);
   $courses = filterCourses($courses,$filter);
@@ -27,7 +31,6 @@ if ($theme == "default") {
   $users = getUsers("externalBadges",$users);
 }
 $users = getUsers("courseAttendance",$users); 
-$users = removeNullProfiles($users);
 $profile = getLMSProfile($theme);
 $client = $profile["client"];
 if ($profile != "") {
@@ -44,6 +47,11 @@ if ($profile != "") {
     $data["courses"]["complete"] = $ids;
     $users[$email] = $data;
   }
+}
+if ($single_course) {
+  $users = removeNullProfilesBadges($users);
+} else {
+  $users = removeNullProfiles($users);  
 }
 $users = getUserBadgeTotals($users);
 
@@ -69,8 +77,18 @@ function filterUsers($users,$filter,$client) {
     $data["eLearning"]["in_progress"] = filterCourseUser($data["eLearning"]["in_progress"],$filter,$email);
     $users[$email] = $data;
   }
-  return removeNullProfiles($users);
 }
+
+function removeNullProfilesBadges($users) {
+  $ret = "";
+  foreach ($users as $email => $data) {
+    if ($data["courses"]["complete"] != null || $data["eLearning"]["complete"] !=null || $data["eLearning"]["in_progress"] !=null ) {
+      $ret[$email] = $data;
+    }
+  }
+  return $ret;
+}
+
 function filterCourseUser($courses,$filter,$email) {
   $ret = "";
   for($i=0;$i<count($courses);$i++) {

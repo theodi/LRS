@@ -36,10 +36,31 @@
     <div id="time-bar"></div>
     </section> 
     <section id="questions">
-    </section> 
-    <section>
+    </section>
+    <!--<section>
     <h3>Data Table</h3>
     <table id="dc-data-table" class="table table-hover"></table>
+    </section>-->
+    <section>
+    <h3>Completed users table (not part of filter above!)</h3>
+    <p><b>Note:</b> This page only shows profiles for learners with known email addresses. It does not show anonymous eLearning profile data.</p><br/>
+    <div id="loading" align="center" style="margin: 2em;">
+        <img src="../images/ajax-loader.gif" alt="Loading"/>
+        <br/>
+        <b style="font-size: 2em;">Loading</b>
+    </div>
+    <table id="learners" class="display" cellspacing="0" width="100%" style="display: none;">
+        <thead>
+            <tr>
+                <th>First Name</th>
+                <th>Surname</th>
+                <th>email</th>
+                <th>Badges</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+        </tbody>
+    </table>
     </section>
 
  
@@ -49,5 +70,5 @@
     <script src='js/dc.js'></script>
     <script src='js/colorbrewer.js'></script>
     <script src='js/eLearning.js'></script>
-
-
+    <script type="text/javascript" src="https://cdn.datatables.net/t/dt/dt-1.10.11,r-2.0.2/datatables.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/t/dt/dt-1.10.11,r-2.0.2/datatables.min.css"/>

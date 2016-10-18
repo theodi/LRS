@@ -79,14 +79,7 @@ $(document).ready(function() {
             	{ "data": function(d) {
 					id = d["id"];
 					format = d["format"];
-            		if (id.substring(0,4) == "ODI_") {
-                        	dashId = id.substring(4);
-                       	 	output = '<a href="/dashboard/index.php?module=' + dashId + '"><img src="/images/dashboard.png" width="30px"/></a>';
-                	} else {
-                        	output = '<a href="/dashboard/index.php?module=' + d["ID"] + '"><img src="/images/dashboard.png" width="30px"/></a>';
-                	}
-                	if (format == "eLearning") { return output; }
-                	return "";
+                    return '<a href="../dashboard/index.php?module=' + d["ID"] + '&format='+format+'"><img src="/images/dashboard.png" width="30px"/></a>';
 	    		}},
 	    		{ "data": "ID" }
 	   	],

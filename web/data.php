@@ -19,6 +19,9 @@ $module = $_GET["module"];
 if (!$module) {
 	exit(0);
 }
+if (substr($module,0,4) == "ODI_") {
+	$module = substr($module,4);
+}
 
 if (is_numeric($module)) {
 	$module_data_url = $module_data_url_prefix . "module" . $module . $module_data_suffix;
