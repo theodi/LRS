@@ -26,9 +26,9 @@ $tracking = getCourseIdentifiers();
 
 $users = "";
 $users = getUsers("elearning",$users);
-if ($theme == "default") {
+//if ($theme == "default") {
   $users = getUsers("externalBadges",$users);
-}
+//}
 $users = getUsers("courseAttendance",$users); 
 $profile = getLMSProfile($theme);
 $client = $profile["client"];
@@ -47,7 +47,7 @@ if ($profile != "") {
     $users[$email] = $data;
   }
 }
-if ($single_course) {
+if ($single_course || $theme != "default") {
   $users = removeNullProfilesBadges($users);
 } else {
   $users = removeNullProfiles($users);  
