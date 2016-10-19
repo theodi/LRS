@@ -81,7 +81,7 @@ $(document).ready(function() {
                 if (typeof(d["badges"]) != "undefined") {
             		badges = d["badges"]["complete"];
             		for(i=0;i<badges.length;i++) {
-                		badgesComplete += "<img src='"+badges[i]['url']+"' alt='"+badges[i]['id']+"'/>";
+                		badgesComplete += "<img style='max-height: 50px;' src='"+badges[i]['url']+"' alt='"+badges[i]['id']+"'/>";
             		}
             		return badgesComplete;
         		}
