@@ -13,7 +13,7 @@
 <?php
 	set_include_path(get_include_path() . PATH_SEPARATOR . $path);
 	if ($_GET["format"] == "eLearning") {
-		include('dashboard/board.html');	
+		include('dashboard/board.html');
 	}
 ?>
 	<section>
@@ -27,6 +27,7 @@
     <table id="learners" class="display" cellspacing="0" width="100%" style="display: none;">
         <thead>
             <tr>
+                <th>Complete</th>
                 <th>First Name</th>
                 <th>Surname</th>
                 <th>email</th>
@@ -47,7 +48,6 @@
     <script src='js/colorbrewer.js'></script>
     <script src='js/eLearning.js'></script>
     <script type="text/javascript" src="https://cdn.datatables.net/t/dt/dt-1.10.11,r-2.0.2/datatables.min.js"></script>
-    <script type='text/javascript' src=""></script>
     <script type='text/javascript' src="https://cdn.datatables.net/buttons/1.2.2/js/dataTables.buttons.min.js"></script>
     <script type='text/javascript' src="//cdn.datatables.net/buttons/1.2.2/js/buttons.flash.min.js"></script>
     <script type='text/javascript' src="//cdnjs.cloudflare.com/ajax/libs/jszip/2.5.0/jszip.min.js"></script>
@@ -62,10 +62,17 @@
 ?>
 <script>
 $(document).ready(function() {
+    module = "<?php echo $module; ?>";
     var table = $('#learners').DataTable({
         "responsive": true,
         "ajax": "../api/v1/generate_user_summary.php?course=<?php echo $module; ?>",
         "columns": [
+            { "data": function(d) {
+                try { if (d["eLearning"]["complete"][0] == module) { return "<span id='tick_small'>✔</span>"; } } catch(err) {}
+                try { if (d["courses"]["complete"][0] == module) { return "<span id='tick_small'>✔</span>"; } } catch(err) {}
+                try { if (d["eLearning"]["active"][0] == module) { return "<span id='tick_small'>✗</span>"; } } catch(err) {}
+                return "-";
+            }},
             { "data": "First Name" },
             { "data": "Surname" },
             { "data": "Email" },
@@ -82,7 +89,7 @@ $(document).ready(function() {
             }}
        ],
        "pageLength": 50,
-       "order": [[ 1, "asc" ], [0, "asc"]],
+       "order": [[ 0, "asc" ], [1, "asc"]],
        "dom": 'Bfrtip',
        "buttons": [
             'copy', 'csv', 'excel', 'pdf', 'print'

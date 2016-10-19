@@ -33,6 +33,7 @@
                 <th>Badges</th>
 		<th class="none">F2F courses complete</th>
 		<th class="none">eLearning modules complete</th>
+        <th class="none">eLearning modules active</th>
             </tr>
         </thead>
         <tbody id="tableBody">
@@ -96,14 +97,24 @@ $(document).ready(function() {
 	    }},
 	    { "data": function(d) {
     		ret = "<ul>";
-		if (d["eLearning"]["complete"]) {
+		    if (d["eLearning"]["complete"]) {
 			$.each(d["eLearning"]["complete"], function(key,value) {
     				ret += "<li>" + value + "</li>";
     			});
-		}
+		    }
     		ret +="</ul>";
 	    	return ret;
-	    }}
+	    }},
+        { "data": function(d) {
+            ret = "<ul>";
+            if (d["eLearning"]["active"]) {
+            $.each(d["eLearning"]["active"], function(key,value) {
+                    ret += "<li>" + value + "</li>";
+                });
+            }
+            ret +="</ul>";
+            return ret;
+        }}
 	   ],
 	   "pageLength": 50,
 	   "order": [[ 5, "desc" ], [0, "asc"]],

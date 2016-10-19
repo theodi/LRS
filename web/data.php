@@ -122,7 +122,7 @@ function processRecord($doc) {
 			$output[$outkey] = $doc[$key];
 		}
 	}
-	if ($theme && strtolower($theme) != strtolower($doc["theme"])) {
+	if ($theme && strtolower($theme) != strtolower($doc["theme"]) && $theme != "default") {
 			return;
 	}
 	if ($output) {

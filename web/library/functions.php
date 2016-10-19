@@ -532,7 +532,7 @@ function getModuleBadgeData($course) {
 function removeNullProfiles($users) {
   $ret = "";
   foreach ($users as $email => $data) {
-    if ($data["courses"]["complete"] != null || $data["eLearning"]["complete"] !=null || $data["eLearning"]["in_progress"] !=null || $data["badges"]["complete"] != null ) {
+    if ($data["courses"]["complete"] != null || $data["eLearning"]["complete"] !=null || $data["eLearning"]["in_progress"] !=null || $data["badges"]["complete"] != null || $data["eLearning"]["active"] !=null ) {
       $ret[$email] = $data;
     }
   }
