@@ -17,7 +17,7 @@
 	}
 ?>
 	<section>
-    <h3>Completed users table</h3>
+    <h3>Active users table</h3>
     <p><b>Note:</b> This page only shows profiles for learners with known email addresses. It does not show anonymous eLearning profile data.</p><br/>
     <div id="loading" align="center" style="margin: 2em;">
         <img src="../images/ajax-loader.gif" alt="Loading"/>
