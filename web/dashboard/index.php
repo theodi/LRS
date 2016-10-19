@@ -16,6 +16,7 @@
 		include('dashboard/board.html');
 	}
 ?>
+    <h1 id="courseTitle" style="text-align: center;"></h1>
 	<section>
     <h3>Active users table</h3>
     <p><b>Note:</b> This page only shows profiles for learners with known email addresses. It does not show anonymous eLearning profile data.</p><br/>
@@ -63,6 +64,15 @@
 <script>
 $(document).ready(function() {
     module = "<?php echo $module; ?>";
+    $.getJSON( "../api/v1/courses.php", function( data ) {
+        data = data["data"];
+        for(i=0;i<data.length;i++){
+            course = data[i];
+            if (course.ID == module) {
+                $('#courseTitle').html(course.title)
+            }
+        }
+    });
     var table = $('#learners').DataTable({
         "responsive": true,
         "ajax": "../api/v1/generate_user_summary.php?course=<?php echo $module; ?>",
