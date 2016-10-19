@@ -10,13 +10,13 @@
 	var module = "<?php echo $module; ?>";
 	var theme = "<?php echo $theme; ?>";
 	</script>
+    <h1 id="courseTitle" style="text-align: center;">Loading</h1>
 <?php
 	set_include_path(get_include_path() . PATH_SEPARATOR . $path);
 	if ($_GET["format"] == "eLearning") {
 		include('dashboard/board.html');
 	}
 ?>
-    <h1 id="courseTitle" style="text-align: center;"></h1>
 	<section>
     <h3>Active users table</h3>
     <p><b>Note:</b> This page only shows profiles for learners with known email addresses. It does not show anonymous eLearning profile data.</p><br/>
