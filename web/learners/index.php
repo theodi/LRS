@@ -6,6 +6,14 @@
 ?>
 <script src="../js/jquery-2.1.4.min.js"></script>
 <script type="text/javascript" src="https://cdn.datatables.net/t/dt/dt-1.10.11,r-2.0.2/datatables.min.js"></script>
+<script type='text/javascript' src="https://cdn.datatables.net/buttons/1.2.2/js/dataTables.buttons.min.js"></script>
+<script type='text/javascript' src="//cdn.datatables.net/buttons/1.2.2/js/buttons.flash.min.js"></script>
+<script type='text/javascript' src="//cdnjs.cloudflare.com/ajax/libs/jszip/2.5.0/jszip.min.js"></script>
+<script type='text/javascript' src="//cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/pdfmake.min.js"></script>
+<script type='text/javascript' src="//cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/vfs_fonts.js"></script>
+<script type='text/javascript' src="//cdn.datatables.net/buttons/1.2.2/js/buttons.html5.min.js"></script>
+<script type='text/javascript' src="//cdn.datatables.net/buttons/1.2.2/js/buttons.print.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.2.2/css/buttons.dataTables.min.css"/>
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/t/dt/dt-1.10.11,r-2.0.2/datatables.min.css"/>
 <p><b>Note:</b> This page only shows profiles for learners with known email addresses. It does not show anonymous eLearning profile data.</p><br/>
 <div id="loading" align="center" style="margin: 2em;">
@@ -98,7 +106,11 @@ $(document).ready(function() {
 	    }}
 	   ],
 	   "pageLength": 50,
-	   "order": [[ 5, "desc" ], [0, "asc"]]
+	   "order": [[ 5, "desc" ], [0, "asc"]],
+       "dom": 'Bfrtip',
+       "buttons": [
+            'copy', 'csv', 'excel', 'pdf', 'print'
+       ]
 	});
 	$('#loading').fadeOut();
 	$('#learners').fadeIn("slow");
