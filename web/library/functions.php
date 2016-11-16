@@ -219,9 +219,11 @@ function getCoursesData() {
 	foreach ($cursor as $doc) {
    		if ($doc["slug"]) {
 			$id = $doc["slug"];
-		} else {
+		} elseif ($doc["id"]) {
 			$id = $doc["id"];
-		}
+		} else {
+      $id = $doc["_id"];
+    }
 		if ($tracking[$id]) {
 			$id = $tracking[$id];
 		}
@@ -232,6 +234,14 @@ function getCoursesData() {
 			$courses[$id] = $doc;
 		}
 		$los = $courses[$id]["_learningOutcomes"];
+    //Adapt 2 backport
+    if (!$los) {
+      $los = $courses[$id]["_skillsFramework"]["_skills"];
+      for ($i=0;$i<count($los);$i++) {
+        $lo = $los[$i];
+        $los[$i]["badge"] = $lo["level"];
+      }
+    }
 		$badge = "";
 		$total = 0;
 		for ($i=0;$i<count($los);$i++) {
@@ -239,6 +249,9 @@ function getCoursesData() {
 			$badge[$lo["badge"]] += $lo["credits"];
 			$total += $lo["credits"];
 		}
+    if (!$courses[$id]["format"]) {
+      $courses[$id]["format"] = "eLearning";
+    }
 		$courses[$id]["credits"] = $badge;
 		$courses[$id]["totalCredits"] = $total;
 	}
