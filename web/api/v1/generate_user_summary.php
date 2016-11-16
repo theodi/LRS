@@ -33,6 +33,8 @@ $client = $profile["client"];
 
 if ($profile != "") {
   $users = filterUsers($users,$filter,$client,$theme);
+} elseif ($theme != "default") {
+  $users = filterUsers($users,$filter,"",$theme);
 } else {
   foreach($users as $email => $data) {
     $ctemp = $data["courses"]["complete"];
@@ -46,7 +48,6 @@ if ($profile != "") {
     $users[$email] = $data;
   }
 }
-
 
 if ($single_course || $theme != "default") {
   $users = removeNullProfilesBadges($users);
