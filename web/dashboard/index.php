@@ -32,13 +32,14 @@
                 <th>First Name</th>
                 <th>Surname</th>
                 <th>email</th>
+                <th>Client</th>
                 <th>Badges</th>
             </tr>
         </thead>
         <tbody id="tableBody">
         </tbody>
     </table>
-    </section>	
+    </section>
     <!--<link rel='stylesheet prefetch' href='css/bootstrap.min.css'>-->
     <link rel='stylesheet prefetch' href='css/dc.css'>
     <link rel='stylesheet prefetch' href='css/style.css'/>
@@ -86,6 +87,10 @@ $(document).ready(function() {
             { "data": "First Name" },
             { "data": "Surname" },
             { "data": "Email" },
+            { "data" : function(d) {
+                try { if (d["eLearning"]["theme"]) { return d["eLearning"]["theme"]; } } catch(err) {}
+                return "-";
+            }},
             { "data": function(d) {
                 badgesComplete = "";
                 if (typeof(d["badges"]) != "undefined") {

@@ -27,11 +27,12 @@ $tracking = getCourseIdentifiers();
 $users = "";
 $users = getUsers("elearning",$users);
 $users = getUsers("externalBadges",$users);
-$users = getUsers("courseAttendance",$users); 
+$users = getUsers("courseAttendance",$users);
 $profile = getLMSProfile($theme);
 $client = $profile["client"];
+
 if ($profile != "") {
-  $users = filterUsers($users,$filter,$client);
+  $users = filterUsers($users,$filter,$client,$theme);
 } else {
   foreach($users as $email => $data) {
     $ctemp = $data["courses"]["complete"];
@@ -45,6 +46,8 @@ if ($profile != "") {
     $users[$email] = $data;
   }
 }
+
+
 if ($single_course || $theme != "default") {
   $users = removeNullProfilesBadges($users);
 } else {
@@ -67,11 +70,18 @@ echo json_encode($out);
  * Called by: api/v1/generate_user_summary.php
  *
  */
-function filterUsers($users,$filter,$client) {
+function filterUsers($users,$filter,$client,$theme) {
   foreach($users as $email => $data) {
     $data["courses"]["complete"] = filterCourseClient($data["courses"]["complete"],$client);
-    $data["eLearning"]["complete"] = filterCourseUser($data["eLearning"]["complete"],$filter,$email);
-    $data["eLearning"]["in_progress"] = filterCourseUser($data["eLearning"]["in_progress"],$filter,$email);
+    if (strtolower($data["eLearning"]["theme"]) == strtolower($theme)) {
+      $data["eLearning"]["complete"] = filterCourseUser($data["eLearning"]["complete"],$filter,$email);
+      $data["eLearning"]["in_progress"] = filterCourseUser($data["eLearning"]["in_progress"],$filter,$email);
+      $data["eLearning"]["active"] = filterCourseUser($data["eLearning"]["active"],$filter,$email);
+    } else {
+      $data["eLearning"]["active"] = [];
+      $data["eLearning"]["complete"] = [];
+      $data["eLearning"]["in_progress"] = [];
+    }
     $users[$email] = $data;
   }
   return $users;
@@ -94,7 +104,7 @@ function filterCourseUser($courses,$filter,$email) {
     if (is_array($id)) {
       $id = $id["id"];
     }
-    if ($filter[$id][0] == "ALL" || in_array($email, $filter[$id])) {
+    if ($filter[$id][0] == "ALL" || in_array($id, $filter)) {
       $ret[] = $id;
     }
   }

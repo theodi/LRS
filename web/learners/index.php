@@ -30,6 +30,7 @@
                 <th>Completed F2F courses</th>
                 <th>Completed online modules</th>
                 <th>Credits</th>
+                <th>Theme</th>
                 <th>Badges</th>
 		<th class="none">F2F courses complete</th>
 		<th class="none">eLearning modules complete</th>
@@ -70,6 +71,10 @@ $(document).ready(function() {
 				}
             } },
             { "data": "totalCredits" },
+            { "data" : function(d) {
+                try { if (d["eLearning"]["theme"]) { return d["eLearning"]["theme"]; } } catch(err) {}
+                return "-";
+            }},
             { "data": function(d) {
             	badgesComplete = "";
             	if (typeof(d["badges"]) != "undefined") {

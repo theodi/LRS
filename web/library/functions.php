@@ -279,7 +279,7 @@ function filterCourses($courses,$filter) {
   $ret = "";
   foreach ($courses as $id => $data) {
     for($i=0;$i<count($filter);$i++) {
-      if ($filter[$i] == $id) {
+      if (strtolower($filter[$i]) == strtolower($id)) {
         $ret[$id] = $data;
       }
     }
@@ -296,7 +296,7 @@ function filterCourses($courses,$filter) {
 function filterCourseClient($courses,$filter) {
   foreach($courses as $id => $data) {
     $client = $data["client"];
-    if ($client == $filter) {
+    if (strtolower($client) == strtolower($filter)) {
       $ret[] = $id;
     }
   }
@@ -334,7 +334,7 @@ function getClientMapping($theme) {
 function getLMSProfile($theme) {
 	global $connection_url, $db_name;
 	$collection = "externalAccess";
-	$query = array('theme' => $theme);
+	$query = array('theme' => new MongoRegex('/^' .  $theme . '$/i'));
 	$res = executeQuery($connection_url,$db_name,$collection,$query);
 	foreach ($res as $doc) {
 		return $doc;
