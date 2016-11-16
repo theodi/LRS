@@ -9,7 +9,7 @@ function getCachedCompletionStats($theme,$type,$date,$collection) {
    try {
     $m = new MongoClient($connection_url);
     $col = $m->selectDB($db_name)->selectCollection($collection);
-    $query = array('theme' => $theme, 'type' => $type, 'date' => $date);
+    $query = array('theme' => new MongoRegex('/^' .  $theme . '$/i'), 'type' => $type, 'date' => $date);
     $res = $col->find($query);
     $ret = "";
     foreach ($res as $doc) {
@@ -79,7 +79,13 @@ ksort($complete);
 <table style="width: 400px; text-align: center; line-height:20px;">
 <tr><th>Number of modules completed</th><th>Number of people</th></tr>
 <?php
-	for($i=1;$i<=count($complete);$i++) {
+  foreach ($complete as $key => $value) {
+    $max = $key;
+  }
+	for($i=1;$i<=$max;$i++) {
+    if (!is_numeric($complete[$i])) {
+      $complete[$i] = 0;
+    }
 		echo '<tr><td>' . $i . '</td><td>' . $complete[$i] . '</td></tr>';
 	}
 ?>

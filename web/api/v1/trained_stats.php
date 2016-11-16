@@ -12,7 +12,6 @@ if ($_GET["theme"]) {
 if ($theme == "") {
 	$theme = "default";
 }
-
 $data = getDataFromCollection($collection);
 $courses = getCoursesData();
 
@@ -28,20 +27,20 @@ $collection = "elearning";
 $count = getNumberOfRecords($collection);
 $data = getDataFromCollection($collection);
 $position = 0;
+
 foreach ($data as $user) {
-	$complete_modules = getCompleteModuleCount($user,$courses);
+	$complete_modules = getCompleteModuleCount($user,$courses,$theme);
 	if ($complete_modules > 0) {
-	$people_trained++;
+		$people_trained++;
 		$complete[$complete_modules]++;
 		$module_completions+=$complete_modules;
 	} else {
-	    if (isUserActive($user,$courses)) {
+	    if (isUserActive($user,$courses,$theme)) {
          	$active++;
       	}
     }
     $position++;
 }
-
 $users = getUsers("courseAttendance",null);
 $users = removeNullProfiles($users);
 $profile = getLMSProfile($theme);
@@ -93,7 +92,10 @@ function filterClient($users,$filter) {
   return removeNullProfiles($users);
 }
 
-function isUserActive($user,$courses) {
+function isUserActive($user,$courses,$theme) {
+	if ($theme && strtolower($user["theme"]) != strtolower($theme) && $theme !="default") {
+		return 0;
+	}
     foreach($user as $key => $data) {
         $key = str_replace("．",".",$key);
         if (strpos($key,"_cmi.suspend_data") !== false) {
@@ -113,8 +115,10 @@ function isUserActive($user,$courses) {
     return false;
 }
 
-function getCompleteModuleCount($user,$courses) {
-	$complete = 0;
+function getCompleteModuleCount($user,$courses,$theme) {
+	if ($theme && strtolower($user["theme"]) != strtolower($theme) && $theme !="default") {
+		return 0;
+	}
 	foreach($user as $key => $data) {
                 $key = str_replace("．",".",$key);
                 if (strpos($key,"_cmi.suspend_data") !== false) {

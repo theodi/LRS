@@ -135,7 +135,7 @@ function getCachedStats($theme,$type,$collection) {
 	// use the database we connected to
 	$col = $m->selectDB($db_name)->selectCollection($collection);
 	
-	$query = array('theme' => $theme, 'type' => $type);
+	$query = array('theme' => new MongoRegex('/^' .  $theme . '$/i'), 'type' => $type);
 	$res = $col->find($query);
 	$ret = "";
 	foreach ($res as $doc) {
