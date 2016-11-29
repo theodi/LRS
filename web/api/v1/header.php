@@ -24,6 +24,19 @@ if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
   $client->setAccessToken($_SESSION['access_token']);
 }
 
+$theme = "default";
+$host = $_SERVER["HTTP_HOST"];
+
+if (getTheme($host)) {
+  $theme = getTheme($host);
+} elseif ($_GET["theme"]) {
+  $theme = $_GET["theme"];
+} elseif ($_SESSION["theme"]) {
+  $theme = $_SESSION["theme"];
+}
+
+$_SESSION["theme"] = $theme;
+
 if ($client->getAccessToken()) {
   try {
 	$userData = $objOAuthService->userinfo->get();
@@ -32,20 +45,16 @@ if ($client->getAccessToken()) {
 	exit(1);
   }
   $email = $userData["email"];
-  $userData["isAdmin"] = false;
-  $_SESSION["isAdmin"] = false;
-  $userData["isViewer"] = false;
-  $_SESSION["isViewer"] = false;
   
   $userData["externalAccess"] = getExternalAccess($email,$theme);
   $suffix = substr($email,strrpos($email,"@")+1,strlen($email));
   if ($suffix == "theodi.org") {
-	$userData["isAdmin"] = true;
-	$_SESSION["isAdmin"] = true;
-	$userData["isViewer"] = true;
-  	$_SESSION["isViewer"] = true;
+	 $userData["isAdmin"] = true;
+	 $_SESSION["isAdmin"] = true;
+	 $userData["isViewer"] = true;
+   $_SESSION["isViewer"] = true;
   }
-  if ($userData["externalAccess"]["courses"]) {
+  if ($userData["externalAccess"]["theme"] == $theme) {
   	$userData["isViewer"] = true;
   	$_SESSION["isViewer"] = true;
   }
@@ -54,16 +63,6 @@ if ($client->getAccessToken()) {
 } else {
   $authUrl = $client->createAuthUrl();
 }
-
-if (getTheme($host)) {
-	$theme = getTheme($host);
-} elseif ($_GET["theme"]) {
-	$theme = $_GET["theme"];
-} elseif ($_SESSION["theme"]) {
-	$theme = $_SESSION["theme"];
-}
-
-$_SESSION["theme"] = $theme;
 
 if ($access == "public") {
 } elseif ($access == "viewer" && $userData["isViewer"]) {

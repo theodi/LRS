@@ -7,7 +7,7 @@ set_include_path(get_include_path() . PATH_SEPARATOR . $path);
 include_once('library/functions.php');
 include_once('header.php');
 if (!$userData["isAdmin"]) {
-  if (!$userData["externalAccess"]["courses"]) {
+  if (!$userData["isViewer"]) {
     header('Location: /401.php');
     exit();
   }

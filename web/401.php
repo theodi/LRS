@@ -1,4 +1,5 @@
 <?php
+	$access = 'public';
 	$location = "404.php";
 	header("HTTP/1.0 401 Unauthorised");
 	include('_includes/header.php');
