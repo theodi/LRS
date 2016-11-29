@@ -1,4 +1,5 @@
 <?php
+    $access = "public";
 	$location = "/";
 	include('_includes/header.php');
 ?>

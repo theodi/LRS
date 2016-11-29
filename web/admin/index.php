@@ -1,9 +1,10 @@
 <?php
-	$location = "/admin/index.php";
+	$access = "admin";
+	$requireAdmin = true;
     $path = "../";
     set_include_path(get_include_path() . PATH_SEPARATOR . $path);
 	include('_includes/header.php');
-	include_once('library/functions.php');
+  	include_once('library/functions.php');
 ?>
 <script src="../js/jquery-2.1.4.min.js"></script>
 

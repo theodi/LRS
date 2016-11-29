@@ -1,4 +1,5 @@
 <?php
+    $access = "viewer";
 	$location = "/dashboard/index.php?module=1";
 	$path = "../";
 	set_include_path(get_include_path() . PATH_SEPARATOR . $path);

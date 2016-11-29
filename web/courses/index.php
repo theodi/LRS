@@ -1,4 +1,5 @@
 <?php
+	$access = "public";
 	$location = "/courses/index.php";
     $path = "../";
     set_include_path(get_include_path() . PATH_SEPARATOR . $path);
@@ -33,6 +34,7 @@ table.dataTable.dtr-inline.collapsed>tbody>tr>td:first-child:before, table.dataT
                 <th>Type</th>
                 <th>Dashboard</th>
                 <th class="none">ID</th>
+                <th class="none">Description</th>
             </tr>
         </thead>
         <tbody id="tableBody">
@@ -69,7 +71,12 @@ $(document).ready(function() {
 		"responsive": true,
 		"ajax": "../api/v1/courses.php",
        	"columns": [
-            	{ "data": "title" },
+            	{ "data": function(d) {
+            		if (d["url"]) {
+            			return "<a href='"+d["url"]+"' target='_blank'>" + d["title"] + "</a>"
+            		}
+            		return d["title"];
+            	}},
             	{ "data": function(d) { return renderCredits(d); } },
             	{ "data": function(d) {
 					output = '<span style="display: none;">'+d["format"]+'</span><img style="max-height: 40px;" src="/images/';
@@ -89,7 +96,10 @@ $(document).ready(function() {
 					format = d["format"];
                     return '<a href="../dashboard/index.php?module=' + d["ID"] + '&format='+format+'"><img src="/images/dashboard.png" width="30px"/></a>';
 	    		}},
-	    		{ "data": "ID" }
+	    		{ "data": "ID" },
+	    		{ "data": function(d) {
+	    			if (d["body"]) {return d["body"];} else {return "";}
+	    		}}
 	   	],
 	   	"pageLength": 25,
 	   	"order": [[ 2, "asc" ], [1,"desc"], [0, "asc"]],

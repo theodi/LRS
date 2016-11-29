@@ -87,10 +87,6 @@ if ($client->getAccessToken()) {
 	exit(1);
   }
   $email = $userData["email"];
-  $userData["isAdmin"] = false;
-  $_SESSION["isAdmin"] = false;
-  $userData["isViewer"] = false;
-  $_SESSION["isViewer"] = false;
   
   $userData["externalAccess"] = getExternalAccess($email,$theme);
   $suffix = substr($email,strrpos($email,"@")+1,strlen($email));
@@ -100,7 +96,7 @@ if ($client->getAccessToken()) {
 	$userData["isViewer"] = true;
   	$_SESSION["isViewer"] = true;
   }
-  if ($userData["externalAccess"]["courses"]) {
+  if ($userData["externalAccess"]["theme"] == $theme) {
   	$userData["isViewer"] = true;
   	$_SESSION["isViewer"] = true;
   }
@@ -113,7 +109,7 @@ if ($client->getAccessToken()) {
 
 $site_title = "ODI Learning Management System";
 $pages = getMenuPages($redirect_path);
-$pages = getUserStatusLink($pages);
+$pages = getUserStatusLink($redirect_path,$pages);
 
 for($i=0;$i<count($pages);$i++) {
 	if ($pages[$i]['url'] == $location) {
@@ -128,6 +124,19 @@ if (($current['viewer'] && !$userData["isViewer"]) && ($current['admin'] && !$us
 	header('Location: ' . $redirect_path . '/401.php?viewer=true');
 	exit();
 } 
+
+if ($access == "public") {
+} elseif ($access == "viewer" && $userData["isViewer"]) {
+} elseif ($access == "admin" && $userData["isAdmin"]) {
+} else {
+	if (file_exists('401.php')) {
+		header('Location: 401.php');
+	} else {
+		header('Location: ../401.php');
+	}
+	exit();
+}
+
 ?>
 <!DOCTYPE html>
 <html prefix="dct: http://purl.org/dc/terms/
@@ -232,7 +241,7 @@ function render_menu() {
   return $ret;
 }
 
-function getUserStatusLink($pages) {
+function getUserStatusLink($redirect_path,$pages) {
 	global $authUrl;
 	if ($authUrl) {
 		$page['url'] = $authUrl;
