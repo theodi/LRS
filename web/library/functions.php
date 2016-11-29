@@ -178,24 +178,6 @@ function storeDatasets($datasets,$collection,$ret_keys) {
 }
 
 /*
- * load($email)
- * Load a users profile
- *
- */
-function load($email) {
-    global $connection_url, $db_name, $collection;
-    if ($email == "" || !$email) {
-		return null;
-   	}
-	$email = str_replace('.','．',$email);
-	$query = array('email' => $email);
-	$res = executeQuery($connection_url,$db_name,$collection,$query);
-	foreach ($res as $doc) {
-		return json_encode($doc);
-	}
-}
-
-/*
  * OTHER FUNCTIONS - Both Adapt and GDocs 
  *
  */
@@ -217,7 +199,7 @@ function getCoursesData() {
 	$tracking = getCourseIdentifiers();
 	$courses = "";
 	foreach ($cursor as $doc) {
-   		if ($doc["slug"]) {
+   	if ($doc["slug"]) {
 			$id = $doc["slug"];
 		} elseif ($doc["id"]) {
 			$id = $doc["id"];
@@ -241,6 +223,7 @@ function getCoursesData() {
         $lo = $los[$i];
         $los[$i]["badge"] = $lo["level"];
       }
+      $courses[$id]["_learningOutcomes"] = $los;
     }
 		$badge = "";
 		$total = 0;
@@ -358,6 +341,36 @@ function getLMSProfile($theme) {
  * USER PROFILES SECTION
  */
 
+/* getUser($email) 
+ * 
+ * Get the profile for a single user and translate it back ready for the profile screen to use
+ * 
+ */
+function getUser($email,$user) {
+  global $connection_url, $db_name, $courses;
+  $courses = getCoursesData();
+  $collection = "elearning";
+  $a1email = str_replace('.','．',$email);
+  $query = array('email' => $a1email);
+  $cursor = executeQuery($connection_url,$db_name,$collection,$query);
+  foreach ($cursor as $doc) {
+      $user = processUser($collection,$user,$doc,$email);
+  }
+  $query = array('Email' => $a1email);
+  $cursor = executeQuery($connection_url,$db_name,$collection,$query);
+  foreach ($cursor as $doc) {
+      $user = processUser($collection,$user,$doc,$email);
+  }
+  $collection = "adapt2";
+  $query = array('user.email' => $email);
+  $cursor = executeQuery($connection_url,$db_name,$collection,$query);
+  foreach ($cursor as $doc) {
+      $user = processAdapt2User($user,$doc,$email);
+  }
+  return $user;
+}
+
+
 /*
  * getUsers($collection,$users)
  * Get active users for the learners page. Searches for users who have a known email.
@@ -392,7 +405,51 @@ function getUsers($collection,$users) {
         }
       }
     }
+
+    // ADAPT 2
+    $collection = "adapt2";
+    $query = array('user.email' => array('$ne' => null));
+    $cursor = executeQuery($connection_url,$db_name,$collection,$query);
+    foreach ($cursor as $doc) {
+        $email = $doc["user"]["email"];
+        $users = processAdapt2User($users,$doc,$email);
+    }
   	return $users;
+}
+
+
+/*
+ * processAdapt2User($users,$doc,$email)
+ * Process an individual user and return a profile from the adapt 2 data
+ *
+ * Called by: library/functions.php (above)
+ */
+
+function processAdapt2User($users,$doc,$email) {
+  $details = $doc["user"];
+  if (!$users[$email]["First Name"]) { $users[$email]["First Name"] = $details["First Name"]; } 
+  if (!$users[$email]["Surname"]) { $users[$email]["Surname"] = $details["Surname"]; }
+  foreach ($details as $key => $value) {
+    if ($key != "email") {
+      $users[$email][$key] = $value;
+    }
+  }
+  $progress = $doc["progress"];
+  foreach ($progress as $module => $data) {
+    $object["id"] = $module;
+    $object["progress"] = $data["progress"];
+    $object["time"] = $data["sessionTime"];
+    $object["endTime"] = $data["endTime"];
+    if ($data["progress"] > 99) {
+        $users[$email]["eLearning"]["complete"][] = $object;
+    } elseif ($data["progress"] > 50 && $data["sessionTime"] > 299) {
+        $users[$email]["eLearning"]["active"][] = $object;
+    } elseif ($data["progress"] > 0) {
+        $users[$email]["eLearning"]["in_progress"][] = $object;
+    }
+  }
+  $users[$email] = filterUnique($users[$email]);
+  return $users;
 }
 
 /*
@@ -413,15 +470,15 @@ function processUser($collection,$users,$doc,$email) {
 
     if ($tracking[$id]) { $id = $tracking[$id]; }
     if ($courses[$id])  { 
-    	$object = "";
-    	$object["id"] = $id;
-    	if ($doc["Date"]) {
-    		$object["date"] = $doc["Date"];
-    	}
-    	if ($doc["Client"]) {
-    		$object["client"] = $doc["Client"];
-    	}
-    	$users[$email]["courses"]["complete"][$id] = $object; 
+      $object = "";
+      $object["id"] = $id;
+      if ($doc["Date"]) {
+        $object["date"] = $doc["Date"];
+      }
+      if ($doc["Client"]) {
+        $object["client"] = $doc["Client"];
+      }
+      $users[$email]["courses"]["complete"][] = $object; 
     }
   }
   if ($collection = "externalBadges") {
@@ -432,43 +489,102 @@ function processUser($collection,$users,$doc,$email) {
       $users[$email]["badges"]["complete"][] = $badge;
     }
   }
+  $users[$email] = filterUnique($users[$email]);
   return $users;
 }
 
+
+function filterUnique($user) {
+  $user = filtereLearningUnique($user);
+  $user = filterCoursesUnique($user);
+  return $user;
+}
+
+// TODO Filter this on LAST SAVE FOR ACTIVE AND IN_PROGRESS! 
+function filtereLearningUnique($user) {
+  $el = $user["eLearning"];
+  $complete = $el["complete"];
+  $done = [];
+  for($i=0;$i<count($complete);$i++) {
+    if (!$done[$complete[$i]["id"]]) {
+      $done[$complete[$i]["id"]] = true;
+      $out[] = $complete[$i];
+    }
+  }
+  $user["eLearning"]["complete"] = $out;
+  
+  $out = [];
+  $active = $el["active"];
+  for($i=0;$i<count($active);$i++) {
+    if (!$done[$active[$i]["id"]]) {
+      $done[$active[$i]["id"]] = true;
+      $out[] = $active[$i];
+    }
+  }
+  $user["eLearning"]["active"] = $out;
+
+  $out = [];
+  $in_progress = $el["in_progress"];
+  for($i=0;$i<count($in_progress);$i++) {
+    if (!$done[$in_progress[$i]["id"]]) {
+      $done[$in_progress[$i]["id"]] = true;
+      $out[] = $in_progress[$i];
+    }
+  }
+  $user["eLearning"]["in_progress"] = $out;
+  return $user;
+}
+
+function filterCoursesUnique($user) {
+  $cs = $user["courses"]["complete"];
+  $out = [];
+    for($i=0;$i<count($cs);$i++) {
+    if (!$done[$cs[$i]["id"]]) {
+      $done[$cs[$i]["id"]] = true;
+      $out[] = $cs[$i];
+    }
+  }
+  $user["courses"]["complete"] = $out;
+  return $user;
+}
+
 /*
- * geteLearningCompletion($user,$courses,$ret)
+ * geteLearningCompletion2($user,$courses,$ret)
  * Get complete, active and in_progress courses given a user
  *
  * Called by: api/v1/module_stats.php
- * 			  library/functions.php
+ *        library/functions.php
  */
 function geteLearningCompletion($user,$courses,$ret) {
-	foreach($user as $key => $data) {
-		$key = str_replace("．",".",$key);
-		if ($key == "theme") {
-			$ret["theme"] = $data;
-		}
-		if (strpos($key,"_cmi.suspend_data") !== false) {
-			$course = substr($key,0,strpos($key,"_cmi"));
-			$progress = $data;
-			if ($courses[$course] && $courses[$course]["format"] == "eLearning") {
-				$courses[$course]["progress"] = getProgress($courses[$course],$progress);
-				$time = $user[$course . "_cmi．core．session_time"];
-				if ($courses[$course]["progress"] > 99) {
-					$ret["complete"][] = $courses[$course]["id"];
-				} else if (getTime($time) > 300) {
-					$ret["active"][] = $courses[$course]["id"];
-				} else {
-					$ret["in_progress"][] = $courses[$course]["id"];
-				}
-			}
-		}
-	}
-	$ret["active"] = @array_unique($ret["active"]);
-	$ret["complete"] = @array_unique($ret["complete"]);
-	$ret["in_progress"] = @array_unique($ret["in_progress"]);
-	$ret["in_progress"] = @array_diff($ret["in_progress"],$ret["complete"]);
-	return $ret;
+  foreach($user as $key => $data) {
+    $key = str_replace("．",".",$key);
+    if ($key == "theme") {
+      $ret["theme"] = $data;
+    }
+    if (strpos($key,"_cmi.suspend_data") !== false) {
+      $course = substr($key,0,strpos($key,"_cmi"));
+      $progress = $data;
+      if ($courses[$course] && $courses[$course]["format"] == "eLearning") {
+        $courses[$course]["progress"] = getProgress($courses[$course],$progress);
+        $time = getTime($user[$course . "_cmi．core．session_time"]);
+
+        $object = [];
+        $object["id"] = $courses[$course]["id"];
+        $object["progress"] = $courses[$course]["progress"];
+        $object["time"] = $time;
+        $object["lastSave"] = $user[$course . "_lastSave"];
+
+        if ($courses[$course]["progress"] > 99) {
+          $ret["complete"][] = $object;
+        } else if ($time > 300) {
+          $ret["active"][] = $object;
+        } else {
+          $ret["in_progress"][] = $object;
+        }
+      }
+    }
+  }
+  return $ret;
 }
 
 /*

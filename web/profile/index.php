@@ -15,7 +15,8 @@
 		enableSelectUser();
 	}
 	$user = getProfileData();
-	drawProfile($user);
+	$courses = getCoursesData();
+	drawProfile($user,$courses);
 	include('_includes/footer.html');
 
 function enableSelectUser() {
@@ -36,16 +37,14 @@ function getProfileData() {
 	} else {
 		$userid = $userData["email"];
 	}
-	$doc = load($userid);
-	$doc = str_replace("．",".",$doc);
-	$data = json_decode($doc,true);
-	$user = getProfile($data);
+	$data = getUser($userid);
+	$user = $data[$userid]["eLearning"];
 	$user = getF2FCompletion($userid,$user);
 	$user = getExternalBadges($userid,$user);
 	return $user;
 }
 
-function drawProfile($user) {
+function drawProfile($user,$courses) {
 	global $userBadgeCredits;
 	echo outputUserBadges($user["externalBadges"]);
 	echo outputUserCredits($userBadgeCredits);
@@ -53,11 +52,11 @@ function drawProfile($user) {
 	$in_progress = $user["in_progress"];
 	if (count($complete)>0) {
 		echo '<h2 class="profile_h2">Completed courses</h2>';
-		outputCourses($complete,"Complete");
+		outputCourses($complete,"Complete",$courses);
 	}
 	if (count($in_progress)>0) {
 		echo '<h2 class="profile_h2">Courses in progress</h2>';
-		outputCourses($in_progress,"Progress");
+		outputCourses($in_progress,"Progress",$courses);
 	}
 }
 
@@ -90,10 +89,14 @@ function getF2FCompletion($userid,$user) {
 		if ($tracking[$id]) {
 			$id = $tracking[$id];
 		}
+		$object["id"] = $id;
+		$object["date"] = $data[$i]["Date"];
+    	$object["progress"] = 100;
 		if ($courses[$id]) {
-			$courses[$id]["progress"] = 100;
 			$badgeData = getModuleBadgeData($courses[$id]);
-			$user["complete"][] = $courses[$id];
+		}
+		if ($id) {
+			$user["complete"][] = $object;
 		}
 	}
 	return $user;
@@ -145,35 +148,38 @@ function outputUserBadges($badges) {
 	return $output;
 }
 
-function outputCourses($courses,$heading) {
+function outputCourses($data,$heading,$courses) {
 	echo '<table style="width: 100%;">';
-        echo '<tr><th width="50%"></th><th style="width:150px;">Credits</th><th width="20%">Type</th><th width="20%">'.$heading.'</th></tr>';
-	foreach ($courses as $course) {
-	        echo outputCourse($course,$course["progress"]);
+    echo '<tr><th width="50%"></th><th style="width:150px;">Credits</th><th width="20%">Type</th><th width="20%">'.$heading.'</th></tr>';
+	foreach ($data as $course) {
+	        echo outputCourse($course,$course["progress"],$courses);
 	}
 	echo '</table>';
 }
 
-function outputCourse($doc,$progress) {
+function outputCourse($doc,$progress,$courses) {
 	$output = "";
-   	if ($doc["web_url"]) {
-		$output .= '<tr><td id="course_name"><a target="_blank" href="'.$doc["web_url"].'">' . $doc["title"] . '</a></td>';
+	$course = $courses[$doc["id"]];
+	if ($course["web_url"]) { $url = $course["web_url"]; }
+	if ($course["url"]) { $url = $course["url"]; }
+   	if ($url) {
+		$output .= '<tr><td id="course_name"><a target="_blank" href="'. $url .'">' . $course["title"] . '</a></td>';
 	} else {
-		$output .= '<tr><td id="course_name">' . $doc["title"] . '</td>';
+		$output .= '<tr><td id="course_name">' . $course["title"] . '</td>';
 	}
      	$output .= '<td style="text-align: center;">';
-	$output .= outputCredits($doc);
+	$output .= outputCredits($course);
 	$output .= '</td>';
 	$output .= '<td style="text-align: center;"><img style="max-height: 40px;" src="/images/';
-	$output .= $doc["format"]; 
+	$output .= $course["format"]; 
 	$output .= '.png"></img></td>';
 	$output .= '<td style="text-align: center;">';
 	if ($progress == "") {
-		if (substr($doc["id"],0,4) == "ODI_") {
-			$dashId = str_replace("ODI_","",$doc["id"]);
+		if (substr($course["id"],0,4) == "ODI_") {
+			$dashId = str_replace("ODI_","",$course["id"]);
 			$output .= '<a href="/dashboard/index.php?module=' . $dashId . '"><img src="/images/dashboard.png" width="30px"/></a>';
-		} elseif ($tracking[$doc["slug"]]) {
-			$output .= '<a href="/dashboard/index.php?module=' . $tracking[$doc["slug"]] . '"><img src="/images/dashboard.png" width="30px"/></a>';
+		} elseif ($tracking[$course["slug"]]) {
+			$output .= '<a href="/dashboard/index.php?module=' . $tracking[$course["slug"]] . '"><img src="/images/dashboard.png" width="30px"/></a>';
 		} 
 	} elseif ($progress == 100) {
 		$output .= '<span id="tick">&#10004;</span>';

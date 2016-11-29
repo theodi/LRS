@@ -43,12 +43,15 @@
 </table>
 
 <script>
+/*
+TODO: Convert this to use more of the courses data and provide links.
+*/
 $(document).ready(function() {
   $.getJSON( "../api/v1/courses.php", function( data ) {
   	data = data["data"];
   	var courses = {};
   	$.each(data, function(key,val) {
-  		courses[val['id']] = val['title'];
+  		courses[val['ID']] = val['title'];
   	});
 	var table = $('#learners').DataTable({
 		"responsive": true,
@@ -58,16 +61,16 @@ $(document).ready(function() {
 	        { "data": "Surname" },
             { "data": "Email" },
             { "data": function(d) {
-            	if (d["courses"]["complete"]) {
+                try {
 					return Object.keys(d["courses"]["complete"]).length;
-				} else {
-					return 0;
-				}
+                } catch (err) {
+                    return 0;
+                }
             } },
             { "data": function(d) {
-            	if (d["eLearning"]["complete"]) {
+                try {
 					return Object.keys(d["eLearning"]["complete"]).length;
-				} else {
+				} catch(err) {
 					return 0;
 				}
             } },
@@ -79,45 +82,53 @@ $(document).ready(function() {
             { "data": function(d) {
             	badgesComplete = "";
             	if (typeof(d["badges"]) != "undefined") {
-			badges = d["badges"]["complete"];
-			for(i=0;i<badges.length;i++) {
-				badgesComplete += "<img src='"+badges[i]['url']+"' alt='"+badges[i]['id']+"'/>";
-			}
-			return badgesComplete;
-		}
-		return "";
+			         badges = d["badges"]["complete"];
+			         for(i=0;i<badges.length;i++) {
+				        badgesComplete += "<img src='"+badges[i]['url']+"' alt='"+badges[i]['id']+"'/>";
+			         }
+			         return badgesComplete;
+		        }
+		        return "";
             }},
 	    { "data": function(d) {
     		ret = "<ul>";
-		if (d["courses"]["complete"]) {
-    			$.each(d["courses"]["complete"], function(key,value) {
-    				if (courses[value]) {
-    					ret += "<li>" + courses[value] + "</li>";
+		    try {
+    			$.each(d["courses"]["complete"], function(item,data) {
+    				if (courses[data["id"]]) {
+    					ret += "<li>" + courses[data["id"]] + "</li>";
     				} else {
     					ret += "<li>" + value + "</li>";
     				}
     			});
-    		}
+    		} catch (err) {}
     		ret +="</ul>";
 		return ret;
 	    }},
 	    { "data": function(d) {
     		ret = "<ul>";
-		    if (d["eLearning"]["complete"]) {
-			$.each(d["eLearning"]["complete"], function(key,value) {
-    				ret += "<li>" + value + "</li>";
+		    try {
+			    $.each(d["eLearning"]["complete"], function(item,data) {
+    				if (courses[data["id"]]) {
+                        ret += "<li>" + courses[data["id"]] + "</li>";
+                    } else {
+                        ret += "<li>" + value + "</li>";
+                    }
     			});
-		    }
+		    } catch (err) {}
     		ret +="</ul>";
 	    	return ret;
 	    }},
         { "data": function(d) {
             ret = "<ul>";
-            if (d["eLearning"]["active"]) {
-            $.each(d["eLearning"]["active"], function(key,value) {
-                    ret += "<li>" + value + "</li>";
+            try {
+                $.each(d["eLearning"]["active"], function(item,data) {
+                    if (courses[data["id"]]) {
+                        ret += "<li>" + courses[data["id"]] + "</li>";
+                    } else {
+                        ret += "<li>" + value + "</li>";
+                    }
                 });
-            }
+            } catch (err) {}
             ret +="</ul>";
             return ret;
         }}

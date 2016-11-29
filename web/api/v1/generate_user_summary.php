@@ -36,6 +36,7 @@ if ($profile != "") {
 } elseif ($theme != "default") {
   $users = filterUsers($users,$filter,"",$theme);
 } else {
+  /*
   foreach($users as $email => $data) {
     $ctemp = $data["courses"]["complete"];
     $ids = "";
@@ -47,6 +48,7 @@ if ($profile != "") {
     $data["courses"]["complete"] = $ids;
     $users[$email] = $data;
   }
+  */
 }
 
 if ($single_course || $theme != "default") {
@@ -101,12 +103,13 @@ function removeNullProfilesBadges($users) {
 function filterCourseUser($courses,$filter,$email) {
   $ret = "";
   for($i=0;$i<count($courses);$i++) {
-    $id = $courses[$i];
+    $out = $courses[$i];
+    $id = $courses[$i]["id"];
     if (is_array($id)) {
       $id = $id["id"];
     }
     if ($filter[$id][0] == "ALL" || in_array($id, $filter)) {
-      $ret[] = $id;
+      $ret[] = $out;
     }
   }
   return $ret;
@@ -125,12 +128,12 @@ function getUserBadgeTotals($users) {
     }
     $complete = array_merge($data["eLearning"]["complete"],$data["courses"]["complete"]);
     for($i=0;$i<count($complete);$i++) {
-      $total += $courses[$complete[$i]]["totalCredits"];
+      $total += $courses[$complete[$i]["id"]]["totalCredits"];
       if (!is_array($users[$email]["credits"])) {
         $users[$email]["credits"] = array();
       }
       $a1 = $users[$email]["credits"];
-      $a2 = $courses[$complete[$i]]["credits"];
+      $a2 = $courses[$complete[$i]["id"]]["credits"];
       if (!is_array($a2)) {
         $a2 = array();
       }
