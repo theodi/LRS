@@ -5,54 +5,7 @@ $path = "../../";
 set_include_path(get_include_path() . PATH_SEPARATOR . $path);
 include_once('library/functions.php');
 include_once('header.php');
-/*
-$data = getDataFromCollection($collection);
-$courses = getCoursesData();
 
-if ($theme && $theme != "default") {
-   $filter = getClientMapping($theme);
-   $courses = filterCourses($courses,$filter);
-}
-$tracking = getCourseIdentifiers();
-
-$all = "";
-$complete = "";
-$collection = "elearning";
-$count = getNumberOfRecords($collection);
-    $data = getDataFromCollection($collection);
-    $position = 0;
-    foreach ($data as $user) {
-		$complete_modules = getCompleteModuleCount($user,$courses);
-		if ($complete_modules > 0) {
-			$people_trained++;
-			$complete[$complete_modules]++;
-			$module_completions+=$complete_modules;
-		} else {
-	        if (isUserActive($user,$courses)) {
-            	$active++;
-        	}
-    	}
-    	$position++;
-    }
-
-$theme = "default";
-$users = getUsers("courseAttendance","");
-$users = removeNullProfiles($users);
-$profile = getLMSProfile($theme);
-if ($profile != "") {
-	$users = filterClient($users,$profile["client"]);
-}
-$all["trained"]["attendance"] = count($users);
-$all["trained"]["eLearning"] = $people_trained;
-$all["modules"]["eLearning"] = $module_completions;
-$all["active"]["eLearning"] = $active;
-$all["modules"]["completeCount"] = $complete;
-$all["id"] = "trained-" . $theme . "-" . date("Y-m-d");
-$all["date"] = date("Y-m-d");
-$all["type"] = "trained";
-$all["theme"] = $theme;
-store($all,"statisticsCache");
-*/
 $allStats = getCachedStats($theme,"trained","statisticsCache");
 $out = "";
 for($i=0;$i<count($allStats);$i++) {
