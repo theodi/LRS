@@ -263,6 +263,24 @@ function getCourseIdentifiers() {
 }
 
 /*
+ * filterUsers($users,$filter,$client) 
+ * Filter to user profiles that a relevant to the client/theme
+ *
+ * Called by: api/v1/generate_user_summary.php
+ *
+ */
+function filterUsers($users,$filter,$client,$theme,$courses) {
+  foreach($users as $email => $data) {
+    $data["courses"]["complete"] = filterCourseClient($data["courses"]["complete"],$client);
+    $data["eLearning"]["complete"] = filterCourseUser($data["eLearning"]["complete"],$filter,$theme,$email,$courses);
+    $data["eLearning"]["in_progress"] = filterCourseUser($data["eLearning"]["in_progress"],$filter,$theme,$email,$courses);
+    $data["eLearning"]["active"] = filterCourseUser($data["eLearning"]["active"],$filter,$theme,$email,$courses);
+    $users[$email] = $data;
+  }
+  return $users;
+}
+
+/*
  * filterCourses($courses,$filter)
  * Filter the courses data to only that relevant to the user
  * 
@@ -282,6 +300,33 @@ function filterCourses($courses,$filter) {
   }
   return $ret;
 }
+
+/*
+ * filterCourseUser($userdata,$filter,$theme,$email,$courses)
+ * Takes the user data and filters the courses to only those a client is permitted to see
+ *
+ * Called by: api/v1/trained_stats.php
+ *            api/v1/generate_user_summary.php
+ */
+function filterCourseUser($userdata,$filter,$theme,$email,$courses) {
+  $ret = "";
+  for($i=0;$i<count($userdata);$i++) {
+    $out = $userdata[$i];
+    $id = $userdata[$i]["id"];
+    if (is_array($id)) {
+      $id = $id["id"];
+    }
+    // Adapt 2
+    if (in_array($courses[$id]["topMenu"],$filter)) {
+      $ret[] = $out;
+    // Adapt 1
+    } elseif (($filter[$id][0] == "ALL" || in_array($id, $filter)) && (strtolower($out["theme"]) == $theme)) {
+      $ret[] = $out;
+    }
+  }
+  return $ret;
+}
+
 /*
  * filterCourseClient($courses,$filter)
  * Filter to a single course 
@@ -415,6 +460,41 @@ function getUsers($collection,$users) {
         $users = processAdapt2User($users,$doc,$email);
     }
   	return $users;
+}
+
+/*
+ * getAllUsers($collection,$users)
+ * Get active users regardless of email.
+ * 
+ * Called by: 
+ *        api/v1/trained_stats.php
+ */
+function getAllUsers($collection,$users) {
+  global $connection_url, $db_name;
+    $cursor = getDataFromCollection($collection); 
+    foreach ($cursor as $doc) {
+      if ($doc["email"]) {
+        $email = $doc["email"];
+      } elseif ($doc["Email"]) {
+        $email = $doc["Email"];
+      } else {
+        $email = $doc["_id"];
+      }
+      $email = str_replace("．",".",$email);
+      $users = processUser($collection,$users,$doc,$email);
+    }
+    // ADAPT 2
+    $collection = "adapt2";
+    $cursor = getDataFromCollection($collection); 
+    foreach ($cursor as $doc) {
+        if ($doc["user"]["email"]) {
+          $email = $doc["user"]["email"];
+        } else {
+          $email = $doc["_id"];
+        }
+        $users = processAdapt2User($users,$doc,$email);
+    }
+    return $users;
 }
 
 
@@ -557,12 +637,9 @@ function filterCoursesUnique($user) {
  */
 function geteLearningCompletion($user,$courses,$ret) {
   $theme = "";
+  $theme = $user["theme"];
   foreach($user as $key => $data) {
     $key = str_replace("．",".",$key);
-    if ($key == "theme") {
-      //$ret["theme"] = $data;
-      $theme = $data;
-    }
     if (strpos($key,"_cmi.suspend_data") !== false) {
       $course = substr($key,0,strpos($key,"_cmi"));
       $progress = $data;
@@ -671,5 +748,22 @@ function removeNullProfiles($users) {
   return $ret;
 }
 
+/*
+ * removeNullProfilesBadges($users)
+ * Remove profiles that have no data except badges
+ *
+ * Called by: api/v1/generate_user_summary.php
+ *            api/v1/trained_stats.php
+ *        
+ */
+function removeNullProfilesBadges($users) {
+  $ret = "";
+  foreach ($users as $email => $data) {
+    if ($data["courses"]["complete"] != null || $data["eLearning"]["complete"] !=null || $data["eLearning"]["in_progress"] !=null || $data["eLearning"]["active"] !=null ) {
+      $ret[$email] = $data;
+    }
+  }
+  return $ret;
+}
 
 ?>

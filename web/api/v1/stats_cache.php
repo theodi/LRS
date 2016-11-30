@@ -1,4 +1,7 @@
 <?php
+
+/* Called by the statistics page */
+
 $access = "public";
 //$location = "/api/view_data.php";
 $path = "../../";
@@ -28,7 +31,7 @@ foreach ($out as $date => $values) {
 	fputcsv($handle,$foo[0]);
 }
 fclose($handle);
-
+/*
 function filterClient($users,$filter) {
   foreach($users as $email => $data) {
     $data["courses"]["complete"] = filterCourseClient($data["courses"]["complete"],$filter);
@@ -36,7 +39,8 @@ function filterClient($users,$filter) {
   }
   return removeNullProfiles($users);
 }
-
+*/
+/*
 function isUserActive($user,$courses) {
     foreach($user as $key => $data) {
         $key = str_replace("．",".",$key);
@@ -56,7 +60,8 @@ function isUserActive($user,$courses) {
     }
     return false;
 }
-
+*/
+/*
 function getCompleteModuleCount($user,$courses) {
 	$complete = 0;
 	foreach($user as $key => $data) {
@@ -78,6 +83,7 @@ function getCompleteModuleCount($user,$courses) {
         }
 	return $complete;
 }
+*/
 
 function getCachedStats($theme,$type,$collection) {
    global $connection_url, $db_name;
@@ -113,7 +119,7 @@ function getCachedStats($theme,$type,$collection) {
 	syslog(LOG_ERR,'Error: ' . $e->getMessage());
    }
 }
-
+/*
 function store($data,$collection) {
    global $connection_url, $db_name;
    try {
@@ -153,5 +159,5 @@ function store($data,$collection) {
 	syslog(LOG_ERR,'Error: ' . $e->getMessage());
    }
 }
-
+*/
 ?>

@@ -35,21 +35,7 @@ if ($profile != "") {
   $users = filterUsers($users,$filter,$client,$theme,$courses);
 } elseif ($theme != "default") {
   $users = filterUsers($users,$filter,"",$theme,$courses);
-} else {
-  /*
-  foreach($users as $email => $data) {
-    $ctemp = $data["courses"]["complete"];
-    $ids = "";
-    if ($ctemp) {
-      foreach($ctemp as $cid => $foo) {
-        $ids[] = $cid;
-      }
-    }
-    $data["courses"]["complete"] = $ids;
-    $users[$email] = $data;
-  }
-  */
-}
+} 
 
 if ($single_course || $theme != "default") {
   $users = removeNullProfilesBadges($users);
@@ -65,53 +51,6 @@ foreach ($users as $email => $data) {
 $out["data"] = $output;
 
 echo json_encode($out);
-
-/*
- * filterUsers($users,$filter,$client) 
- * Filter to user profiles that a relevant to the client/theme
- *
- * Called by: api/v1/generate_user_summary.php
- *
- */
-function filterUsers($users,$filter,$client,$theme,$courses) {
-  foreach($users as $email => $data) {
-    $data["courses"]["complete"] = filterCourseClient($data["courses"]["complete"],$client);
-    $data["eLearning"]["complete"] = filterCourseUser($data["eLearning"]["complete"],$filter,$theme,$email,$courses);
-    $data["eLearning"]["in_progress"] = filterCourseUser($data["eLearning"]["in_progress"],$filter,$theme,$email,$courses);
-    $data["eLearning"]["active"] = filterCourseUser($data["eLearning"]["active"],$filter,$theme,$email,$courses);
-    $users[$email] = $data;
-  }
-  return $users;
-}
-
-function removeNullProfilesBadges($users) {
-  $ret = "";
-  foreach ($users as $email => $data) {
-    if ($data["courses"]["complete"] != null || $data["eLearning"]["complete"] !=null || $data["eLearning"]["in_progress"] !=null || $data["eLearning"]["active"] !=null ) {
-      $ret[$email] = $data;
-    }
-  }
-  return $ret;
-}
-
-function filterCourseUser($userdata,$filter,$theme,$email,$courses) {
-  $ret = "";
-  for($i=0;$i<count($userdata);$i++) {
-    $out = $userdata[$i];
-    $id = $userdata[$i]["id"];
-    if (is_array($id)) {
-      $id = $id["id"];
-    }
-    // Adapt 2
-    if (in_array($courses[$id]["topMenu"],$filter)) {
-      $ret[] = $out;
-    // Adapt 1
-    } elseif (($filter[$id][0] == "ALL" || in_array($id, $filter)) && (strtolower($out["theme"]) == $theme)) {
-      $ret[] = $out;
-    }
-  }
-  return $ret;
-}
 
 function getUserBadgeTotals($users) {
   global $courses;

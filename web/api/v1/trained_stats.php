@@ -1,6 +1,7 @@
 <?php
+// Some replicated code but works without passing lots of variables around. 
+
 $access = "public";
-//$location = "/api/view_data.php";
 $path = "../../";
 set_include_path(get_include_path() . PATH_SEPARATOR . $path);
 include_once('library/functions.php');
@@ -12,46 +13,132 @@ if ($_GET["theme"]) {
 if ($theme == "") {
 	$theme = "default";
 }
-$data = getDataFromCollection($collection);
-$courses = getCoursesData();
 
+$courses = getCoursesData();
 if ($theme && $theme != "default") {
-   $filter = getClientMapping($theme);
-   $courses = filterCourses($courses,$filter);
+  $filter = getClientMapping($theme);
+  $courses = filterCourses($courses,$filter);
 }
 $tracking = getCourseIdentifiers();
 
-$all = "";
-$complete = "";
-$collection = "elearning";
-$count = getNumberOfRecords($collection);
-$data = getDataFromCollection($collection);
-$position = 0;
+// IMPORTANT, THIS ALGORITHM HAS TO WORK FROM THE RAW DATA TO REMAIN FAST! 
 
-foreach ($data as $user) {
-	$complete_modules = getCompleteModuleCount($user,$courses,$theme);
-	if ($complete_modules > 0) {
-		$people_trained++;
-		$complete[$complete_modules]++;
-		$module_completions+=$complete_modules;
-	} else {
-	    if (isUserActive($user,$courses,$theme)) {
-         	$active++;
-      	}
-    }
-    $position++;
-}
-$users = getUsers("courseAttendance",null);
-$users = removeNullProfiles($users);
+// TAKE 2
+
 $profile = getLMSProfile($theme);
-if ($profile != "") {
-	$users = filterClient($users,$profile["client"]);
+$client = $profile["client"];
+
+$collection = "elearning";
+$cursor = getDataFromCollection($collection); 
+foreach ($cursor as $doc) {
+	$users = "";
+    if ($doc["email"]) {
+        $email = $doc["email"];
+      } elseif ($doc["Email"]) {
+        $email = $doc["Email"];
+      } else {
+        $email = $doc["_id"];
+      }
+    $email = str_replace("．",".",$email);
+    $users = processUser($collection,$users,$doc,$email);
+
+    if ($profile != "") {
+  		$users = filterUsers($users,$filter,$client,$theme,$courses);
+	} elseif ($theme != "default") {
+  		$users = filterUsers($users,$filter,"",$theme,$courses);
+	}
+
+	if ($theme != "default") {
+  		$users = removeNullProfilesBadges($users);
+	} else {
+  		$users = removeNullProfiles($users);  
+	}
+
+    foreach ($users as $id => $data) {
+    	$complete_modules = 0;
+		$active_modules = 0;
+		$complete_courses = 0;
+		if (is_array($data["eLearning"]["complete"])) {
+			$complete_modules = count($data["eLearning"]["complete"]);
+		}
+		if (is_array($data["eLearning"]["active"])) {
+			$active_modules = count($data["eLearning"]["active"]);
+		}
+		if ($complete_modules > 0) {
+			$people_trained++;
+			$complete[$complete_modules]++;
+			$module_completions+=$complete_modules;
+		} elseif ($active_modules > 0) {
+			$active++;
+		}
+		if ($complete_courses > 0) {
+			$attended_training++;
+		}
+    }
 }
-if (!is_array($users)) {
-	$all["trained"]["attendance"] = 0;
-} else {
-	$all["trained"]["attendance"] = count($users);
+// ADAPT 2
+$collection = "adapt2";
+$cursor = getDataFromCollection($collection); 
+foreach ($cursor as $doc) {
+	$users = "";
+    if ($doc["user"]["email"]) {
+    	$email = $doc["user"]["email"];
+    } else {
+    	$email = $doc["_id"];
+    }
+    $users = processAdapt2User($users,$doc,$email);
+
+    if ($profile != "") {
+  		$users = filterUsers($users,$filter,$client,$theme,$courses);
+	} elseif ($theme != "default") {
+  		$users = filterUsers($users,$filter,"",$theme,$courses);
+	}
+
+	if ($theme != "default") {
+  		$users = removeNullProfilesBadges($users);
+	} else {
+  		$users = removeNullProfiles($users);  
+	}
+
+    foreach ($users as $id => $data) {
+    	$complete_modules = 0;
+		$active_modules = 0;
+		$complete_courses = 0;
+		if (is_array($data["eLearning"]["complete"])) {
+			$complete_modules = count($data["eLearning"]["complete"]);
+		}
+		if (is_array($data["eLearning"]["active"])) {
+			$active_modules = count($data["eLearning"]["active"]);
+		}
+		if ($complete_modules > 0) {
+			$people_trained++;
+			$complete[$complete_modules]++;
+			$module_completions+=$complete_modules;
+		} elseif ($active_modules > 0) {
+			$active++;
+		}
+		if ($complete_courses > 0) {
+			$attended_training++;
+		}
+    }
 }
+
+$users = "";
+$users = getUsers("courseAttendance",$users);
+
+$attended_training = 0;
+
+foreach($users as $email => $data) {
+	$complete_courses = 0;
+	if (is_array($data["courses"]["complete"])) {
+		$complete_courses = count($data["courses"]["complete"]);
+	}
+	if ($complete_courses > 0) {
+		$attended_training++;
+	}
+}
+
+$all["trained"]["attendance"] = $attended_training;
 $all["trained"]["eLearning"] = $people_trained;
 $all["modules"]["eLearning"] = $module_completions;
 $all["active"]["eLearning"] = $active;
@@ -60,6 +147,7 @@ $all["id"] = "trained-" . $theme . "-" . date("Y-m-d");
 $all["date"] = date("Y-m-d");
 $all["type"] = "trained";
 $all["theme"] = $theme;
+
 $allStats = getCachedStats($theme,"trained","statisticsCache");
 store($all,"statisticsCache");
 $out = "";
@@ -83,61 +171,6 @@ foreach ($out as $date => $values) {
 	fputcsv($handle,$foo[0]);
 }
 fclose($handle);
-
-function filterClient($users,$filter) {
-  foreach($users as $email => $data) {
-    $data["courses"]["complete"] = filterCourseClient($data["courses"]["complete"],$filter);
-    $users[$email] = $data;
-  }
-  return removeNullProfiles($users);
-}
-
-function isUserActive($user,$courses,$theme) {
-	if ($theme && strtolower($user["theme"]) != strtolower($theme) && $theme !="default") {
-		return 0;
-	}
-    foreach($user as $key => $data) {
-        $key = str_replace("．",".",$key);
-        if (strpos($key,"_cmi.suspend_data") !== false) {
-            $time = $user[$course . "_cmi．core．session_time"];
-            $course = substr($key,0,strpos($key,"_cmi"));
-            $progress = $data;
-            if ($courses[$course] && $courses[$course]["format"] == "eLearning") {
-                $course_id = $courses[$course]["id"];
-                $course_id = substr($course_id,4);
-                $courses[$course]["progress"] = getProgress($courses[$course],$progress);
-                if ($courses[$course]["progress"] > 49 && getTime($time) > 300) {
-                    return true;
-                }
-            }
-        }
-    }
-    return false;
-}
-
-function getCompleteModuleCount($user,$courses,$theme) {
-	if ($theme && strtolower($user["theme"]) != strtolower($theme) && $theme !="default") {
-		return 0;
-	}
-	foreach($user as $key => $data) {
-                $key = str_replace("．",".",$key);
-                if (strpos($key,"_cmi.suspend_data") !== false) {
-                        $course = substr($key,0,strpos($key,"_cmi"));
-                        $progress = $data;
-                        if ($courses[$course] && $courses[$course]["format"] == "eLearning") {
-				            $course_id = $courses[$course]["id"];
-				            $course_id = substr($course_id,4);
-	           //			if (is_numeric($course_id) && $course_id < 14) {
-                             	$courses[$course]["progress"] = getProgress($courses[$course],$progress);
-                               	if ($courses[$course]["progress"] > 99) {
-                                       	$complete++;
-                               	}
-	           //			}
-                        }
-                }
-        }
-	return $complete;
-}
 
 function getCachedStats($theme,$type,$collection) {
    global $connection_url, $db_name;
