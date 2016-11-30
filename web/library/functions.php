@@ -481,16 +481,13 @@ function processAdapt2User($users,$doc,$email) {
   }
   $progress = $doc["progress"];
   foreach ($progress as $module => $data) {
-    $object["id"] = $module;
-    $object["progress"] = $data["progress"];
-    $object["time"] = $data["sessionTime"];
-    $object["endTime"] = $data["endTime"];
+    $data["id"] = $module;
     if ($data["progress"] > 99) {
-        $users[$email]["eLearning"]["complete"][] = $object;
+        $users[$email]["eLearning"]["complete"][] = $data;
     } elseif ($data["progress"] > 50 && $data["sessionTime"] > 299) {
-        $users[$email]["eLearning"]["active"][] = $object;
+        $users[$email]["eLearning"]["active"][] = $data;
     } elseif ($data["progress"] > 0) {
-        $users[$email]["eLearning"]["in_progress"][] = $object;
+        $users[$email]["eLearning"]["in_progress"][] = $data;
     }
   }
   $users[$email] = filterUnique($users[$email]);
