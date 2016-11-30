@@ -275,7 +275,7 @@ function filterCourses($courses,$filter) {
   $ret = "";
   foreach ($courses as $id => $data) {
     for($i=0;$i<count($filter);$i++) {
-      if (strtolower($filter[$i]) == strtolower($id)) {
+      if (strtolower($filter[$i]) == strtolower($id) || strtolower($data["topMenu"]) == strtolower($filter[$i])) {
         $ret[$id] = $data;
       }
     }
@@ -556,10 +556,12 @@ function filterCoursesUnique($user) {
  *        library/functions.php
  */
 function geteLearningCompletion($user,$courses,$ret) {
+  $theme = "";
   foreach($user as $key => $data) {
     $key = str_replace("．",".",$key);
     if ($key == "theme") {
-      $ret["theme"] = $data;
+      //$ret["theme"] = $data;
+      $theme = $data;
     }
     if (strpos($key,"_cmi.suspend_data") !== false) {
       $course = substr($key,0,strpos($key,"_cmi"));
@@ -573,6 +575,7 @@ function geteLearningCompletion($user,$courses,$ret) {
         $object["progress"] = $courses[$course]["progress"];
         $object["time"] = $time;
         $object["lastSave"] = $user[$course . "_lastSave"];
+        $object["theme"] = $theme;
 
         if ($courses[$course]["progress"] > 99) {
           $ret["complete"][] = $object;

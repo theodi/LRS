@@ -32,9 +32,9 @@ $profile = getLMSProfile($theme);
 $client = $profile["client"];
 
 if ($profile != "") {
-  $users = filterUsers($users,$filter,$client,$theme);
+  $users = filterUsers($users,$filter,$client,$theme,$courses);
 } elseif ($theme != "default") {
-  $users = filterUsers($users,$filter,"",$theme);
+  $users = filterUsers($users,$filter,"",$theme,$courses);
 } else {
   /*
   foreach($users as $email => $data) {
@@ -73,18 +73,12 @@ echo json_encode($out);
  * Called by: api/v1/generate_user_summary.php
  *
  */
-function filterUsers($users,$filter,$client,$theme) {
+function filterUsers($users,$filter,$client,$theme,$courses) {
   foreach($users as $email => $data) {
     $data["courses"]["complete"] = filterCourseClient($data["courses"]["complete"],$client);
-    if (strtolower($data["eLearning"]["theme"]) == strtolower($theme)) {
-      $data["eLearning"]["complete"] = filterCourseUser($data["eLearning"]["complete"],$filter,$email);
-      $data["eLearning"]["in_progress"] = filterCourseUser($data["eLearning"]["in_progress"],$filter,$email);
-      $data["eLearning"]["active"] = filterCourseUser($data["eLearning"]["active"],$filter,$email);
-    } else {
-      $data["eLearning"]["active"] = [];
-      $data["eLearning"]["complete"] = [];
-      $data["eLearning"]["in_progress"] = [];
-    }
+    $data["eLearning"]["complete"] = filterCourseUser($data["eLearning"]["complete"],$filter,$theme,$email,$courses);
+    $data["eLearning"]["in_progress"] = filterCourseUser($data["eLearning"]["in_progress"],$filter,$theme,$email,$courses);
+    $data["eLearning"]["active"] = filterCourseUser($data["eLearning"]["active"],$filter,$theme,$email,$courses);
     $users[$email] = $data;
   }
   return $users;
@@ -100,15 +94,19 @@ function removeNullProfilesBadges($users) {
   return $ret;
 }
 
-function filterCourseUser($courses,$filter,$email) {
+function filterCourseUser($userdata,$filter,$theme,$email,$courses) {
   $ret = "";
-  for($i=0;$i<count($courses);$i++) {
-    $out = $courses[$i];
-    $id = $courses[$i]["id"];
+  for($i=0;$i<count($userdata);$i++) {
+    $out = $userdata[$i];
+    $id = $userdata[$i]["id"];
     if (is_array($id)) {
       $id = $id["id"];
     }
-    if ($filter[$id][0] == "ALL" || in_array($id, $filter)) {
+    // Adapt 2
+    if (in_array($courses[$id]["topMenu"],$filter)) {
+      $ret[] = $out;
+    // Adapt 1
+    } elseif (($filter[$id][0] == "ALL" || in_array($id, $filter)) && (strtolower($out["theme"]) == $theme)) {
       $ret[] = $out;
     }
   }
