@@ -36,11 +36,14 @@ if ($profile != "") {
 } elseif ($theme != "default") {
   $users = filterUsers($users,$filter,"",$theme,$courses);
 } 
+if ($single_course){
+  $users = filterUsersNotTheme($users,$single_course);
+}
 
 if ($single_course || $theme != "default") {
   $users = removeNullProfilesBadges($users);
 } else {
-  $users = removeNullProfiles($users);  
+  $users = removeNullProfiles($users);
 }
 $users = getUserBadgeTotals($users);
 
@@ -81,6 +84,40 @@ function getUserBadgeTotals($users) {
       $users[$email]["credits"] = $sums;
     }
     $users[$email]["totalCredits"] = $total;
+  }
+  return $users;
+}
+
+/* Single course filter functions */
+/*
+ * filterCourseUserNotTheme($userdata,$filter,$theme,$email,$courses)
+ * For single course filtering after the theme filtering has been done!
+ *
+ * Called by: api/v1/trained_stats.php
+ *            api/v1/generate_user_summary.php
+ */
+function filterCourseUserNotTheme($userdata,$filter) {
+  $ret = "";
+  for($i=0;$i<count($userdata);$i++) {
+    $out = $userdata[$i];
+    $id = $userdata[$i]["id"];
+    if (is_array($id)) {
+      $id = $id["id"];
+    }
+    // Adapt 2
+    if (in_array($id, $filter)) {
+      $ret[] = $out;
+    }
+  }
+  return $ret;
+}
+
+function filterUsersNotTheme($users,$filter) {
+  foreach($users as $email => $data) {
+    $data["eLearning"]["complete"] = filterCourseUserNotTheme($data["eLearning"]["complete"],$filter);
+    $data["eLearning"]["in_progress"] = filterCourseUserNotTheme($data["eLearning"]["in_progress"],$filter);
+    $data["eLearning"]["active"] = filterCourseUserNotTheme($data["eLearning"]["active"],$filter);
+    $users[$email] = $data;
   }
   return $users;
 }

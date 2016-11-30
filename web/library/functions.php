@@ -319,7 +319,6 @@ function filterCourseUser($userdata,$filter,$theme,$email,$courses) {
     // Adapt 2
     if (in_array($courses[$id]["topMenu"],$filter)) {
       $ret[] = $out;
-    // Adapt 1
     } elseif (($filter[$id][0] == "ALL" || in_array($id, $filter)) && (strtolower($out["theme"]) == $theme)) {
       $ret[] = $out;
     }
@@ -452,12 +451,14 @@ function getUsers($collection,$users) {
     }
 
     // ADAPT 2
-    $collection = "adapt2";
-    $query = array('user.email' => array('$ne' => null));
-    $cursor = executeQuery($connection_url,$db_name,$collection,$query);
-    foreach ($cursor as $doc) {
-        $email = $doc["user"]["email"];
-        $users = processAdapt2User($users,$doc,$email);
+    if ($collection == "elearning") {
+      $collection = "adapt2";
+      $query = array('user.email' => array('$ne' => null));
+      $cursor = executeQuery($connection_url,$db_name,$collection,$query);
+      foreach ($cursor as $doc) {
+          $email = $doc["user"]["email"];
+          $users = processAdapt2User($users,$doc,$email);
+      }
     }
   	return $users;
 }
