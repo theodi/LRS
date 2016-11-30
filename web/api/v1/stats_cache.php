@@ -3,7 +3,7 @@
 /* Called by the statistics page */
 
 $access = "public";
-//$location = "/api/view_data.php";
+
 $path = "../../";
 set_include_path(get_include_path() . PATH_SEPARATOR . $path);
 include_once('library/functions.php');

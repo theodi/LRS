@@ -463,42 +463,6 @@ function getUsers($collection,$users) {
 }
 
 /*
- * getAllUsers($collection,$users)
- * Get active users regardless of email.
- * 
- * Called by: 
- *        api/v1/trained_stats.php
- */
-function getAllUsers($collection,$users) {
-  global $connection_url, $db_name;
-    $cursor = getDataFromCollection($collection); 
-    foreach ($cursor as $doc) {
-      if ($doc["email"]) {
-        $email = $doc["email"];
-      } elseif ($doc["Email"]) {
-        $email = $doc["Email"];
-      } else {
-        $email = $doc["_id"];
-      }
-      $email = str_replace("．",".",$email);
-      $users = processUser($collection,$users,$doc,$email);
-    }
-    // ADAPT 2
-    $collection = "adapt2";
-    $cursor = getDataFromCollection($collection); 
-    foreach ($cursor as $doc) {
-        if ($doc["user"]["email"]) {
-          $email = $doc["user"]["email"];
-        } else {
-          $email = $doc["_id"];
-        }
-        $users = processAdapt2User($users,$doc,$email);
-    }
-    return $users;
-}
-
-
-/*
  * processAdapt2User($users,$doc,$email)
  * Process an individual user and return a profile from the adapt 2 data
  *
