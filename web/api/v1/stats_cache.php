@@ -31,59 +31,6 @@ foreach ($out as $date => $values) {
 	fputcsv($handle,$foo[0]);
 }
 fclose($handle);
-/*
-function filterClient($users,$filter) {
-  foreach($users as $email => $data) {
-    $data["courses"]["complete"] = filterCourseClient($data["courses"]["complete"],$filter);
-    $users[$email] = $data;
-  }
-  return removeNullProfiles($users);
-}
-*/
-/*
-function isUserActive($user,$courses) {
-    foreach($user as $key => $data) {
-        $key = str_replace("．",".",$key);
-        if (strpos($key,"_cmi.suspend_data") !== false) {
-            $time = $user[$course . "_cmi．core．session_time"];
-            $course = substr($key,0,strpos($key,"_cmi"));
-            $progress = $data;
-            if ($courses[$course] && $courses[$course]["format"] == "eLearning") {
-                $course_id = $courses[$course]["id"];
-                $course_id = substr($course_id,4);
-                $courses[$course]["progress"] = getProgress($courses[$course],$progress);
-                if ($courses[$course]["progress"] > 49 && getTime($time) > 300) {
-                    return true;
-                }
-            }
-        }
-    }
-    return false;
-}
-*/
-/*
-function getCompleteModuleCount($user,$courses) {
-	$complete = 0;
-	foreach($user as $key => $data) {
-                $key = str_replace("．",".",$key);
-                if (strpos($key,"_cmi.suspend_data") !== false) {
-                        $course = substr($key,0,strpos($key,"_cmi"));
-                        $progress = $data;
-                        if ($courses[$course] && $courses[$course]["format"] == "eLearning") {
-				            $course_id = $courses[$course]["id"];
-				            $course_id = substr($course_id,4);
-	           //			if (is_numeric($course_id) && $course_id < 14) {
-                             	$courses[$course]["progress"] = getProgress($courses[$course],$progress);
-                               	if ($courses[$course]["progress"] > 99) {
-                                       	$complete++;
-                               	}
-	           //			}
-                        }
-                }
-        }
-	return $complete;
-}
-*/
 
 function getCachedStats($theme,$type,$collection) {
    global $connection_url, $db_name;

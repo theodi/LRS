@@ -68,7 +68,7 @@ function getProfile($user) {
 			$course = substr($key,0,strpos($key,"_cmi"));
 			$progress = $data;
 			if ($courses[$course]) {
-				$courses[$course]["progress"] = getProgress($courses[$course],$progress);
+				$courses[$course]["progress"] = getProgress($courses[$course],$progress)["progress"];
 				if ($courses[$course]["progress"] > 99) {
 					$user["complete"][] = $courses[$course];
 				} else {

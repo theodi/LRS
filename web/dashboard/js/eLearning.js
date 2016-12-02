@@ -23,7 +23,7 @@ var timeBar = dc.barChart('#time-bar');
 var questionIDs = [];
 var expansionDone = false;
 
-d3.csv('../data.php?module='+module+'&theme='+theme, function (data) {
+d3.csv('../api/v1/data2.php?module='+module+'&theme='+theme, function (data) {
     var expansion = [];
     var ndx = crossfilter(data);
     var all = ndx.groupAll();
@@ -154,10 +154,10 @@ langLine
 });
 
 var time = ndx.dimension(function(d) {
-	raw = d.session_time;
-	hours = parseInt(raw.substring(0,4));
-	mins = parseInt(raw.substring(5,7));
-	secs = parseInt(raw.substring(9,11));
+	raw = d.session_time.split(":");
+	hours = parseInt(raw[0]);
+	mins = parseInt(raw[1]);
+	secs = parseInt(raw[2]);
 	extra = Math.round(secs / 60);
 	total = (hours * 60) + mins + extra;
 	if (!isInt(total)) {

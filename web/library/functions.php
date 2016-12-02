@@ -502,8 +502,10 @@ function processAdapt2User($users,$doc,$email) {
  */
 function processUser($collection,$users,$doc,$email) {
   global $courses,$tracking;
+
   $users[$email]["First Name"] = $doc["First Name"];
   $users[$email]["Surname"] = $doc["Surname"];
+  $users[$email]["id"] = $doc["_id"];
   if ($collection = "eLearning") {
     $users[$email]["eLearning"] = geteLearningCompletion($doc,$courses,$users[$email]["eLearning"]);
   }
@@ -591,8 +593,10 @@ function filterCoursesUnique($user) {
 }
 
 /*
- * geteLearningCompletion2($user,$courses,$ret)
+ * geteLearningCompletion($user,$courses,$ret)
  * Get complete, active and in_progress courses given a user
+ *
+ * ADAPT 1
  *
  * Called by: api/v1/module_stats.php
  *        library/functions.php
@@ -600,21 +604,43 @@ function filterCoursesUnique($user) {
 function geteLearningCompletion($user,$courses,$ret) {
   $theme = "";
   $theme = $user["theme"];
+  $lang = $user["lang"];
+  $platform = $user["platform"];
   foreach($user as $key => $data) {
     $key = str_replace("．",".",$key);
     if (strpos($key,"_cmi.suspend_data") !== false) {
       $course = substr($key,0,strpos($key,"_cmi"));
       $progress = $data;
       if ($courses[$course] && $courses[$course]["format"] == "eLearning") {
-        $courses[$course]["progress"] = getProgress($courses[$course],$progress);
+        $spoor = getProgress($courses[$course],$progress);
+        $courses[$course]["progress"] = $spoor["progress"];
+        $courses[$course]["assessmentPassed"] = "false";
+        if ($spoor["_isAssessmentPassed"]) {
+          $courses[$course]["assessmentPassed"] = "true";
+        }
         $time = getTime($user[$course . "_cmi．core．session_time"]);
+
+        $answers = $user[$course . "_cmi．answers"];
+        $answers = json_decode($answers,true);
+        if (!is_array($answers)) {
+          $courses[$course]["assessmentPassed"] = "not attempted";
+        }
+        $out = [];
+        foreach ($answers as $id => $data) {
+          unset($data["selectedItems"]);
+          $out[$id] = $data;
+        }
 
         $object = [];
         $object["id"] = $courses[$course]["id"];
         $object["progress"] = $courses[$course]["progress"];
+        $object["assessmentPassed"] = $courses[$course]["assessmentPassed"];
         $object["time"] = $time;
         $object["lastSave"] = $user[$course . "_lastSave"];
         $object["theme"] = $theme;
+        $object["lang"] = $lang;
+        $object["platform"] = $platform;
+        $object["answers"] = $out;
 
         if ($courses[$course]["progress"] > 99) {
           $ret["complete"][] = $object;
@@ -649,9 +675,9 @@ function getTime($time) {
  * getProgress($course,$progress)
  * Get the progress and badge 
  * 
- * NEEDS UPGRADING TO v2 API
+ *  ADAPT 1
  * 
- * Called by: api/v1/trained_stats.php
+ * Called by: 
  * 			  library/functions.php
  * 			  profile/index.php
  */
@@ -661,15 +687,18 @@ function getProgress($course,$progress) {
 	if ($progress["_isAssessmentPassed"] > 0 || $progress["_isCourseComplete"] > 0) {
 		$progress["completion"] = str_replace("0","1",$progress["completion"]);
 		$badgeData = getModuleBadgeData($course);
-		return 100;
-	}
-	$total = strlen($progress["completion"]);
-	if ($total == 0) {
-		return 0;
-	}
-	$sub = substr_count($progress["completion"],0);
-	$complete = round(($sub / $total) * 100);
-	return $complete;	
+		$progress["progress"] = 100;
+	} else {
+	 $total = strlen($progress["completion"]);
+	 if ($total == 0) {
+		  $progress["progress"] = 0;
+	 } else {
+    $sub = substr_count($progress["completion"],0);
+	  $complete = round(($sub / $total) * 100);
+    $progress["progress"] = $complete;
+   }
+  }
+  return $progress;
 }
 
 /* 
