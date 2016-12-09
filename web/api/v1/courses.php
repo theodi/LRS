@@ -21,6 +21,7 @@ foreach ($courses as $id => $course) {
 
 $out["data"] = $output;
 
+
 echo json_encode($out);
 
 ?>

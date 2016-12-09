@@ -1,4 +1,5 @@
 <?php
+// OH GOD! 
 
 header("Access-Control-Allow-Origin: *");
 

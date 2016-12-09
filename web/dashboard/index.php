@@ -80,16 +80,16 @@ $(document).ready(function() {
         "ajax": "../api/v1/generate_user_summary.php?course=<?php echo $module; ?>",
         "columns": [
             { "data": function(d) {
-                try { if (d["eLearning"]["complete"][0] == module) { return "<span id='tick_small'>✔</span>"; } } catch(err) {}
-                try { if (d["courses"]["complete"][0] == module) { return "<span id='tick_small'>✔</span>"; } } catch(err) {}
-                try { if (d["eLearning"]["active"][0] == module) { return "<span id='tick_small'>✗</span>"; } } catch(err) {}
+                try { if (d["eLearning"]["complete"][0]["id"] == module) { return "<span id='tick_small'>✔</span>"; } } catch(err) {}
+                try { if (d["courses"]["complete"][0]["id"] == module) { return "<span id='tick_small'>✔</span>"; } } catch(err) {}
+                try { if (d["eLearning"]["active"][0]["id"] == module) { return "<span id='tick_small'>✗</span>"; } } catch(err) {}
                 return "-";
             }},
             { "data": "First Name" },
             { "data": "Surname" },
             { "data": "Email" },
             { "data" : function(d) {
-                try { if (d["eLearning"]["theme"]) { return d["eLearning"]["theme"]; } } catch(err) {}
+                try { if (d["eLearning"]["complete"][0]["theme"]) { return d["eLearning"]["complete"][0]["theme"]; } } catch(err) {}
                 return "-";
             }},
             { "data": function(d) {

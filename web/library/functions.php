@@ -178,24 +178,6 @@ function storeDatasets($datasets,$collection,$ret_keys) {
 }
 
 /*
- * load($email)
- * Load a users profile
- *
- */
-function load($email) {
-    global $connection_url, $db_name, $collection;
-    if ($email == "" || !$email) {
-		return null;
-   	}
-	$email = str_replace('.','．',$email);
-	$query = array('email' => $email);
-	$res = executeQuery($connection_url,$db_name,$collection,$query);
-	foreach ($res as $doc) {
-		return json_encode($doc);
-	}
-}
-
-/*
  * OTHER FUNCTIONS - Both Adapt and GDocs 
  *
  */
@@ -217,7 +199,7 @@ function getCoursesData() {
 	$tracking = getCourseIdentifiers();
 	$courses = "";
 	foreach ($cursor as $doc) {
-   		if ($doc["slug"]) {
+   	if ($doc["slug"]) {
 			$id = $doc["slug"];
 		} elseif ($doc["id"]) {
 			$id = $doc["id"];
@@ -241,6 +223,7 @@ function getCoursesData() {
         $lo = $los[$i];
         $los[$i]["badge"] = $lo["level"];
       }
+      $courses[$id]["_learningOutcomes"] = $los;
     }
 		$badge = "";
 		$total = 0;
@@ -280,6 +263,24 @@ function getCourseIdentifiers() {
 }
 
 /*
+ * filterUsers($users,$filter,$client) 
+ * Filter to user profiles that a relevant to the client/theme
+ *
+ * Called by: api/v1/generate_user_summary.php
+ *
+ */
+function filterUsers($users,$filter,$client,$theme,$courses) {
+  foreach($users as $email => $data) {
+    $data["courses"]["complete"] = filterCourseClient($data["courses"]["complete"],$client);
+    $data["eLearning"]["complete"] = filterCourseUser($data["eLearning"]["complete"],$filter,$theme,$email,$courses);
+    $data["eLearning"]["in_progress"] = filterCourseUser($data["eLearning"]["in_progress"],$filter,$theme,$email,$courses);
+    $data["eLearning"]["active"] = filterCourseUser($data["eLearning"]["active"],$filter,$theme,$email,$courses);
+    $users[$email] = $data;
+  }
+  return $users;
+}
+
+/*
  * filterCourses($courses,$filter)
  * Filter the courses data to only that relevant to the user
  * 
@@ -292,13 +293,39 @@ function filterCourses($courses,$filter) {
   $ret = "";
   foreach ($courses as $id => $data) {
     for($i=0;$i<count($filter);$i++) {
-      if (strtolower($filter[$i]) == strtolower($id)) {
+      if (strtolower($filter[$i]) == strtolower($id) || strtolower($data["topMenu"]) == strtolower($filter[$i])) {
         $ret[$id] = $data;
       }
     }
   }
   return $ret;
 }
+
+/*
+ * filterCourseUser($userdata,$filter,$theme,$email,$courses)
+ * Takes the user data and filters the courses to only those a client is permitted to see
+ *
+ * Called by: api/v1/trained_stats.php
+ *            api/v1/generate_user_summary.php
+ */
+function filterCourseUser($userdata,$filter,$theme,$email,$courses) {
+  $ret = "";
+  for($i=0;$i<count($userdata);$i++) {
+    $out = $userdata[$i];
+    $id = $userdata[$i]["id"];
+    if (is_array($id)) {
+      $id = $id["id"];
+    }
+    // Adapt 2
+    if (in_array($courses[$id]["topMenu"],$filter)) {
+      $ret[] = $out;
+    } elseif (($filter[$id][0] == "ALL" || in_array($id, $filter)) && (strtolower($out["theme"]) == $theme)) {
+      $ret[] = $out;
+    }
+  }
+  return $ret;
+}
+
 /*
  * filterCourseClient($courses,$filter)
  * Filter to a single course 
@@ -358,6 +385,36 @@ function getLMSProfile($theme) {
  * USER PROFILES SECTION
  */
 
+/* getUser($email) 
+ * 
+ * Get the profile for a single user and translate it back ready for the profile screen to use
+ * 
+ */
+function getUser($email,$user) {
+  global $connection_url, $db_name, $courses;
+  $courses = getCoursesData();
+  $collection = "elearning";
+  $a1email = str_replace('.','．',$email);
+  $query = array('email' => $a1email);
+  $cursor = executeQuery($connection_url,$db_name,$collection,$query);
+  foreach ($cursor as $doc) {
+      $user = processUser($collection,$user,$doc,$email);
+  }
+  $query = array('Email' => $a1email);
+  $cursor = executeQuery($connection_url,$db_name,$collection,$query);
+  foreach ($cursor as $doc) {
+      $user = processUser($collection,$user,$doc,$email);
+  }
+  $collection = "adapt2";
+  $query = array('user.email' => $email);
+  $cursor = executeQuery($connection_url,$db_name,$collection,$query);
+  foreach ($cursor as $doc) {
+      $user = processAdapt2User($user,$doc,$email);
+  }
+  return $user;
+}
+
+
 /*
  * getUsers($collection,$users)
  * Get active users for the learners page. Searches for users who have a known email.
@@ -392,7 +449,49 @@ function getUsers($collection,$users) {
         }
       }
     }
+
+    // ADAPT 2
+    if ($collection == "elearning") {
+      $collection = "adapt2";
+      $query = array('user.email' => array('$ne' => null));
+      $cursor = executeQuery($connection_url,$db_name,$collection,$query);
+      foreach ($cursor as $doc) {
+          $email = $doc["user"]["email"];
+          $users = processAdapt2User($users,$doc,$email);
+      }
+    }
   	return $users;
+}
+
+/*
+ * processAdapt2User($users,$doc,$email)
+ * Process an individual user and return a profile from the adapt 2 data
+ *
+ * Called by: library/functions.php (above)
+ */
+
+function processAdapt2User($users,$doc,$email) {
+  $details = $doc["user"];
+  if (!$users[$email]["First Name"]) { $users[$email]["First Name"] = $details["First Name"]; } 
+  if (!$users[$email]["Surname"]) { $users[$email]["Surname"] = $details["Surname"]; }
+  foreach ($details as $key => $value) {
+    if ($key != "email") {
+      $users[$email][$key] = $value;
+    }
+  }
+  $progress = $doc["progress"];
+  foreach ($progress as $module => $data) {
+    $data["id"] = $module;
+    if ($data["progress"] > 99) {
+        $users[$email]["eLearning"]["complete"][] = $data;
+    } elseif ($data["progress"] > 50 && $data["sessionTime"] > 299) {
+        $users[$email]["eLearning"]["active"][] = $data;
+    } elseif ($data["progress"] > 0) {
+        $users[$email]["eLearning"]["in_progress"][] = $data;
+    }
+  }
+  $users[$email] = filterUnique($users[$email]);
+  return $users;
 }
 
 /*
@@ -403,8 +502,10 @@ function getUsers($collection,$users) {
  */
 function processUser($collection,$users,$doc,$email) {
   global $courses,$tracking;
+
   $users[$email]["First Name"] = $doc["First Name"];
   $users[$email]["Surname"] = $doc["Surname"];
+  $users[$email]["id"] = $doc["_id"];
   if ($collection = "eLearning") {
     $users[$email]["eLearning"] = geteLearningCompletion($doc,$courses,$users[$email]["eLearning"]);
   }
@@ -413,15 +514,15 @@ function processUser($collection,$users,$doc,$email) {
 
     if ($tracking[$id]) { $id = $tracking[$id]; }
     if ($courses[$id])  { 
-    	$object = "";
-    	$object["id"] = $id;
-    	if ($doc["Date"]) {
-    		$object["date"] = $doc["Date"];
-    	}
-    	if ($doc["Client"]) {
-    		$object["client"] = $doc["Client"];
-    	}
-    	$users[$email]["courses"]["complete"][$id] = $object; 
+      $object = "";
+      $object["id"] = $id;
+      if ($doc["Date"]) {
+        $object["date"] = $doc["Date"];
+      }
+      if ($doc["Client"]) {
+        $object["client"] = $doc["Client"];
+      }
+      $users[$email]["courses"]["complete"][] = $object; 
     }
   }
   if ($collection = "externalBadges") {
@@ -432,43 +533,126 @@ function processUser($collection,$users,$doc,$email) {
       $users[$email]["badges"]["complete"][] = $badge;
     }
   }
+  $users[$email] = filterUnique($users[$email]);
   return $users;
+}
+
+
+function filterUnique($user) {
+  $user = filtereLearningUnique($user);
+  $user = filterCoursesUnique($user);
+  return $user;
+}
+
+// TODO Filter this on LAST SAVE FOR ACTIVE AND IN_PROGRESS! 
+function filtereLearningUnique($user) {
+  $el = $user["eLearning"];
+  $complete = $el["complete"];
+  $done = [];
+  for($i=0;$i<count($complete);$i++) {
+    if (!$done[$complete[$i]["id"]]) {
+      $done[$complete[$i]["id"]] = true;
+      $out[] = $complete[$i];
+    }
+  }
+  $user["eLearning"]["complete"] = $out;
+  
+  $out = [];
+  $active = $el["active"];
+  for($i=0;$i<count($active);$i++) {
+    if (!$done[$active[$i]["id"]]) {
+      $done[$active[$i]["id"]] = true;
+      $out[] = $active[$i];
+    }
+  }
+  $user["eLearning"]["active"] = $out;
+
+  $out = [];
+  $in_progress = $el["in_progress"];
+  for($i=0;$i<count($in_progress);$i++) {
+    if (!$done[$in_progress[$i]["id"]]) {
+      $done[$in_progress[$i]["id"]] = true;
+      $out[] = $in_progress[$i];
+    }
+  }
+  $user["eLearning"]["in_progress"] = $out;
+  return $user;
+}
+
+function filterCoursesUnique($user) {
+  $cs = $user["courses"]["complete"];
+  $out = [];
+    for($i=0;$i<count($cs);$i++) {
+    if (!$done[$cs[$i]["id"]]) {
+      $done[$cs[$i]["id"]] = true;
+      $out[] = $cs[$i];
+    }
+  }
+  $user["courses"]["complete"] = $out;
+  return $user;
 }
 
 /*
  * geteLearningCompletion($user,$courses,$ret)
  * Get complete, active and in_progress courses given a user
  *
+ * ADAPT 1
+ *
  * Called by: api/v1/module_stats.php
- * 			  library/functions.php
+ *        library/functions.php
  */
 function geteLearningCompletion($user,$courses,$ret) {
-	foreach($user as $key => $data) {
-		$key = str_replace("．",".",$key);
-		if ($key == "theme") {
-			$ret["theme"] = $data;
-		}
-		if (strpos($key,"_cmi.suspend_data") !== false) {
-			$course = substr($key,0,strpos($key,"_cmi"));
-			$progress = $data;
-			if ($courses[$course] && $courses[$course]["format"] == "eLearning") {
-				$courses[$course]["progress"] = getProgress($courses[$course],$progress);
-				$time = $user[$course . "_cmi．core．session_time"];
-				if ($courses[$course]["progress"] > 99) {
-					$ret["complete"][] = $courses[$course]["id"];
-				} else if (getTime($time) > 300) {
-					$ret["active"][] = $courses[$course]["id"];
-				} else {
-					$ret["in_progress"][] = $courses[$course]["id"];
-				}
-			}
-		}
-	}
-	$ret["active"] = @array_unique($ret["active"]);
-	$ret["complete"] = @array_unique($ret["complete"]);
-	$ret["in_progress"] = @array_unique($ret["in_progress"]);
-	$ret["in_progress"] = @array_diff($ret["in_progress"],$ret["complete"]);
-	return $ret;
+  $theme = "";
+  $theme = $user["theme"];
+  $lang = $user["lang"];
+  $platform = $user["platform"];
+  foreach($user as $key => $data) {
+    $key = str_replace("．",".",$key);
+    if (strpos($key,"_cmi.suspend_data") !== false) {
+      $course = substr($key,0,strpos($key,"_cmi"));
+      $progress = $data;
+      if ($courses[$course] && $courses[$course]["format"] == "eLearning") {
+        $spoor = getProgress($courses[$course],$progress);
+        $courses[$course]["progress"] = $spoor["progress"];
+        $courses[$course]["assessmentPassed"] = "false";
+        if ($spoor["_isAssessmentPassed"]) {
+          $courses[$course]["assessmentPassed"] = "true";
+        }
+        $time = getTime($user[$course . "_cmi．core．session_time"]);
+
+        $answers = $user[$course . "_cmi．answers"];
+        $answers = json_decode($answers,true);
+        if (!is_array($answers)) {
+          $courses[$course]["assessmentPassed"] = "not attempted";
+        }
+        $out = [];
+        foreach ($answers as $id => $data) {
+          unset($data["selectedItems"]);
+          $out[$id] = $data;
+        }
+
+        $object = [];
+        $object["id"] = $courses[$course]["id"];
+        $object["progress"] = $courses[$course]["progress"];
+        $object["assessmentPassed"] = $courses[$course]["assessmentPassed"];
+        $object["time"] = $time;
+        $object["lastSave"] = $user[$course . "_lastSave"];
+        $object["theme"] = $theme;
+        $object["lang"] = $lang;
+        $object["platform"] = $platform;
+        $object["answers"] = $out;
+
+        if ($courses[$course]["progress"] > 99) {
+          $ret["complete"][] = $object;
+        } else if ($time > 300) {
+          $ret["active"][] = $object;
+        } else {
+          $ret["in_progress"][] = $object;
+        }
+      }
+    }
+  }
+  return $ret;
 }
 
 /*
@@ -491,9 +675,9 @@ function getTime($time) {
  * getProgress($course,$progress)
  * Get the progress and badge 
  * 
- * NEEDS UPGRADING TO v2 API
+ *  ADAPT 1
  * 
- * Called by: api/v1/trained_stats.php
+ * Called by: 
  * 			  library/functions.php
  * 			  profile/index.php
  */
@@ -503,15 +687,18 @@ function getProgress($course,$progress) {
 	if ($progress["_isAssessmentPassed"] > 0 || $progress["_isCourseComplete"] > 0) {
 		$progress["completion"] = str_replace("0","1",$progress["completion"]);
 		$badgeData = getModuleBadgeData($course);
-		return 100;
-	}
-	$total = strlen($progress["completion"]);
-	if ($total == 0) {
-		return 0;
-	}
-	$sub = substr_count($progress["completion"],0);
-	$complete = round(($sub / $total) * 100);
-	return $complete;	
+		$progress["progress"] = 100;
+	} else {
+	 $total = strlen($progress["completion"]);
+	 if ($total == 0) {
+		  $progress["progress"] = 0;
+	 } else {
+    $sub = substr_count($progress["completion"],0);
+	  $complete = round(($sub / $total) * 100);
+    $progress["progress"] = $complete;
+   }
+  }
+  return $progress;
 }
 
 /* 
@@ -552,5 +739,22 @@ function removeNullProfiles($users) {
   return $ret;
 }
 
+/*
+ * removeNullProfilesBadges($users)
+ * Remove profiles that have no data except badges
+ *
+ * Called by: api/v1/generate_user_summary.php
+ *            api/v1/trained_stats.php
+ *        
+ */
+function removeNullProfilesBadges($users) {
+  $ret = "";
+  foreach ($users as $email => $data) {
+    if ($data["courses"]["complete"] != null || $data["eLearning"]["complete"] !=null || $data["eLearning"]["in_progress"] !=null || $data["eLearning"]["active"] !=null ) {
+      $ret[$email] = $data;
+    }
+  }
+  return $ret;
+}
 
 ?>

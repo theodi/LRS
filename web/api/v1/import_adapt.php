@@ -60,6 +60,7 @@ function importAdapt2Module($module,$url) {
 	unset($module["_type"]);
 	unset($module["_parentID"]);
 	unset($module["_isLockedBy"]);
+	$module["topMenu"] = $url;
 	if (substr($url,-1) == "/") {
 		$module["url"] = $url . "#/id/" . $module["_id"];
 	} else {
