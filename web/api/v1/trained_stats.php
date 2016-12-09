@@ -126,7 +126,19 @@ foreach ($cursor as $doc) {
 $users = "";
 $users = getUsers("courseAttendance",$users);
 
+if ($profile != "") {
+	$users = filterUsers($users,$filter,$client,$theme,$courses);
+} elseif ($theme != "default") {
+	$users = filterUsers($users,$filter,"",$theme,$courses);
+}
+if ($theme != "default") {
+ 	$users = removeNullProfilesBadges($users);
+} else {
+	$users = removeNullProfiles($users);  
+}
 $attended_training = 0;
+
+//print_r($users);
 
 foreach($users as $email => $data) {
 	$complete_courses = 0;

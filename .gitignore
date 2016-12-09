@@ -4,3 +4,4 @@ vendor/
 composer.phar
 client_secret.json
 html/
+backup.sh
