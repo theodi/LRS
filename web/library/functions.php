@@ -482,7 +482,7 @@ function processAdapt2User($users,$doc,$email) {
   $progress = $doc["progress"];
   foreach ($progress as $module => $data) {
     $data["id"] = $module;
-    if ($data["progress"] > 99) {
+    if ($data["progress"] > 99 || $data["answers"]["_assessmentState"] == "Passed" || $data["answers"]["_assessmentState"] == "Failed") {
         $users[$email]["eLearning"]["complete"][] = $data;
     } elseif ($data["progress"] > 50 && $data["sessionTime"] > 299) {
         $users[$email]["eLearning"]["active"][] = $data;

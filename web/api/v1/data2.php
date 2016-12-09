@@ -194,7 +194,7 @@ function rotate2($id,$indata) {
 	$line["platform"] = $data["platform"];
 	$line["lang"] = $data["lang"];
 	$line["complete"] = "false";
-	if ($data["progress"] > 99 || $data["_isComplete"] == true) {
+	if ($data["progress"] > 99 || $data["_isComplete"] == true || $data["answers"]["_assessmentState"] == "Passed" || $data["answers"]["_assessmentState"] == "Failed") {
 		$line["complete"] = "true";
 	}
 	// Need to mark the assessment (do I need the assement module?)
