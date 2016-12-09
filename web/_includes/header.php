@@ -225,6 +225,7 @@ function render_menu_item($current,$page) {
 
 function render_menu() {
   global $pages,$current,$userData;
+
   $ret = "";
   for ($i=0;$i<count($pages);$i++) {
 	$page = $pages[$i];

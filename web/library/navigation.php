@@ -23,8 +23,8 @@ function getMenuPages($redirect_path) {
 	$page['url'] = $redirect_path . '/profile/index.php';
 	$page['title'] = 'Profile';
 	$page["long_title"] = "Your profile";
-	//$page['admin'] = true;
 	$page['loggedIn'] = true;
+	$page['admin'] = false;
 	$pages[] = $page;
 	$page['url'] = $redirect_path . '/learners/index.php';
 	
