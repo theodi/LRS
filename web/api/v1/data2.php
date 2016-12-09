@@ -1,7 +1,8 @@
 <?php
 // TRY THIS VERSION
 $debug = false;
-$debugid = "DFECD1A5-8180-4390-9A35-340063AA0971";
+$debugid = "q@q.com";
+//$debugid = "DFECD1A5-8180-4390-9A35-340063AA0971";
 $access = "public";
 $path = "../../";
 set_include_path(get_include_path() . PATH_SEPARATOR . $path);
@@ -92,6 +93,7 @@ foreach ($cursor as $doc) {
     }
 }
 // ADAPT 2
+
 $collection = "adapt2";
 $cursor = getDataFromCollection($collection); 
 foreach ($cursor as $doc) {
@@ -117,16 +119,18 @@ foreach ($cursor as $doc) {
 	} else {
   		$users = removeNullProfiles($users);  
 	}
-	echo "\n\nHELLO\n\n";
-	print_r($users);
-
 
     foreach ($users as $id => $data) {
-    		$output[] = rotate($id,$data);
+    	$output[] = rotate2($id,$data);
+    	if ($userid == $debugid && $debug == true) {
+			print_r($output);
+		}
     }
 }
 
-//outputCSV($output);
+outputCSV($output);
+
+// Adapt
 
 function rotate($id,$indata) {
 	global $debug,$debugid;
@@ -164,6 +168,48 @@ function rotate($id,$indata) {
 	return $line;
 }
 
+// Adapt 2
+
+function rotate2($id,$indata) {
+	global $debug,$debugid;
+	$line = [];
+
+	$line["id"] = $id;
+	$line["email"] = "false";
+	if (strpos($id, "@")) {
+		$line["id"] = $indata["id"];
+		$line["email"] = "true";
+	}
+	$data = $indata["eLearning"]["complete"][0];
+	if (!is_array($data)) {
+		$data = $indata["eLearning"]["in_progress"][0];
+	}
+	if (!is_array($data)) {
+		$data = $indata["eLearning"]["active"][0];
+	}
+	$line["theme"] = $data["theme"];
+	if (!$data["platform"]) {
+		$data["platform"] = "web";
+	}
+	$line["platform"] = $data["platform"];
+	$line["lang"] = $data["lang"];
+	$line["complete"] = "false";
+	if ($data["progress"] > 99 || $data["_isComplete"] == true) {
+		$line["complete"] = "true";
+	}
+	// Need to mark the assessment (do I need the assement module?)
+	$line["passed"] = $data["answers"]["_assessmentState"];
+
+	$line["completion"] = $data["progress"] / 100;
+	$line["session_time"] = gmdate("H:i:s", $data["sessionTime"]);
+	foreach ($data["answers"] as $aid => $data) {
+		if (is_array($data["_userAnswer"])) {
+			$line[$aid] = json_encode($data["_userAnswer"]);
+		}
+	}
+
+	return $line;
+}
 
 // FIXME DUPLICATED IN GENERATE_USER_SUMMARY
 /* Single course filter functions */
