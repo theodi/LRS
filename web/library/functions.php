@@ -508,6 +508,10 @@ function processUser($collection,$users,$doc,$email) {
   $users[$email]["id"] = $doc["_id"];
   if ($collection = "eLearning") {
     $users[$email]["eLearning"] = geteLearningCompletion($doc,$courses,$users[$email]["eLearning"]);
+    if ($users[$email]["First Name"] == "") {
+	$users[$email]["First Name"] = $doc["firstname"];
+    	$users[$email]["Surname"] = $doc["lastname"];
+    }
   }
   if ($collection = "courseAttendance") {
     $id = $doc["Course"];
