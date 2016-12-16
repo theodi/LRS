@@ -55,6 +55,9 @@ function setAdapt2Data($data,$url) {
 
 function importAdapt2Module($module,$url) {
 	global $courses_collection;
+	if ($module["_classes"] == "hidden") {
+		return;
+	}
 	unset($module["_pageLevelProgress"]);
 	unset($module["linkText"]);
 	unset($module["_type"]);
