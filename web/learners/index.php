@@ -33,7 +33,8 @@
                 <th>Credits</th>
                 <th>Theme</th>
                 <th>Badges</th>
-		<th class="none">F2F courses complete</th>
+        <th class="none">Location</th>
+        <th class="none">F2F courses complete</th>
 		<th class="none">eLearning modules complete</th>
         <th class="none">eLearning modules active</th>
             </tr>
@@ -90,6 +91,7 @@ $(document).ready(function() {
 		        }
 		        return "";
             }},
+            { "data": "Location" },
 	    { "data": function(d) {
     		ret = "<ul>";
 		    try {

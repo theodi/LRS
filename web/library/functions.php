@@ -474,6 +474,13 @@ function processAdapt2User($users,$doc,$email) {
   $details = $doc["user"];
   if (!$users[$email]["First Name"]) { $users[$email]["First Name"] = $details["First Name"]; } 
   if (!$users[$email]["Surname"]) { $users[$email]["Surname"] = $details["Surname"]; }
+  if (!$users[$email]["Location"]) { 
+    $users[$email]["Location"] = $details["Country"]; 
+    if ($details["Region"] != "") {
+      $users[$email]["Location"] .= ' (' . $details["Region"] . ')';
+    }
+  }
+
   foreach ($details as $key => $value) {
     if ($key != "email") {
       $users[$email][$key] = $value;
@@ -506,10 +513,16 @@ function processUser($collection,$users,$doc,$email) {
   $users[$email]["First Name"] = $doc["First Name"];
   $users[$email]["Surname"] = $doc["Surname"];
   $users[$email]["id"] = $doc["_id"];
+  if ($doc["Country"] != "") {
+    $users[$email]["Location"] = $doc["Country"]; 
+    if ($doc["Region"] != "") {
+      $users[$email]["Location"] .= ' (' . $doc["Region"] . ')';
+    }
+  }
   if ($collection = "eLearning") {
     $users[$email]["eLearning"] = geteLearningCompletion($doc,$courses,$users[$email]["eLearning"]);
     if ($users[$email]["First Name"] == "") {
-	$users[$email]["First Name"] = $doc["firstname"];
+	    $users[$email]["First Name"] = $doc["firstname"];
     	$users[$email]["Surname"] = $doc["lastname"];
     }
   }
