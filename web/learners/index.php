@@ -48,6 +48,10 @@
 TODO: Convert this to use more of the courses data and provide links.
 */
 $(document).ready(function() {
+  countries = {};
+  $.getJSON("../api/v1/countries.php", function(data) {
+    countries = data;
+  });
   $.getJSON( "../api/v1/courses.php", function( data ) {
   	data = data["data"];
   	var courses = {};
@@ -91,7 +95,19 @@ $(document).ready(function() {
 		        }
 		        return "";
             }},
-            { "data": "Location" },
+            { "data" : function(d) {
+                try { 
+                    if (d["Country"] && d["Region"]) {
+                        img = '<img src="../images/blank.gif" class="flag ' + d["Country"] + ' fnone"> '; 
+                        return img + countries[d["Country"]]["name"] + " (" + d["Region"] + ")"; 
+                    } else if (d["Country"]) {
+                        img = '<img src="../images/blank.gif" class="flag ' + d["Country"] + ' fnone"> '; 
+                        return img + countries[d["Country"]]["name"];
+                    }
+                } catch(err) {}
+                
+                return "Unknown";
+            }},
 	    { "data": function(d) {
     		ret = "<ul>";
 		    try {

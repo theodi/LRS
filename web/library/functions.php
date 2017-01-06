@@ -513,11 +513,11 @@ function processUser($collection,$users,$doc,$email) {
   $users[$email]["First Name"] = $doc["First Name"];
   $users[$email]["Surname"] = $doc["Surname"];
   $users[$email]["id"] = $doc["_id"];
-  if ($doc["Country"] != "") {
-    $users[$email]["Location"] = $doc["Country"]; 
-    if ($doc["Region"] != "") {
-      $users[$email]["Location"] .= ' (' . $doc["Region"] . ')';
-    }
+  if ($doc["country"] != "") {
+    $users[$email]["Country"] = $doc["country"];
+  }
+  if ($doc["region"] != "") {
+      $users[$email]["Region"] = $doc["region"];
   }
   if ($collection = "eLearning") {
     $users[$email]["eLearning"] = geteLearningCompletion($doc,$courses,$users[$email]["eLearning"]);

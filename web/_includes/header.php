@@ -155,6 +155,7 @@ if ($access == "public") {
 <link href="/css/odi-bootstrap.css" rel="stylesheet">
 <link href="/css/style.css" rel="stylesheet">
 <link href="/css/nav.css" rel="stylesheet">
+<link href="/css/flags.css" rel="stylesheet">
 <link rel="shortcut icon" href="/images/odifavicon32.ico">
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 <script src="/js/nav.js"></script>
