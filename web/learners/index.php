@@ -31,9 +31,10 @@
                 <th>Completed F2F courses</th>
                 <th>Completed online modules</th>
                 <th>Credits</th>
-                <th>Theme</th>
+                <th>Location</th>
                 <th>Badges</th>
-		<th class="none">F2F courses complete</th>
+        <th class="none">Theme</th>
+        <th class="none">F2F courses complete</th>
 		<th class="none">eLearning modules complete</th>
         <th class="none">eLearning modules active</th>
             </tr>
@@ -47,6 +48,10 @@
 TODO: Convert this to use more of the courses data and provide links.
 */
 $(document).ready(function() {
+  countries = {};
+  $.getJSON("../api/v1/countries.php", function(data) {
+    countries = data;
+  });
   $.getJSON( "../api/v1/courses.php", function( data ) {
   	data = data["data"];
   	var courses = {};
@@ -76,8 +81,17 @@ $(document).ready(function() {
             } },
             { "data": "totalCredits" },
             { "data" : function(d) {
-                try { if (d["eLearning"]["theme"]) { return d["eLearning"]["theme"]; } } catch(err) {}
-                return "-";
+                try { 
+                    if (d["Country"] && d["Region"]) {
+                        img = '<img src="../images/blank.gif" class="flag ' + d["Country"] + ' fnone"><br/>'; 
+                        return img + countries[d["Country"]]["name"] + " (" + d["Region"] + ")"; 
+                    } else if (d["Country"]) {
+                        img = '<img src="../images/blank.gif" class="flag ' + d["Country"] + ' fnone"><br/>'; 
+                        return img + countries[d["Country"]]["name"];
+                    }
+                } catch(err) {}
+                
+                return "";
             }},
             { "data": function(d) {
             	badgesComplete = "";
@@ -89,6 +103,10 @@ $(document).ready(function() {
 			         return badgesComplete;
 		        }
 		        return "";
+            }},
+            { "data" : function(d) {
+                try { if (d["eLearning"]["theme"]) { return d["eLearning"]["theme"]; } } catch(err) {}
+                return "-";
             }},
 	    { "data": function(d) {
     		ret = "<ul>";
