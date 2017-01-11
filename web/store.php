@@ -31,7 +31,7 @@ function store($data) {
 
 	$m->close();
 
-	if (!getMailLock()) {
+	if (!getMailLock(1)) {
 		findEmails();
 	}
 	

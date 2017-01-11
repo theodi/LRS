@@ -7,11 +7,11 @@ if ($_SERVER["HTTP_HOST"] == "localhost") {
 	include_once('_includes/config.inc.php');
 }
 
-function getMailLock() {
-   global $connection_url, $db_name, $collection;
+function getMailLock($version) {
+   global $connection_url, $db_name;
 	$m = new MongoClient($connection_url);
-	$col = $m->selectDB($db_name)->selectCollection($collection);
-	$query = array('_id' => "email_process");
+	$col = $m->selectDB($db_name)->selectCollection("emailLocks");
+	$query = array('Version' => $version);
 	$count = $col->count($query);
 	$m->close();
 	if ($count > 0) {
@@ -21,11 +21,15 @@ function getMailLock() {
 	}
 }
 
-function setMailLock($state) {
-   global $connection_url, $db_name, $collection;
+function setMailLock($state,$version) {
+   global $connection_url, $db_name;
 	$m = new MongoClient($connection_url);
-	$col = $m->selectDB($db_name)->selectCollection($collection);
-	$query = array('_id' => "email_process");
+	$col = $m->selectDB($db_name)->selectCollection("emailLocks");
+	$query = array("Version" => $version);
+	$count = $col->count($query);
+	if ($state && $count > 0) {
+		return;
+	}
 	if($state) {
 		$col->save($query);
 	} else {
@@ -35,8 +39,16 @@ function setMailLock($state) {
 }
 
 function findEmails() {
-	global $connection_url, $db_name, $collection;
-	setMailLock(true);
+	global $collection;
+	findEmailsCollection($collection,1);
+	// Not required as adapt2 store calls this directly.
+	//findEmailsCollection("adapt2",2);
+}
+
+
+function findEmailsCollection($collection,$version) {
+	setMailLock(true,$version);
+	global $connection_url, $db_name;
 	try {
 		$m = new MongoClient($connection_url);
 		$col = $m->selectDB($db_name)->selectCollection($collection);
@@ -46,16 +58,16 @@ function findEmails() {
 	
 		foreach ($cursor as $doc) {
 			$doc = json_encode($doc);
-			processEmail($doc);
+			processEmail($doc,$version);
 		}
 	} catch ( Exception $e ) {
 		syslog(LOG_ERR,'Error: ' . $e->getMessage());
 	}
-	setMailLock(false);
+	setMailLock(false,$version);
 }
 
-function markDone($id) {
-	global $connection_url, $db_name, $collection;
+function markDone($collection,$id) {
+	global $connection_url, $db_name;
 	try {
 		$m = new MongoClient($connection_url);
 		$col = $m->selectDB($db_name)->selectCollection($collection);
@@ -67,8 +79,16 @@ function markDone($id) {
 	}
 }
 
-function processEmail($data) {
-	global $eLearning_prefix;
+function processEmail($data,$version) {
+	if ($version == 1) {
+		processEmailAdapt1($data);
+	} elseif ($version == 2) {
+		processEmailAdapt2($data);
+	}
+}
+
+function processEmailAdapt1($data) {
+	global $eLearning_prefix,$collection;
 	$data = json_decode($data,true);
 	$id = $data["_id"];
 	$email = $data["email"];
@@ -91,7 +111,29 @@ function processEmail($data) {
 	if ($email && $sent == "false") {
 		$email = str_replace("．",".",$email);
 		sendEmail($id,$email,$prefix,$theme);
-		markDone($id);
+		markDone($collection,$id);
+	}
+}
+
+function processEmailAdapt2($data) {
+	$data = json_decode($data,true);
+	$id = $data["_id"];
+	if (!$data["user"]["email"] || !$id) {
+		return;
+	}
+	$email = $data["user"]["email"];
+	$modules = $data["progress"];
+	$done = [];
+	foreach($modules as $uid => $values) {
+		$prefix = $values["courseID"];
+		$theme = $values["theme"];
+		$lang = "en";
+		if (!$done[$prefix]) {
+			if (sendEmail($id,$email,$prefix,$theme)) {
+				markDone("adapt2",$id);			
+			}
+			$done[$prefix] = true;
+		}
 	}
 }
 
