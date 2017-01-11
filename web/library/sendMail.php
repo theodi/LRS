@@ -99,8 +99,8 @@ function processEmailAdapt1($data) {
 	}
 	$lang = $data["lang"];
 	$prefix = $eLearning_prefix;
-	if ($theme == "TZ") {
-		$prefix = "https://tanzania.learndata.info/eLearning/";
+	if ($theme == "DLAB") {
+		$prefix = "https://dlab.learndata.info/";
 	}
 	if ($theme == "EU") {
 		$prefix = "http://europeandataportal.eu/elearning/" . $lang . "/";
