@@ -162,7 +162,12 @@ function rotate($id,$indata) {
 	$line["completion"] = $data["progress"] / 100;
 	$line["session_time"] = gmdate("H:i:s", $data["time"]);
 	foreach ($data["answers"] as $aid => $data) {
-		$line[$aid] = json_encode($data["userAnswer"]);
+		$i=0;
+		foreach($data["userAnswer"] as $value) {
+			$line[$aid."-".$i] = $value;
+			$i++;
+		}
+		//$line[$aid] = json_encode($data["userAnswer"]);
 	}
 
 	return $line;
@@ -172,6 +177,7 @@ function rotate($id,$indata) {
 
 function rotate2($id,$indata) {
 	global $debug,$debugid;
+	global $connection_url, $db_name;
 	$line = [];
 
 	$line["id"] = $id;
@@ -202,12 +208,31 @@ function rotate2($id,$indata) {
 
 	$line["completion"] = $data["progress"] / 100;
 	$line["session_time"] = gmdate("H:i:s", $data["sessionTime"]);
-	foreach ($data["answers"] as $aid => $data) {
-		if (is_array($data["_userAnswer"])) {
-			$line[$aid] = json_encode($data["_userAnswer"]);
+
+	$collection = "adapt2Components";
+	$adapt2Components = getDataFromCollection("adapt2Components");
+	foreach ($adapt2Components as $doc) {
+		if ($doc["_items"] && $doc["_component"] == "mcq") {
+			$comps[$doc["_id"]] = $doc;	
 		}
 	}
-
+	foreach ($data["answers"] as $aid => $data) {
+		$items = $comps[$aid]["_items"];
+		if (is_array($data["_userAnswer"])) {
+			if ($items) {
+				if ($data["_isCorrect"]) {
+					$line[$aid."_isCorrect"] = $data["_isCorrect"];
+				} elseif (count($data["_userAnswer"]) > 0) {
+					$line[$aid."_isCorrect"] = "0";
+				} else {
+					$line[$aid."_isCorrect"] = "";
+				}
+			}
+			for ($i=0;$i<count($items);$i++) {
+				$line[$aid."_".$i] = $data["_userAnswer"][$i] || "0";
+			}
+		}
+	}
 	return $line;
 }
 
