@@ -176,6 +176,7 @@ if ($access == "public") {
 <body>
 <div class="navigation" style="margin: 0 -20px; width: initial;">
 <div class="navigation-inner clearfix">
+<div id="odiLearning" style="margin-left: 30px; width: 50%;"></div>
 <a href="javascript:void(0)" class="icon">
   <div class="hamburger">
     <div class="menui top-menu"></div>
