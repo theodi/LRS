@@ -1,8 +1,8 @@
 <?php
 // TRY THIS VERSION
 $debug = false;
-$debugid = "q@q.com";
-//$debugid = "DFECD1A5-8180-4390-9A35-340063AA0971";
+//$debugid = "q@q.com";
+$debugid = "01952696-3F84-4636-BD3E-489EB82BD5AD";
 $access = "public";
 $path = "../../";
 set_include_path(get_include_path() . PATH_SEPARATOR . $path);
@@ -28,6 +28,7 @@ $single_course[] = $module;
 if (!$module) {
 	exit(0);
 }
+$componentItems = getComponents($module);
 
 $courses = getCoursesData();
 if ($theme && $theme != "default") {
@@ -59,37 +60,25 @@ foreach ($cursor as $doc) {
     foreach ($users as $id => $data) {
     	$userid = $id;
     }
-    if ($userid == $debugid && $debug == true) {
-		print_r($users);
-	}
     if ($profile != "") {
   		$users = filterUsers($users,$filter,$client,$theme,$courses);
 	} elseif ($theme != "default") {
   		$users = filterUsers($users,$filter,"",$theme,$courses);
 	}
-	if ($userid == $debugid && $debug == true) {
-		print_r($users);
-	}
 	if ($single_course) {
   		$users = filterUsersNotTheme($users,$single_course);
-	}
-	if ($userid == $debugid && $debug == true) {
-		print_r($users);
 	}
 	if ($theme != "default") {
   		$users = removeNullProfilesBadges($users);
 	} else {
   		$users = removeNullProfiles($users);  
 	}
-	if ($userid == $debugid && $debug == true) {
-		print_r($users);
-	}
-
     foreach ($users as $id => $data) {
-    	$output[] = rotate($id,$data);
-    	if ($userid == $debugid && $debug == true) {
-			print_r($output);
+		$data = addUserAnswer($data);
+    	if ($id == $debugid && $debug == true) {
+			print_r($data);
 		}
+		$output[] = rotate($id,$data);
     }
 }
 // ADAPT 2
@@ -113,13 +102,11 @@ foreach ($cursor as $doc) {
 	if ($single_course){
   		$users = filterUsersNotTheme($users,$single_course);
 	}
-
 	if ($theme != "default") {
   		$users = removeNullProfilesBadges($users);
 	} else {
   		$users = removeNullProfiles($users);  
 	}
-
     foreach ($users as $id => $data) {
     	$output[] = rotate2($id,$data);
     	if ($userid == $debugid && $debug == true) {
@@ -161,10 +148,11 @@ function rotate($id,$indata) {
 
 	$line["completion"] = $data["progress"] / 100;
 	$line["session_time"] = gmdate("H:i:s", $data["time"]);
-	foreach ($data["answers"] as $aid => $data) {
+	foreach ($data["answers"] as $aid => $adata) {
+		$line[$aid."_isCorrect"] = $adata["correct"];
 		$i=0;
-		foreach($data["userAnswer"] as $value) {
-			$line[$aid."-".$i] = $value;
+		foreach($adata["userAnswer"] as $value) {
+			$line[$aid."_".$i] = $value;
 			$i++;
 		}
 		//$line[$aid] = json_encode($data["userAnswer"]);
@@ -295,14 +283,78 @@ function outputCSV($summary) {
 	for($i=1;$i<count($summary);$i++) {
 		$values = "";
 		$line = $summary[$i];
-		foreach ($line as $key => $value) {
-			$values[] = $value;
+		for($k=0;$k<count($keys);$k++) {
+			$values[] = $line[$keys[$k]];
 		}
+		//foreach ($line as $key => $value) {
+		//	$values[] = $value;
+		//}
 		fputcsv($handle,$values);
 	}
 
 	fclose($handle);
 	
+}
+
+$componentItems = null;
+
+function getComponents($module) {
+	global $connection_url,$db_name;
+	$collection = "adaptComponents";
+	$query = array("_moduleId" => $module);
+	$res = executeQuery($connection_url,$db_name,$collection,$query);
+	foreach ($res as $doc) {
+		$ret[$doc["_componentId"]][] = $doc;
+	}
+	return $ret;
+}
+
+function addUserAnswer($data) {
+  	$data["eLearning"]["complete"] = addUserAnswers($data["eLearning"]["complete"]);
+  	$data["eLearning"]["in_progress"] = addUserAnswers($data["eLearning"]["in_progress"]);
+  	$data["eLearning"]["active"] = addUserAnswers($data["eLearning"]["active"]);
+  	return $data;
+}
+
+function addUserAnswers($courses) {
+	global $componentItems;
+	for($i=0;$i<count($courses);$i++) {
+		$answers = $courses[$i]["answers"];
+		foreach($answers as $id => $data) {
+	      $componentId = $id;
+          $item_sources = $componentItems[$componentId];
+          $min = 10000;
+          $pointer = "";
+          for($ci=0;$ci<count($item_sources);$ci++) {
+          	$items = $item_sources[$ci]["_items"];
+          	$data["items"][$ci] = $items;
+	        for($s=0;$s<count($data["selectedItems"]);$s++) {
+	        	$selected = $data["selectedItems"][$s]["text"];
+	            for($n=0;$n<count($items);$n++) {
+	               $distance = levenshtein($selected, $items[$n]["text"]);
+	          	   //echo "Comparing " . $selected  . " to " . $items[$n]["text"] . " = " . $distance . "\n";
+	               if ($distance < $min) {
+	                $min = $distance;
+	                //echo "setting pointer " . $s . " to " .$n . "\n";
+	                $pointer[$s] = $n;
+	               }
+	            }
+	        }
+	      }
+          unset($data["userAnswer"]);
+          $new = [];
+          for($n=0;$n<count($items);$n++) {
+            if (in_array($n, $pointer)) {
+              $new[$n] = 1;
+            } else {
+              $new[$n] = null;
+            }
+          }
+          $data["userAnswer"] = $new;
+          $courses[$i]["answers"][$id] = $data;
+        }
+    }
+    return $courses;
 }
 
 ?>

@@ -63,8 +63,6 @@ d3.csv('../api/v1/data2.php?module='+module+'&theme='+theme, function (data) {
           }
       }
     }
-    console.log(range);
-
 
     questionsHTML = "";
     for (var key in questions) {
@@ -81,21 +79,28 @@ d3.csv('../api/v1/data2.php?module='+module+'&theme='+theme, function (data) {
         questionsHTML += "<td><div id='" + docid + "' class='dc-chart question-chart'></div></td></tr>";
         $('#table_'+key).append(questionsHTML);
       }
-      $.getJSON( "../api/v1/getComponent.php?id="+key, function( data ) {
+      $.getJSON( "../api/v1/getComponent.php?id="+key+"&module="+module, function( data ) {
         questionData[data["_id"]] = data;
-        console.log(data);
         title = "<h3>" + data["title"] +"</h3><div class='questionText'>" + data["body"] + "</div>";
         $('#question_'+data["_id"]).prepend(title);
         items = data["_items"];
         for(i=0;i<items.length;i++) {
-          console.log('#label_'+data["_id"]+'_'+i);
-          console.log(items[i]["text"]);
           $('#label_'+data["_id"]+'_'+i).html(items[i]["text"]);
         }
         $('#label_'+data["_id"]+'_isCorrect').html('Correct users')
       });
     }
     
+    function remove_empty_bins(source_group) {
+        return {
+            all:function () {
+                return source_group.all().filter(function(d) {
+                    return d.key != "";
+                });
+            }
+        };
+    }
+
     var complete = ndx.dimension(function(d) {
         return d.complete;
     });
@@ -170,7 +175,11 @@ d3.csv('../api/v1/data2.php?module='+module+'&theme='+theme, function (data) {
     });
 
     var platform = ndx.dimension(function(d) {
+        if (d.platform == "" || typeof d.platform == 'undefined') {
+        return "web";
+      } else {
         return d.platform;
+      }
     });
 
     var platformGroup = platform.group();
@@ -188,7 +197,11 @@ d3.csv('../api/v1/data2.php?module='+module+'&theme='+theme, function (data) {
     });
 
     var theme = ndx.dimension(function(d) {
+      if (d.theme == "" || typeof d.theme == 'undefined') {
+        return "ODI";
+      } else {
         return d.theme;
+      }
     });
 
     var themeGroup = theme.group();
@@ -204,10 +217,15 @@ d3.csv('../api/v1/data2.php?module='+module+'&theme='+theme, function (data) {
     });
 
     var lang = ndx.dimension(function(d) {
-        return d.lang;
+      if (d.lang == "" || typeof d.lang == 'undefined') {
+          return "";
+      } else {
+          return d.lang;
+      }
     });
 
     var langGroup = lang.group();
+    langGroup = remove_empty_bins(langGroup);
 
     langLine
     .width(320)
@@ -258,15 +276,7 @@ d3.csv('../api/v1/data2.php?module='+module+'&theme='+theme, function (data) {
         return +value;
     });
 
-    function remove_empty_bins(source_group) {
-        return {
-            all:function () {
-                return source_group.all().filter(function(d) {
-                    return d.key != "no answer";
-                });
-            }
-        };
-    }
+
 
     for (var key in questions) {
       for(var part in questions[key]) {
@@ -275,8 +285,8 @@ d3.csv('../api/v1/data2.php?module='+module+'&theme='+theme, function (data) {
         questionIDs[lkey] = dc.rowChart('#' + docid);
       
         var dimension = ndx.dimension(function(d) {
-          if (d[lkey] == "") {
-            return "no answer";
+          if (d[lkey] == "" || typeof d[lkey] == 'undefined') {
+            return "";
           } else {
             return d[lkey];
           }
@@ -292,9 +302,6 @@ d3.csv('../api/v1/data2.php?module='+module+'&theme='+theme, function (data) {
           .renderLabel(true)
           .x(d3.scale.linear().range([0,270]).domain([0,range[lkey.substr(0,lkey.lastIndexOf("_"))]]))
           .label(function (d) {
-            return d.value;
-          })
-          .labelOffsetX(function(d) {
             return d.value;
           })
           .elasticX(false)

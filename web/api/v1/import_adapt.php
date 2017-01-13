@@ -11,6 +11,10 @@ if (!$url || $url == "") {
   echo "GO AWAY";
   exit();
 }
+$lang = "en";
+if ($_GET["lang"]) {
+	$lang = $_GET["lang"];
+}
 
 $data = getCourseData($url);
 $data["_id"] = getModuleId($url);
@@ -23,16 +27,18 @@ if ($data["title"] == "" || $data["id"] == "") {
 }
 
 function getCourseData($url) {
-	$dataUrl = $url . "/course/en/course.json";
+	global $lang;
+	$dataUrl = $url . "/course/".$lang."/course.json";
 	$data = file_get_contents($dataUrl);
 	if (strpos($data,"title") !== false && strpos($data,"_globals") === false) {
 		$data = getAdapt1Data($data);
+		importAdaptComponents($url);
 		$data["url"] = $url;
 	} elseif (strpos($data,"_globals") > 0) {
-		$dataUrl = $url . "/course/en/contentObjects.json";
+		$dataUrl = $url . "/course/".$lang."/contentObjects.json";
 		$data = file_get_contents($dataUrl);
-		$data = setAdapt2Data($data,$url);
-		$data = importAdapt2Components($url);
+		setAdapt2Data($data,$url);
+		importAdapt2Components($url);
 		exit(1);
 	}
 	return $data;
@@ -73,24 +79,40 @@ function importAdapt2Module($module,$url) {
 }
 
 function getModuleId($url) {
-	$dataUrl = $url . "/course/en/config.json";
+	global $lang;
+	$dataUrl = $url . "/course/".$lang."/config.json";
 	$data = file_get_contents($dataUrl);
 	$data = json_decode($data,true);
 	return $data["_moduleId"];
 }
 
+function importAdaptComponents($url) {
+	global $lang;
+	$id = getModuleId($url);
+	$components = json_decode(file_get_contents($url . "/course/".$lang."/components.json"),true);;
+	for ($i=0;$i<count($components);$i++) {
+		$component = $components[$i];
+		$component["_componentId"] = $component["_id"];
+		$component["_id"] = $url . '#' . $component["_id"];
+		$component["_moduleId"] = $id;
+		$component["_lang"] = $lang;
+		storeDataWithID($component["_id"],$component,"adaptComponents");
+	}
+}
+
 function importAdapt2Components($url) {
-	$articles = json_decode(file_get_contents($url . "/course/en/articles.json"),true);
+	global $lang;
+	$articles = json_decode(file_get_contents($url . "/course/".$lang."/articles.json"),true);
 	for ($i=0;$i<count($articles);$i++) {
 		$article = $articles[$i];
 		$arts[$article["_id"]] = $article["_parentId"];
 	}
-	$blocks = json_decode(file_get_contents($url . "/course/en/blocks.json"),true);
+	$blocks = json_decode(file_get_contents($url . "/course/".$lang."/blocks.json"),true);
 	for ($i=0;$i<count($blocks);$i++) {
 		$block = $blocks[$i];
 		$blks[$block["_id"]] = $arts[$block["_parentId"]];
 	}
-	$components = json_decode(file_get_contents($url . "/course/en/components.json"),true);;
+	$components = json_decode(file_get_contents($url . "/course/".$lang."/components.json"),true);;
 	for ($i=0;$i<count($components);$i++) {
 		$component = $components[$i];
 		$component["_moduleId"] = $blks[$component["_parentId"]];
