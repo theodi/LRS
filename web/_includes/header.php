@@ -161,12 +161,19 @@ if ($access == "public") {
 <script src="/js/nav.js"></script>
 <?php
 	require_once('library/lessify.inc.php');
-	$css = file_get_contents("https://raw.githubusercontent.com/theodi/ODI-eLearning/master/src/theme/$theme/less/variables.less");
+
+	//$css = file_get_contents("https://raw.githubusercontent.com/theodi/ODI-eLearning/master/src/theme/$theme/less/variables.less");
+	$css = @file_get_contents("css/theme/$theme/less/variables.less");
+	$css .= @file_get_contents("../css/theme/$theme/less/variables.less");
 	$css .= "@default-width:100%;\n";
 	$css .= @file_get_contents("css/variables.less");
 	$css .= @file_get_contents("../css/variables.less");
-	$css .= file_get_contents("https://raw.githubusercontent.com/theodi/ODI-eLearning/master/src/theme/$theme/less/navigation.less");
-	$css = str_replace("assets/","https://raw.githubusercontent.com/theodi/ODI-eLearning/master/src/theme/$theme/assets/",$css);
+	$css .= @file_get_contents("css/theme/$theme/less/navigation.less");
+	$css .= @file_get_contents("../css/theme/$theme/less/navigation.less");
+	$css = @str_replace("assets/","css/theme/$theme/assets/",$css);
+	$css = @str_replace("assets/","../css/theme/$theme/assets/",$css);
+	//$css .= file_get_contents("https://raw.githubusercontent.com/theodi/ODI-eLearning/master/src/theme/$theme/less/navigation.less");
+	//$css = str_replace("assets/","https://raw.githubusercontent.com/theodi/ODI-eLearning/master/src/theme/$theme/assets/",$css);
 	$less = new lessc;
 	echo '<style>' . "\n";
 	echo $less->compile($css);
