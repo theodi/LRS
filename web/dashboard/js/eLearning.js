@@ -68,9 +68,14 @@ d3.csv('../api/v1/data2.php?module='+module+'&theme='+theme, function (data) {
     for (var key in questions) {
       questionid = "question_"+key;
       questionsHTML = "";
-      questionsHTML += "<subsection id='"+questionid+"' class='question'><table id='table_"+key+"'></table></subsection>";
+      questionsHTML += "<subsection id='"+questionid+"' class='question'>";
+      questionsHTML += "<div class='correct_block'><div class='label'>Correct answers:</div><div id='question_" + key + "_isCorrect' class='number-chart'></div></div>"
+      questionsHTML += "<table id='table_"+key+"'></table></subsection>";
       $('#questions').append(questionsHTML);
       for(var part in questions[key]) {
+        if (part == "isCorrect") {
+          continue;
+        }
         lkey = key+"_"+part;
         docid = "question_"+lkey;
         labelid = "label_"+lkey;
@@ -80,11 +85,15 @@ d3.csv('../api/v1/data2.php?module='+module+'&theme='+theme, function (data) {
         $('#table_'+key).append(questionsHTML);
       }
       $.getJSON( "../api/v1/getComponent.php?id="+key+"&module="+module, function( data ) {
+        console.log(data);
         questionData[data["_id"]] = data;
         title = "<h3>" + data["title"] +"</h3><div class='questionText'>" + data["body"] + "</div>";
         $('#question_'+data["_id"]).prepend(title);
         items = data["_items"];
         for(i=0;i<items.length;i++) {
+          if (items[i]["_shouldBeSelected"]) {
+            $('#label_'+data["_id"]+'_'+i).parent().addClass("correct");
+          }
           $('#label_'+data["_id"]+'_'+i).html(items[i]["text"]);
         }
         $('#label_'+data["_id"]+'_isCorrect').html('Correct users')
@@ -95,6 +104,11 @@ d3.csv('../api/v1/data2.php?module='+module+'&theme='+theme, function (data) {
         return {
             all:function () {
                 return source_group.all().filter(function(d) {
+                    return d.key != "";
+                });
+            },
+            top:function () {
+              return source_group.all().filter(function(d) {
                     return d.key != "";
                 });
             }
@@ -282,7 +296,12 @@ d3.csv('../api/v1/data2.php?module='+module+'&theme='+theme, function (data) {
       for(var part in questions[key]) {
         lkey = key+"_"+part;
         docid = "question_"+lkey;
-        questionIDs[lkey] = dc.rowChart('#' + docid);
+        console.log(part);
+        if (part == "isCorrect") {
+          questionIDs[lkey] = dc.numberDisplay('#' + docid);
+        } else {
+          questionIDs[lkey] = dc.rowChart('#' + docid);
+        }
       
         var dimension = ndx.dimension(function(d) {
           if (d[lkey] == "" || typeof d[lkey] == 'undefined') {
@@ -293,6 +312,12 @@ d3.csv('../api/v1/data2.php?module='+module+'&theme='+theme, function (data) {
         });
         var group = dimension.group();
         var group2 = remove_empty_bins(group);
+
+        if (part == "isCorrect") {
+          questionIDs[lkey]
+            .group(group2)
+            .formatNumber(d3.format(".3s"))
+        } else {
         questionIDs[lkey]
           .width(320)
           .height(40)
@@ -306,7 +331,7 @@ d3.csv('../api/v1/data2.php?module='+module+'&theme='+theme, function (data) {
           })
           .elasticX(false)
           .xAxis().ticks(0)
-
+        }
       }
     }
 

@@ -30,11 +30,30 @@ subsection {
 	overflow-y: auto;
 	padding: 10px;
 	color: white;
+	width: 70%;
+	display: inline-block;
+	float: left;
 }
 .questionText p {
 	font-size: inherit;
 	line-height: 1.2em;
 	margin: 0;
+}
+.correct_block {
+    display: inline-block;
+    width: 120px;
+    float: right;
+    background-color: black;
+    height: 100px;
+    margin-top: -10px;
+}
+.number-chart {
+	text-align: center;
+    width: inherit;
+    height: inherit;
+    font-size: 2em;
+    padding-top: 28px;
+    color: white;
 }
 .multiSelection {
 	background-color: white;
@@ -64,7 +83,7 @@ subsection {
 #questions {
 	display: block;
 	width: 100%;
-	text-align: left;	
+	text-align: left;
 }
 .dc-chart g.row text {
     fill: white;
@@ -76,4 +95,14 @@ subsection {
 }
 .label-cell {
 	background-color: #999999;
+	width: 160px;
+}
+.label-cell .label {
+	white-space: normal;
+}
+.correct {
+	background-color: green;
+}
+.correct .label {
+	background-color: green;
 }
