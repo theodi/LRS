@@ -609,14 +609,6 @@ function filterCoursesUnique($user) {
   return $user;
 }
 
-function getAdaptComponents() {
-  $cursor = getDataFromCollection("adaptComponents");
-  foreach($cursor as $doc) {
-    $componentItems[$doc["_id"]] = $doc;
-    //print_r($componentItems);
-  }
-  return $componentItems;
-}
 /*
  * geteLearningCompletion($user,$courses,$ret)
  * Get complete, active and in_progress courses given a user
@@ -627,10 +619,6 @@ function getAdaptComponents() {
  *        library/functions.php
  */
 function geteLearningCompletion($user,$courses,$ret) {
-  //global $componentItems;
-  //if (!$collectionItems) {
-  //  $componentItems = getAdaptComponents();
-  //}
   $theme = "";
   $theme = $user["theme"];
   $lang = $user["lang"];
@@ -656,9 +644,10 @@ function geteLearningCompletion($user,$courses,$ret) {
         }
         $out = [];
         foreach ($answers as $id => $data) {
-          unset($data["userAnswer"]);
+          unset($data["selectedItems"]);
           $out[$id] = $data;
         }
+
         $object = [];
         $object["id"] = $courses[$course]["id"];
         $object["progress"] = $courses[$course]["progress"];

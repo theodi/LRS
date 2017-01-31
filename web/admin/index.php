@@ -26,7 +26,6 @@
 <section id="add_adapt_course">
 	Please enter the url of the course homepage in the box below, it must be publically accessible. (e.g. http://accelerate.theodi.org/en/module1 or http://training.theodi.org/inaday).<br/><br/>
 	<input type="text" id="course_url"></input></br>
-	<input type="text" id="course_lang" value="en" style="width:20px;"></input></br/>
 	<button id="import_adapt_course">Import adapt course</button>
 </section>
 
@@ -137,13 +136,12 @@ function update_identifiers() {
 
 function import_adapt() {
 	url = $('#course_url').val();
-	lang = $('#course_lang').val();
 	if (url == "") {
 		alert("please enter a course url!");
 		return;
 	} 
 	$('#add_adapt_course').html('Please wait');
-	$.get('../api/v1/import_adapt.php?url=' + encodeURI(url) + '&lang=' + lang, function(data) {
+	$.get('../api/v1/import_adapt.php?url=' + encodeURI(url), function(data) {
 		$('#add_adapt_course').html(data);
 	});
 }
