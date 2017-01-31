@@ -5,9 +5,55 @@ section {
 }
 subsection {
 	display: inline-block;
-        margin: 10px;
-        text-align: center;
+    margin: 10px;
+    text-align: center;
 	width: 320px;
+}
+.question {
+	width: 540px;
+	border: 1px solid black;
+	background-color: rgb(49, 130, 189);
+}
+.question h3 {
+	background: white;
+	width: 100%;
+	margin: 0;
+	margin-bottom: 10px;
+}
+.question table {
+	background: white;
+}
+.questionText {
+	font-size: 0.8em;
+	text-align: left;
+	height: 60px;
+	overflow-y: auto;
+	padding: 10px;
+	color: white;
+	width: 70%;
+	display: inline-block;
+	float: left;
+}
+.questionText p {
+	font-size: inherit;
+	line-height: 1.2em;
+	margin: 0;
+}
+.correct_block {
+    display: inline-block;
+    width: 120px;
+    float: right;
+    background-color: black;
+    height: 100px;
+    margin-top: -10px;
+}
+.number-chart {
+	text-align: center;
+    width: inherit;
+    height: inherit;
+    font-size: 2em;
+    padding-top: 28px;
+    color: white;
 }
 .multiSelection {
 	background-color: white;
@@ -37,10 +83,26 @@ subsection {
 #questions {
 	display: block;
 	width: 100%;
-	text-align: left;	
+	text-align: left;
 }
 .dc-chart g.row text {
-    fill: black;
+    fill: white;
     font-size: 12px;
     cursor: pointer;
+}
+.question-chart .axis path, .axis line {
+	stroke: none
+}
+.label-cell {
+	background-color: #999999;
+	width: 160px;
+}
+.label-cell .label {
+	white-space: normal;
+}
+.correct {
+	background-color: green;
+}
+.correct .label {
+	background-color: green;
 }
