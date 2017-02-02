@@ -12,19 +12,20 @@ function isInt(n){
 }
 
 var module = getUrlVars()["module"];
-var completePie = dc.pieChart('#complete-pie');
-var passedPie = dc.pieChart('#passed-pie');
-var emailPie = dc.pieChart('#email-pie');
-var platformPie = dc.pieChart('#platform-pie');
-var themeLine = dc.rowChart('#theme-line');
+var completeLine = dc.rowChart('#complete-line');
+var passedLine = dc.rowChart('#assessment-line');
+var platformLine = dc.rowChart('#platform-line');
 var langLine = dc.rowChart('#lang-line');
-var completeBar = dc.barChart('#complete-bar');
+var emailLine = dc.rowChart('#email-line');
+var themeLine = dc.rowChart('#theme-line');
+var completeBar = dc.barChart('#percentage-bar');
 var timeBar = dc.barChart('#time-bar');
 var questionIDs = [];
 
 d3.csv('../api/v1/data2.php?module='+module+'&theme='+theme, function (data) {
     var ndx = crossfilter(data);
     var all = ndx.groupAll();
+    var doneLabels = [];
 
     questions = {};
     questionData = {};
@@ -87,7 +88,7 @@ d3.csv('../api/v1/data2.php?module='+module+'&theme='+theme, function (data) {
       $.getJSON( "../api/v1/getComponent.php?id="+key+"&module="+module, function( data ) {
         console.log(data);
         questionData[data["_id"]] = data;
-        title = "<h3>" + data["title"] +"</h3><div class='questionText'>" + data["body"] + "</div>";
+        title = "<div class='questionText'><h3>" + data["title"] +"</h3>" + data["body"] + "</div>";
         $('#question_'+data["_id"]).prepend(title);
         items = data["_items"];
         for(i=0;i<items.length;i++) {
@@ -120,35 +121,28 @@ d3.csv('../api/v1/data2.php?module='+module+'&theme='+theme, function (data) {
     });
     
     var completeGroup = complete.group();
+    doneLabels["complete"] = [];
 
-    completePie
-    .width(160)
-    .height(160)
-    .radius(80)
+    completeLine
+    .width(320)
+    .height(150)
     .dimension(complete)
     .group(completeGroup)
-//        .ordinalColors(['green', 'red')
-    .colors(d3.scale.ordinal().domain(["true","false"]).range(['blue','gray']))
+    .margins({top: 0, left: 0, right: 10, bottom: -1})
+    .renderLabel(true)
     .label(function (d) {
-        var label = d.key;
-        return label;
-    });
-
-    var percent = ndx.dimension(function(d) {
-      value = Math.round(d.completion * 10);
-      return +value;
-    });
-
-    var percentGroup = percent.group();
-
-    completeBar
-    .width(360)
-    .height(160)
-    .dimension(percent)
-    .group(percentGroup)
-    .x(d3.scale.linear().domain([0,11]))
-    .gap(0.1)
-    .brushOn(true);
+      labelText = "Incomplete";
+      if (d.key == "true") { labelText = "Complete"; }
+      if (!doneLabels["complete"][d.key]) {
+        $('#complete-labels').append("<div class='chart-label complete-label'><div class='chart-label-text label'>"+labelText+"</div></div>");
+        doneLabels["complete"][d.key] = true;
+        height = 100 / Object.keys(doneLabels["complete"]).length;
+        $('.complete-label').css('height',height + '%');
+      }
+      return d.value;
+    })
+    .elasticX(false)
+    .xAxis().ticks(0);
 
     var passed = ndx.dimension(function(d) {
         return d.passed;
@@ -156,79 +150,28 @@ d3.csv('../api/v1/data2.php?module='+module+'&theme='+theme, function (data) {
 
     var passedGroup = passed.group();
 
-    passedPie
-    .width(160)
-    .height(160)
-    .radius(80)
+    doneLabels["passed"] = [];
+    passedLine
+    .width(320)
+    .height(150)
     .dimension(passed)
     .group(passedGroup)
-    //        .ordinalColors(['green', 'red')
-    .colors(d3.scale.ordinal().domain(["true","false","not attempted"]).range(['blue','black','gray']))
+    .margins({top: 0, left: 0, right: 10, bottom: -1})
+    .renderLabel(true)
     .label(function (d) {
-        var label = d.key;
-        return label;
-    });
-
-    var email = ndx.dimension(function(d) {
-        return d.email;
-    });
-
-    var emailGroup = email.group();
-
-    emailPie
-    .width(160)
-    .height(160)
-    .radius(80)
-    .dimension(email)
-    .group(emailGroup)
-    //        .ordinalColors(['green', 'red')
-    .colors(d3.scale.ordinal().domain(["true","false"]).range(['blue','gray']))
-    .label(function (d) {
-        var label = d.key;
-        return label;
-    });
-
-    var platform = ndx.dimension(function(d) {
-        if (d.platform == "" || typeof d.platform == 'undefined') {
-        return "web";
-      } else {
-        return d.platform;
+      if (!doneLabels["passed"][d.key]) {
+        labelText = "Not attempted";
+        if (d.key == "true") { labelText = "Passed";}
+        if (d.key == "false") {labelText = "Failed";}
+        $('#assessment-labels').append("<div class='chart-label assessment-label'><div class='chart-label-text label'>"+labelText+"</div></div>");
+        doneLabels["passed"][d.key] = true;
+        height = 100 / Object.keys(doneLabels["passed"]).length;
+        $('.assessment-label').css('height',height + '%');
       }
-    });
-
-    var platformGroup = platform.group();
-
-    platformPie
-    .width(160)
-    .height(160)
-    .radius(80)
-    .dimension(platform)
-    .group(platformGroup)
-    //        .ordinalColors(['green', 'red')
-    .label(function (d) {
-        var label = d.key;
-        return label;
-    });
-
-    var theme = ndx.dimension(function(d) {
-      if (d.theme == "" || typeof d.theme == 'undefined') {
-        return "ODI";
-      } else {
-        return d.theme;
-      }
-    });
-
-    var themeGroup = theme.group();
-
-    themeLine
-    .width(320)
-    .height(160)
-    .dimension(theme)
-    .group(themeGroup)
-    .label(function (d) {
-        var label = d.key;
-        return label;
-    });
+      return d.value;
+    })
+    .elasticX(false)
+    .xAxis().ticks(0);
 
     var lang = ndx.dimension(function(d) {
       if (d.lang == "" || typeof d.lang == 'undefined') {
@@ -241,18 +184,143 @@ d3.csv('../api/v1/data2.php?module='+module+'&theme='+theme, function (data) {
     var langGroup = lang.group();
     langGroup = remove_empty_bins(langGroup);
 
+    doneLabels["language"] = [];
+
     langLine
     .width(320)
-    .height(160)
+    .height(150)
     .dimension(lang)
     .group(langGroup)
-    //        .ordinalColors(['green', 'red')
-    //        .colors(d3.scale.ordinal().domain(["true","false"]).range(['blue','gray']))
+    .margins({top: 0, left: 0, right: 10, bottom: -1})
+    .renderLabel(true)
     .label(function (d) {
-        var label = d.key;
-        return label;
+      if (!doneLabels["language"][d.key]) {
+        labelText = d.key;
+        $('#language-labels').append("<div class='chart-label language-label'><div class='chart-label-text label'>"+labelText+"</div></div>");
+        doneLabels["language"][d.key] = true;
+        height = 100 / Object.keys(doneLabels["language"]).length;
+        $('.language-label').css('height',height + '%');
+      }
+      return d.value;
+    })
+    .elasticX(false)
+    .xAxis().ticks(0);
+
+    var platform = ndx.dimension(function(d) {
+        if (d.platform == "" || typeof d.platform == 'undefined') {
+        return "web";
+      } else {
+        return d.platform;
+      }
     });
 
+    var platformGroup = platform.group();
+    doneLabels["platform"] = [];
+
+    platformLine
+    .width(320)
+    .height(150)
+    .dimension(platform)
+    .group(platformGroup)
+    .margins({top: 0, left: 0, right: 10, bottom: -1})
+    .renderLabel(true)
+    .label(function (d) {
+      if (!doneLabels["platform"][d.key]) {
+        labelText = d.key;
+        $('#platform-labels').append("<div class='chart-label platform-label'><div class='chart-label-text label'>"+labelText+"</div></div>");
+        doneLabels["platform"][d.key] = true;
+        height = 100 / Object.keys(doneLabels["platform"]).length;
+        $('.platform-label').css('height',height + '%');
+      }
+      return d.value;
+    })
+    .elasticX(false)
+    .xAxis().ticks(0);
+
+
+    var email = ndx.dimension(function(d) {
+        return d.email;
+    });
+
+    var emailGroup = email.group();
+    doneLabels["email"] = [];
+
+    emailLine
+    .width(320)
+    .height(150)
+    .dimension(email)
+    .group(emailGroup)
+    .margins({top: 0, left: 0, right: 10, bottom: -1})
+    .renderLabel(true)
+    .label(function (d) {
+      if (!doneLabels["email"][d.key]) {
+        labelText = "No";
+        if (d.key == "true") { labelText = "Yes"; }
+        $('#email-labels').append("<div class='chart-label email-label'><div class='chart-label-text label'>"+labelText+"</div></div>");
+        doneLabels["email"][d.key] = true;
+        height = 100 / Object.keys(doneLabels["email"]).length;
+        $('.email-label').css('height',height + '%');
+      }
+      return d.value;
+    })
+    .elasticX(false)
+    .xAxis().ticks(0);
+
+    var theme = ndx.dimension(function(d) {
+      if (d.theme == "" || typeof d.theme == 'undefined') {
+        return "ODI";
+      } else {
+        return d.theme;
+      }
+    });
+
+    var themeGroup = theme.group();
+    doneLabels["theme"] = [];
+
+    themeLine
+    .width(320)
+    .height(150)
+    .dimension(theme)
+    .group(themeGroup)
+    .margins({top: 0, left: 0, right: 10, bottom: -1})
+    .renderLabel(true)
+    .label(function (d) {
+      if (!doneLabels["theme"][d.key]) {
+        labelText = d.key;
+        $('#theme-labels').append("<div class='chart-label theme-label'><div class='chart-label-text label'>"+labelText+"</div></div>");
+        doneLabels["theme"][d.key] = true;
+        height = 100 / Object.keys(doneLabels["theme"]).length;
+        $('.theme-label').css('height',height + '%');
+      }
+      return d.value;
+    })
+    .elasticX(false)
+    .xAxis().ticks(0);
+
+
+    var percent = ndx.dimension(function(d) {
+      //return d.completion;
+      value = Math.round(d.completion * 100);
+      value = (Math.floor(value / 10) * 10);
+      if (value > 99) {
+        value = value -10;
+      }
+      return +value;
+    });
+
+    var percentGroup = percent.group().reduceCount();
+
+    completeBar
+    .width(400)
+    .height(160)
+    .dimension(percent)
+    .group(percentGroup)
+    .x(d3.scale.linear().domain([0,100]))
+    .xUnits(function(){return 10;})
+    .gap(0.1)
+    .brushOn(false);
+
+    var timeMax = 0;
     var time = ndx.dimension(function(d) {
     	raw = d.session_time.split(":");
     	hours = parseInt(raw[0]);
@@ -263,20 +331,21 @@ d3.csv('../api/v1/data2.php?module='+module+'&theme='+theme, function (data) {
     	if (!isInt(total)) {
     		total = 0;
     	}
-    	if (total > 10) {
-    		total = 10;
+    	if (total > 20) {
+    		total = 20;
     	}
-        return +total;
+      if (total > timeMax) {timeMax = total;}
+      return +total;
     });
 
-    var timeGroup = time.group();
+    var timeGroup = time.group().reduceCount();
 
     timeBar
-    .width(360)
+    .width(400)
     .height(160)
     .dimension(time)
     .group(timeGroup)
-    .x(d3.scale.linear().domain([0,11]))
+    .x(d3.scale.linear().domain([0,timeMax]))
     .gap(0.1)
     .brushOn(true);
 
@@ -337,7 +406,7 @@ d3.csv('../api/v1/data2.php?module='+module+'&theme='+theme, function (data) {
 
     var count = function() {
     	number = complete.top(Number.POSITIVE_INFINITY).length;
-    	document.getElementById('total').innerHTML = number;
+    	document.getElementById('total_records').innerHTML = number;
     }
     setInterval(function() { count(); },1000); 
 
