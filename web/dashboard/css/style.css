@@ -132,3 +132,11 @@ subsection {
 	padding-left: 100px;
 	margin-bottom: -10px;
 }
+.reset_all {
+	position: relative;
+    float: right;
+    bottom: 20px;
+    right: 15%;
+    color: white;
+    text-decoration: underline;
+}
