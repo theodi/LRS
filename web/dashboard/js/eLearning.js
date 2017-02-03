@@ -317,8 +317,11 @@ d3.csv('../api/v1/data2.php?module='+module+'&theme='+theme, function (data) {
     .group(percentGroup)
     .x(d3.scale.linear().domain([0,100]))
     .xUnits(function(){return 10;})
+    //.yAxisLabel("No. of profiles")
     .gap(0.1)
-    .brushOn(false);
+    .brushOn(true);
+
+    completeBar.margins().left = 40;
 
     var timeMax = 0;
     var time = ndx.dimension(function(d) {
@@ -348,6 +351,8 @@ d3.csv('../api/v1/data2.php?module='+module+'&theme='+theme, function (data) {
     .x(d3.scale.linear().domain([0,timeMax]))
     .gap(0.1)
     .brushOn(true);
+
+    timeBar.margins().left = 40;
 
     var id = ndx.dimension(function(d) {
     	return d.id;
