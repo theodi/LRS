@@ -1,0 +1,231 @@
+// Navigation styling
+// ==================
+
+.navigation {
+    width: @default-width;
+    box-shadow: @page-box-shadow;
+    background-image: url('assets/dlab_banner.png');
+    background-repeat: no-repeat;
+    background-color:@navigation-color;
+    height:@navigation-height;
+    border-top:@navigation-border;
+    border-bottom:@navigation-border;
+    background-position: right;
+    .ie8 & {
+        max-width:@ie8-max-width;
+    }
+    @media all and (max-width:(@device-width-large - 1px)) {
+        width: 100%;
+    }
+    @media all and (max-width:(@device-width-medium - 1px)) {
+        height:@navigation-height-mobile;
+    }
+    .navigation-inner {
+    }
+    .icon {
+      /*
+        padding:@navigation-padding;
+        @media all and (max-width:(@device-width-medium - 1px)) {
+            padding:@navigation-padding-mobile;
+        }
+        */
+        color:@navigation-icon-color;
+        .no-touch &:hover {
+            color:@navigation-icon-hover-color;
+        }
+
+    }
+    #drawText {
+	font-family:@font-family;
+	font-size: 0.75em;
+	bottom: 6px;
+	position: relative;
+	margin-left: 3px;
+	text-transform: uppercase;
+    	@media all and (max-width:(@device-width-medium - 1px)) {
+   		display: none;	
+	} 
+    }
+    .navigation-drawer-toggle-button {
+    	@media all and (min-width:(@device-width-medium - 1px)) {
+       		width: 105px;
+		height: 24px;
+		padding: 3px;
+		padding-bottom: 1px;
+		margin-top: 13px;
+		border-radius: 6px;
+		font-size: 29px;
+    	}
+	@media all and (max-width:(@device-width-medium - 1px)) {
+                font-size: 2.5em;
+		padding-top: 6px;
+		padding-right: 25px;
+        }
+    }
+    .page-level-progress-navigation {
+      z-index: 5000;
+      position: relative;
+      float: right;
+      padding-right: 10px;
+	    @media all and (min-width:(@device-width-medium + 80px)) {  
+        clear: both;
+        top: -3px;
+      }
+      @media all and (max-width:(@device-width-medium - 1px)) {
+        padding: 20px 2px;
+      }
+	    age-level-progress-navigation-completion {
+          background: @plp-navigation-completed;
+          border: 1px solid #fff;
+          height: 10px;
+          .page-level-progress-navigation-bar {
+                background: @plp-navigation-background;
+          }
+      }
+    }
+    #odiLearning {
+      display: inline-block;
+      background-image: url('assets/dlab.png');
+      background-repeat: no-repeat;
+      float: left;
+      height: 50px;
+      padding-top: 5px;
+      margin-left: 10px;
+      background-size: contain;
+      width: 25%;
+      @media all and (max-width:(@device-width-medium - 1px)) {
+        height: 40px;
+      }
+    }
+    .learningTop {
+	    color: #eeeeee;
+        vertical-align: top;
+        font-size: 40px;
+        position: relative;
+        top: 21px;
+        left: 10px;
+        @media all and (max-width:(@device-width-medium - 1px)) {
+		  display: none;
+        }
+    }
+}
+#main-menu {
+  margin-bottom: 15px;
+  box-shadow: none;
+  border-radius: 0;
+  background: none;
+  border: none;
+  min-height: 0;
+  padding: 0;
+  margin: 0;
+  position: absolute;
+  top: 35px;
+  width: 100%;
+}
+#main-menu .container {
+  background-color: @odi-color-six;
+  height: 45px;
+}
+#main-menu .container ul.menu {
+  list-style: none outside;
+  font-size: 0.9em;
+  font-family: Oswald;
+}
+#main-menu .container ul.menu li {
+  display: inline-block;
+  float: left;
+  border-left: 1px solid #4e69a2;
+  position: relative;
+  width: inherit;
+  margin-left: 0px;
+}
+#main-menu .container ul.menu li > a.topMenu {
+  padding: 12px 20px;
+  text-transform: uppercase;
+  font-size: 1.076em;
+}
+#main-menu .container ul.menu li > a, #main-menu .container ul.menu li > .no_link {
+  display: block;
+  line-height: 21px;
+  color: white;
+  text-decoration: none;
+  font-size: 0.9em;
+}
+#main-menu .container ul.menu li a:hover {
+  color: #c01700;
+}
+.page-level-progress {
+	.page-level-progress-indicator {
+	    border: 1px solid #fff;
+	    width: 15%;
+	}
+}
+.navigation .navigation-drawer-toggle-button {
+    display: none;
+}
+ul.dropdown ul { 
+        width: 320px; 
+        display: none;
+        position: absolute; 
+        top: 100%; 
+        left: 0;
+	max-height: 70vh; 
+}
+ul.dropdown ul li { 
+        font-weight: normal; 
+        background: @odi-color-six; 
+        color: #fff; 
+        border-bottom: 1px solid #ccc;
+        float: none;
+}
+ul.dropdown ul li a { 
+        border-right: none; 
+        display: inline-block; 
+}
+ul.sub_menu {
+  overflow-x: hidden;
+  overflow-y: scroll;
+  font-size: 0.9em;
+  font-family: "Helvetica Neue",Arial,sans-serif;
+}
+ul.sub_menu li {
+  color: #fff;
+  text-align: left;
+}
+ul.sub_menu li a, ul.sub_menu li .no_link {
+  padding: 12px 20px 12px 12px;
+  margin: 0px;
+}
+ul.sub_menu li h5 {
+  font-size: 1.3em;
+  margin-bottom: 3px;
+}
+@media all and (max-width:(@device-width-medium - 1px)) {
+  .navigation .navigation-drawer-toggle-button {
+    display: inline-block;
+  }
+  #main-menu {
+    display: none;
+  }
+  #main-menu .topMenu {
+    text-align: left;
+  }
+  #main-menu .container {
+    height: 325px;
+  }
+  #main-menu .container ul.menu li {
+    display: block;
+    width: 100%;
+    margin-left: 0px;
+    margin-bottom: 0px;
+  }
+  ul.dropdown ul {
+    width: 100%;
+  } 
+  ul.dropdown ul li {
+    z-index: 3000;
+  }
+  ul.dropdown ul li a { 
+    margin-left: 10px;
+  }
+}

@@ -1,0 +1,16 @@
+{{#if_value_equals _type "link"}}
+<a class="drawer-item-open {{className}}" href="#">
+{{else}}
+<div class="drawer-item-open {{className}}">
+{{/if_value_equals}}
+	<div class="drawer-item-title">
+		<h5 class="drawer-item-title-inner">{{{title}}}</h5>
+	</div>
+	<div class="drawer-item-description">
+		<div class="drawer-item-description-inner">{{{description}}}</div>
+	</div>
+{{#if_value_equals _type "link"}}
+</a>
+{{else}}
+</div>
+{{/if_value_equals}}

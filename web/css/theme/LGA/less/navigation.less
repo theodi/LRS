@@ -1,0 +1,87 @@
+// Navigation styling
+// ==================
+
+.navigation {
+    width: @default-width;
+    box-shadow: @page-box-shadow;
+//    background-image: url('assets/LGA-banner.png');
+    background-repeat: no-repeat;
+    background-color:@navigation-color;
+    height:@navigation-height;
+    border-top:@navigation-border;
+    border-bottom:@navigation-border;
+    background-size: contain;
+    .ie8 & {
+        max-width:@ie8-max-width;
+    }
+    @media all and (max-width:(@device-width-large - 1px)) {
+        width: 100%;
+    }
+    @media all and (max-width:(@device-width-medium - 1px)) {
+        height:@navigation-height-mobile;
+    }
+    .navigation-inner {
+    }
+    .icon {
+        padding:@navigation-padding;
+        @media all and (max-width:(@device-width-medium - 1px)) {
+            padding:@navigation-padding-mobile;
+        }
+        color:@navigation-icon-color;
+        .no-touch &:hover {
+            color:@navigation-icon-hover-color;
+        }
+    }
+    #drawText {
+	font-family:@font-family;
+	font-size: 0.75em;
+	bottom: 6px;
+	position: relative;
+	margin-left: 3px;
+	text-transform: uppercase;
+    	@media all and (max-width:(@device-width-medium - 1px)) {
+   		display: none;	
+	} 
+    }
+    .navigation-drawer-toggle-button {
+    	@media all and (min-width:(@device-width-medium - 1px)) {
+       		width: 105px;
+		height: 24px;
+		padding: 3px;
+		padding-bottom: 1px;
+		margin-top: 13px;
+		border-radius: 6px;
+		font-size: 29px;
+    	}
+	@media all and (max-width:(@device-width-medium - 1px)) {
+                font-size: 2.5em;
+		padding-top: 6px;
+		padding-right: 25px;
+        }
+    }
+    .page-level-progress-navigation {
+        .page-level-progress-navigation-completion {
+            background: @plp-navigation-background;
+            border: none;
+            height: 10px;
+            .page-level-progress-navigation-bar {
+                background: @plp-navigation-completed;
+            }
+        }
+    }
+    #odiLearning {
+            display: inline-block;
+            float: left;
+    }
+    .learningTop {
+	    color: #eeeeee;
+        vertical-align: top;
+        font-size: 40px;
+        position: relative;
+        top: 21px;
+        left: 10px;
+        @media all and (max-width:(@device-width-medium - 1px)) {
+		  display: none;
+        }
+    }
+}

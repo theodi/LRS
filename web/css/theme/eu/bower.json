@@ -1,0 +1,24 @@
+{
+  "name": "eu",
+  "version": "1.2.0",
+  "homepage": "https://github.com/davetaz/adapt-eu-theme",
+  "authors": [
+    "Dave Tarrant <davetaz@theodi.org>"
+  ],
+  "displayName": "EU Theme",
+  "theme": "eu-theme",
+  "description": "A roughly EU, mostly blue, theme.",
+  "main": "js/theme.js",
+  "keywords": [
+    "adapt-plugin",
+    "adapt-theme"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

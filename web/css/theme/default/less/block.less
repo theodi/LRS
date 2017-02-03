@@ -1,0 +1,218 @@
+// Block styling
+// =============
+.not-default {
+	display: none;
+}
+
+.block {
+    .responsive-layout;
+    .block-inner {
+        padding: 100px 60px;
+        @media all and (max-width:(@device-width-medium - 1px)) {
+		padding: 40px 20px;
+	}
+    }
+    .block-title {
+        text-align:left;
+    }
+    .block-title-inner {
+        padding:@block-title-padding;
+    }
+    .block-body{
+    }
+    .block-body-inner {
+        padding:@block-body-padding;
+    }
+}
+
+// Block inverted (custom styles for inverted)
+// ===========================================
+
+.block {
+    // Inverted styles
+    &.inverted, &.summary, &.footer {
+        color: @inverted-foreground-color;
+        h1,h2,h3,h4,h5,a {
+            color: @inverted-foreground-color;
+        }
+    }
+    &.inverted {
+        .mcq-component {
+            .mcq-item label {
+                background: @inverted-foreground-color;
+                color: @foreground-color;
+            }
+            .mcq-item label,
+            .mcq-item label h5,
+	    .mcq-item label a,
+            .mcq-item label .mcq-answer-icon {
+                color: @inverted-background-color;
+            }
+            .mcq-widget.disabled .mcq-item label.selected.disabled {
+                background: #fff;
+                h5,a {
+                    color: @foreground-color;
+                }
+            }
+            .mcq-widget.disabled .mcq-item label.disabled {
+                background: #ddd;
+                h5,a {
+                    color: #999;
+                }
+            }
+        }
+        .gmcq-component {
+            .gmcq-item label {
+                background: @inverted-foreground-color;
+            }
+            .gmcq-item label,
+            .gmcq-item label h5,
+            .gmcq-item label .gmcq-answer-icon {
+                color: @inverted-background-color;
+            }
+            .gmcq-widget.disabled .gmcq-item label.selected.disabled {
+                background: #fff;
+                h5 {
+                    color: @foreground-color;
+                }
+            }
+            .gmcq-widget.disabled .gmcq-item label.disabled {
+                background: #ddd;
+                h5 {
+                    color: #999;
+                }
+
+            }
+        }
+        .narrative-component {
+            .narrative-content {
+                background: @inverted-background-color;
+                color: @inverted-foreground-color;
+                h2 {
+                    color: @inverted-foreground-color;
+                }
+            }
+            .narrative-progress {
+                border-color: @background-color;
+            }
+        }
+        .accordion-component {
+            .accordion-item-title {
+                background: @inverted-foreground-color;
+                h5 {
+                    color: @foreground-color;
+                }
+                &:hover {
+                    background: #eee;
+                }
+                &.selected {
+                    background: #f6f6f6;
+                    h5 {
+                        color: @foreground-color;
+                    }
+                }
+            }
+            .accordion-item-title-icon {
+                color: @foreground-color;
+            }
+            .accordion-item-body {
+                color: @inverted-foreground-color;
+                background: transparent;
+                border-color: @inverted-foreground-color;
+            }
+        }
+        .matching-component {
+            .matching-select-container {
+                background: @inverted-foreground-color;
+            }
+            .matching-select, .matching-select-icon {
+                color: @foreground-color;
+            }
+            .matching-select:focus {
+                background: @inverted-foreground-color;
+            }
+        }
+        .slider-component {
+            .slider-scale-marker {
+                color: @primary-color;
+            }
+            .slider-scaler, .slider-scale-marker, .slider-line {
+                background: @inverted-foreground-color;
+            }
+            .slider-handle {
+                border: 2px solid #fff;
+            }
+        }
+        .textinput-component {
+            .textinput-item {
+                .textinput-item-textbox {
+                    border: none;
+                }
+            }
+        }
+        .button {
+            background: @inverted-foreground-color;
+            color: @inverted-background-color;
+        }
+    }
+    &.summary {
+        background: #222222;
+        .block-inner {
+            padding-bottom: 30px;
+        }
+        .footer-logo {
+            @media all and (max-width:(@device-width-medium - 1px)) {
+                text-align: center;
+                margin-bottom: 40px;
+            }
+        }
+        .social-buttons {
+            text-align: right;
+            .social {
+                margin-left: 10px;
+                &:hover {
+                    opacity: 0.8;
+                }
+            }
+            @media all and (max-width:(@device-width-medium - 1px)) {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    }
+}
+// Section banner (ODI ADDED)
+// ===========================================
+.block {
+    // Section banner
+    &.section-banner-micro {
+        .block-inner {
+            padding: 20px;
+	        font-size: 20px;
+            @media all and (max-width:(@device-width-medium - 1px)) {
+                padding: 10px;
+                font-size: 100%;
+            }
+        }
+    }
+    &.section-banner {
+        .block-inner {
+            padding: 30px 100px;
+            @media all and (max-width:(@device-width-medium - 1px)) {
+                padding: 30px 20px;
+            }
+        }
+        .text-inner {
+            padding-top: 70px;
+            @media all and (max-width:(@device-width-medium - 1px)) {
+                padding-top: 0px;
+                text-align: center;
+            }
+        }
+    }
+}
+// MCQ Instruction Bold (ODI Added)
+// ================================
+.mcq-body-inner {
+	font-weight: bold;
+}

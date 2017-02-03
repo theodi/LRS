@@ -1,0 +1,68 @@
+// Font setup
+// ==========
+
+body {
+    font-family: @font-family;
+    font-weight: @font-weight-light;
+    color:@font-color;
+    font-size:@font-size;
+    line-height: (@font-size + @font-extra-line-height);
+}
+
+h1 {
+    font-size:(@font-size*2.5);
+    line-height: ((@font-size*2.5) + @font-extra-line-height);
+    font-weight: @font-weight-bold;
+}
+
+h2 {
+    font-size:(@font-size*2.25);
+    line-height: ((@font-size*2.25) + @font-extra-line-height);
+    font-weight: @font-weight-light;
+}
+
+h3 {
+    font-size:(@font-size*2);
+    line-height: ((@font-size*2) + @font-extra-line-height);
+    font-weight: @font-weight-light;
+}
+
+h4 {
+    color: #363535;
+    font-size:(@font-size*1.75);
+    line-height: ((@font-size*1.75) + @font-extra-line-height);
+    font-weight: @font-weight-bold;
+}
+
+h5 {
+    font-size:(@font-size*1.25);
+    line-height: ((@font-size*1.25) + @font-extra-line-height);
+    font-weight: @font-weight-bold;
+    margin-bottom: 25px;
+}
+
+h6 {
+    font-size:(@font-size*1);
+    line-height: ((@font-size*1) + @font-extra-line-height);
+    font-weight: @font-weight-light;
+}
+
+/* List styles */
+ul, ol {
+    margin-bottom: 25px;
+}
+ul.ticks {
+    li {
+        list-style-type: none;
+        margin-left: 28px;
+        white-space: pre-wrap;
+        &:before {
+            content: "✔";
+            margin: 0 14px 0 -28px;
+        }
+    }
+}
+
+p {
+    margin-bottom: 25px;
+}

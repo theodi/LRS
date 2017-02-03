@@ -1,0 +1,103 @@
+{{! Maintainers - Dave Tarrant}}
+{{! All links in the nav bar should have an attritbue of data-event, navigationView uses this to fire a global event}}
+<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Oswald" />
+<div class="navigation-inner clearfix">
+    <div id="odiLearning">
+	<span class="learningTop"></span>
+    </div>
+    <a href="#" class="navigation-drawer-toggle-button icon icon-list" alt="Drawer" onClick="if ( $( '#main-menu' ).is( ':hidden' ) ) { $( '#main-menu' ).slideDown(); } else { $( '#main-menu' ).slideUp();}"></a>
+    <div class="save-section-outer">
+    <section id="save-section" class="save-section"></section>
+    </div>
+
+</div>
+<section id="cloud-status" class="cloud-status">
+	<img id="cloud-status-img"></img>
+	<span id="cloud-status-text"></span>
+</section>
+<nav id="main-menu" class="navbar navbar-default" role="navigation">
+  <div class="collapse navbar-collapse" id="main-menu-inner">
+	<div class="container">
+		<ul class="menu dropdown">
+            <li class="menu-item">
+        		<a class="topMenu" href="../index.html" onClick="window.location.href = '../index.html';" target="_blank">Home</a>
+            </li>
+        </ul>
+	</div>
+  </div>
+</nav>
+<script>
+	setInterval(function() {
+		if ($(window).width() > 760) {
+			if ( $( '#main-menu' ).is( ':hidden' ) ) { 
+				$('#main-menu').slideDown();
+			}
+		}
+	},1000);
+    $.getJSON("course/en/course.json",function(data) {
+        resources = data["_resources"];
+        $(resources).each(function(i,item) {
+            title = item.title;
+            subitems = item["_resourcesItems"];
+            if (subitems) {
+                list = document.createElement('li');
+                list.className = 'menu-item';
+                list.innerHTML = '<a class="topMenu" href="#">'+title+'</a>';
+                sub_menu = document.createElement('ul');
+                sub_menu.className = 'sub_menu';
+                list.appendChild(sub_menu);
+                $(subitems).each(function(i,links) {
+                    sublist = document.createElement('li');
+                    
+                    if (links["_type"] == "link") {
+                        link = document.createElement('a');
+                        link.href = links["_link"];
+                        link.onclick = function() {
+                            if (links["_local"] == "true") {
+                                window.location.href = links["_link"];
+                            } else {
+                                window.open(links["_link"],"_blank");
+                            }
+                        }
+                        link.innerHTML = "<h5>" + links.title + "</h5>";
+                        if (typeof links.description !== 'undefined') {
+                            link.innerHTML += links.description;
+                        }
+                        sublist.appendChild(link);
+                    } else {
+                        sublist.innerHTML = "<div class='no_link'><h5>" + links.title + "</h5></div>";
+                        if (typeof links.description !== 'undefined') {
+                            sublist.innerHTML = "<div class='no_link'><h5>" + links.title + "</h5>" + links.description + "</div>";
+                        }
+                    }
+                    sub_menu.appendChild(sublist);
+                });
+                if (subitems.length > 0) {
+                    $('.menu').append(list);
+                }
+            }
+        });
+        updateListener();
+    });
+    
+    function updateListener() {
+        $('.menu .sub_menu').hide();
+        $("ul.dropdown li").click(function(e) {
+            e.preventDefault();
+    
+            sub_menu = $('ul:first',this);
+            $(".menu .sub_menu").not(sub_menu).hide();
+    
+            // here is what I want to do
+            $('ul:first',this).toggle();
+            $(window).click(function() {
+                $(".menu .sub_menu").hide();
+            });
+            $('.menu').click(function(event){
+                event.stopPropagation();
+            });
+        });
+    }
+    updateListener();
+    
+</script>

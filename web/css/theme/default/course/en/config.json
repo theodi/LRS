@@ -1,0 +1,32 @@
+{
+    "_defaultLanguage": "en",
+    "_questionWeight": 1,
+    "_drawer": {
+        "_showEasing": "easeOutQuart",
+        "_hideEasing": "easeInQuart",
+        "_duration": 400
+    },
+    "_spoor": {
+        "_tracking": {
+            "_requireCourseCompleted": true,
+            "_requireAssessmentPassed": false,
+            "_shouldSubmitScore": true
+        },
+        "_reporting": {
+            "_comment": "Your options here are 'completed', 'passed', 'failed', and 'incomplete'",
+            "_onTrackingCriteriaMet": "completed",
+            "_onAssessmentFailure": "failed"
+        }
+    },
+    "_phrases": {
+        "cloud_saving": "<b>Syncing...</b><br/>Your progress is being synced to the cloud to enable you to resume your learning later.",
+        "cloud_success": "<b>Sync successful</b><br/>Your progress has been saved to the cloud. You can safely close this window.<br/><br/><b id='appTransferText'>Transfer progress to app</b><br/><span id='appTransferBlock'></span>",
+        "cloud_failed": "<b>Sync failed</b></br>Your progress is being saved locally only. You can continue to learn. To sync your progress, simply reconnect to the internet before closing this window.",
+        "enter_email": "<h5>Save your progress, earn rewards...</h5><p>Please enter your <b>email</b> address in the box below. You will receive an email linking to your unique profile so you can save your progress, earn rewards and resume your learning on any device.</p><br/><div align='center'><input type='email' id='email' class='email-input' placeholder='Email address' required></input><br/><br/><input type='submit' id='email_submit' value='OK' style='padding: 10px;' class='course_link tutor-done' onClick='getEmail();'></input></div>",
+        "nav_help": "<h5>Quick Start</h5><table class='help'><tr><td class='getting-started'><div id='menu'><div class='navigation-drawer-toggle-button icon icon-list'><span id='drawText'>Menu</span></div></td><td>Navigate between modules (including main menu) and locate additional resources connected to each module.</td></tr><tr><td class='getting-started'><img src='course/en/images/progress.png'</td><td>View module progress. Click for in module navigation.</td></tr><tr><td class='getting-started'><img id='cloud-status-img2' src='adapt/css/assets/cloud_failed.gif'></td><td>Cloud syncronisation status for resuming progress on any device.</td></tr></table>",
+        "pathfinder-complete": "<div align='center'><h5>Congratulations!</h5><div class='awarded-badge awarded pathfinder-awarded' id='pathfinder-badge'><object class='user-badge' data='adapt/css/assets/badges/pathfinder.svg' type='image/svg+xml'><svg xmlns='http://www.w3.org/2000/svg' version='1.1' class='user-badge' ><image class='user-badge' xlink:href='adapt/css/assets/badges/pathfinder.svg' src='adapt/css/assets/badges/pathfinder.png'  /></svg></object><br/>Pathfinder<br/><span class='badge-progress-overall'>✔</span></div><p>You have successfully earned your Pathfinder badge. You now understand the basics of open data.</p><p>Keep collecting to get the full set of badges.</p><p>Want to learn in more depth? Find out more and get hands-on on our <a href='http://theodi.org/courses/open-data-day' target='_blank'>Open Data in a Day</a> course.</p></div>",
+        "adventurer-complete": "<div align='center'><h5>Congratulations</h5><div class='awarded-badge awarded adventurer-awarded' id='adventurer-badge'><object class='user-badge' data='adapt/css/assets/badges/adventurer.svg' type='image/svg+xml'><svg xmlns='http://www.w3.org/2000/svg' version='1.1' class='user-badge' ><image class='user-badge' xlink:href='adapt/css/assets/badges/adventurer.svg' src='adapt/css/assets/badges/adventurer.png'  /></svg></object><br/>Adventurer<br/><span class='badge-progress-overall'>✔</span></div><p>You have successfully earned your Adventurer badge. You now recognise the underlying principles that make open data successful.</p><p>Keep collecting to get the full set of badges.</p><p>Want to learn in more depth? Learn with others and discover new tools on our <a href='http://theodi.org/courses/open-data-day' target='_blank'>Open Data in a Day</a> course.</p></div>",
+        "technician-complete": "<div align='center'><h5>Congratulations</h5><div class='awarded-badge awarded technician-awarded' id='technician-badge'><object class='user-badge' data='adapt/css/assets/badges/technician.svg' type='image/svg+xml'><svg xmlns='http://www.w3.org/2000/svg' version='1.1' class='user-badge' ><image class='user-badge' xlink:href='adapt/css/assets/badges/technician.svg' src='adapt/css/assets/badges/technician.png'  /></svg></object><br/>Technician<br/><span class='badge-progress-overall'>✔</span></div><p>You have successfully earned your Technician badge.You now possess the essential knowledge to start using and publishing data. </p><p>Keep collecting to get the full set of badges.</p><p>Want to put your knowledge into practice? Get hands on with our <a href='http://theodi.org/courses/open-data-in-practice-3days' target='_blank'>Open Data in Practice</a> and <a href='http://theodi.org/courses/open-data-science' target='_blank'>Open Data Science</a> courses.</p></div>",
+        "planner-complete": "<div align='center'><h5>Congratulations</h5><div class='awarded-badge awarded planner-awarded' id='planner-badge'><object class='user-badge' data='adapt/css/assets/badges/planner.svg' type='image/svg+xml'><svg xmlns='http://www.w3.org/2000/svg' version='1.1' class='user-badge' ><image class='user-badge' xlink:href='adapt/css/assets/badges/planner.svg' src='adapt/css/assets/badges/planner.png'  /></svg></object><br/>Planner<br/><span class='badge-progress-overall'>✔</span></div><p>You have successfully earned your Planner badge. You now have the foundational knowledge to plan an open data initiative.</p><p>Keep collecting to get the full set of badges.</p><p>Want to start planning? Kickstart your journey with our <a href='http://theodi.org/courses/open-data-in-practice-3days' target='_blank'>Open Data in Practice</a> or our <a href='http://theodi.org/courses/business-innovation-workshop' target='_blank'>Business Innovation Workshop</a>.</p></div>"
+    }
+}

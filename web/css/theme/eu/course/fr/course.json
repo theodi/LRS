@@ -1,0 +1,217 @@
+{
+    "_id": "course",
+    "_type": "course",
+    "_buttons": {
+        "submit": "Submit",
+        "reset": "Reset",
+        "showCorrectAnswer": "Model Answer",
+        "hideCorrectAnswer": "My Answer"
+    },
+    "_resources": [
+    {
+        "title": "Modules",
+        "description": "Passer à une autre module",
+        "_filterButtons": {
+            "all": "All",
+            "document": "PDF",
+            "media": "Media",
+            "link": "Link"
+        },
+        "_resourcesItems": [
+            {
+                "_type": "link",
+                "_local": "true",
+		         "title": "Menu principal",
+                "description": "Menu principal",
+                "_link": "../"
+            },
+            {
+                "_type": "link",
+                "_local": "true",
+		"title": "Cours 1",
+                "description": "L’open data, c’est quoi ?",
+                "_link": "../module1/"
+            },
+            {
+                "_type": "link",
+                "_local": "true",
+		"title": "Cours 2",
+                "description": "Générer de la valeur à partir de l’open data",
+                "_link": "../module2/"
+            },
+            {
+                "_type": "link",
+                "_local": "true",
+		"title": "Cours 3",
+                "description": "L’open data. Agent de changement",
+                "_link": "../module3/"
+            },
+            {
+                "_type": "link",
+                "_local": "true",
+		"title": "Cours 4",
+                "description": "Quelle est l’importance d’une licence ?",
+                "_link": "../module4/"
+            },
+            {
+                "_type": "link",
+                "_local": "true",
+		"title": "Cours 5",
+                "description": "Comment évaluer la qualité de l’open data ?",
+                "_link": "../module5/"
+            },
+            {
+                "_type": "link",
+                "_local": "true",
+		"title": "Cours 6",
+                "description": "Mesurer le succès d’open data",
+                "_link": "../module6/"
+            },
+            {
+                "_type": "link",
+                "_local": "true",
+		"title": "Cours 7",
+                "description": "Pourquoi se préoccuper de la durabilité ?",
+                "_link": "../module7/"
+            },
+            {
+                "_type": "link",
+                "_local": "true",
+		"title": "Cours 8",
+                "description": "Maîtriser les plateformes d'open data",
+                "_link": "../module8/"
+            },
+            {
+                "_type": "link",
+                "_local": "true",
+		"title": "Cours 9",
+                "description": "Choisir le bon format pour l’open data",
+                "_link": "../module9/"
+            },
+            {
+                "_type": "link",
+                "_local": "true",
+		"title": "Cours 10",
+                "description": "À quel point mes données sont-elles utilisables?",
+                "_link": "../module10/"
+            },
+            {
+                "_type": "link",
+                "_local": "true",
+		"title": "Cours 11",
+                "description": "Comment nettoyer les données",
+                "_link": "../module11/"
+            },
+            {
+                "_type": "link",
+                "_local": "true",
+		"title": "Cours 12",
+                "description": "Trouver les données cachées sur le Web",
+                "_link": "../module12/"
+            },
+            {
+                "_type": "link",
+                "_local": "true",
+		"title": "Cours 13",
+                "description": "Lier le Web des données",
+                "_link": "../module13/"
+            }
+        ]
+    },
+    {},{},{},
+    {
+        "title": "L'open data",
+        "description": "Utiliser le contenu de ce module en tant qu'open data",
+        "_filterButtons": {
+            "all": "All",
+            "document": "PDF",
+            "media": "Media",
+            "link": "Link"
+        },
+        "_resourcesItems": [
+            {
+                "_type": "link",
+                "title": "<div align='center'><img class='download-image' src='adapt/css/assets/download.png'><p class='downloadp'>Download menu data</p></div>",
+                "description": "",
+                "_link": "course/fr/components.json"
+            },
+            {
+                "_type": "link",
+                "title": "<div align='center'><img class='download-image' src='adapt/css/assets/download.png'><p class='downloadp'>Download sidebar data</p></div>",
+                "description": "",
+                "_link": "course/fr/course.json"
+            },
+            {
+                "_type": "link",
+                "title": "<div align='center'><img class='download-image' src='adapt/css/assets/download.png'><p class='downloadp'>Download scorm object</p></div>",
+                "description": "",
+                "_link": "course/fr/data/scorm.zip"
+            },
+            {
+                "_type": "link",
+                "title": "Open data certificate",
+                "description": "<span class='open-data-certificate'><img alt='Badge' src='adapt/css/assets/badge.png'/><ul class='open-data-certificate-details'> <li> <span>Open: ODI eLearning Data</span> </li> <li> <span>Pilot Open Data Certificate (final)</span> </li> <li> <span>Active - self certified</span> </li> </ul> </span>",
+                "_link": "https://certificates.theodi.org/datasets/25215/certificate"
+            },
+            {
+                "_type": "link",
+                "title": "Open licence",
+                "description": "<div align='center'><img alt='Creative Commons Licence' style='border-width:0' src='https://i.creativecommons.org/l/by-sa/4.0/88x31.png' /></div><br /><span xmlns:dct='http://purl.org/dc/terms/' property='dct:title'>Learning open data</span> by <span xmlns:cc='http://creativecommons.org/ns# property='cc:attributionName'>Open Data Institute</span> is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.",
+                "_link": "http://creativecommons.org/licenses/by-sa/4.0/"
+            },
+        {
+                "title": "Content usage",
+                "description": "The content, including text and structure is available for you to <em>use</em>, <em>reuse</em> and <em>share</em> (including for commercial purposes) subject to the conditions of the license above."
+        },
+        {
+                "title": "Exclusions",
+                "description": "This license does not cover: <ul><li>Logos and trade marks belonging to the Open Data Institute</li><li>Third party content (such as images)</li></ul>"
+        },
+        {
+                "title": "Non-endorsement",
+                "description": "This licence does not grant you any right to use the Information in a way that suggests any official status or that the Information Provider and/or Licensor endorse you or your use of the Information."
+        },
+        {
+                "title": "No warranty",
+                "description": "The Information is licensed 'as is'. The Open Data Institute is not liable for any errors or omissions in the Information and shall not be liable for any loss, injury or damage of any kind caused by its use. The Information Provider does not guarantee the continued supply of the Information."
+        }
+    ]
+    },
+    {
+        "title": "About",
+        "description": "Discover how this learning was created",
+        "_filterButtons": {
+            "all": "All",
+            "document": "PDF",
+            "media": "Media",
+            "link": "Link"
+        },
+        "_resourcesItems": [
+            {
+                "_type": "link",
+                "title": "ODI Training Team",
+                "description": "<div align='center'><img alt='ODI' style='border-width:0' src='adapt/css/assets/odi-logo.png' /></div><br />Expert knowledge, content development and learning plans provided by the by <span xmlns:cc='http://creativecommons.org/ns# property='cc:attributionName'>Open Data Institute</span> training team.",
+                "_link": "http://theodi.org/training_team"
+            },
+        {
+                "_type": "link",
+                "title": "European Data Portal",
+                "description": "<div align='center'><img alt='EDP' style='border-width:0; max-height: 150px;' src='adapt/css/assets/edp.png' /></div><br />Funding for module development and implementation provided by the <span xmlns:cc='http://creativecommons.org/ns# property='cc:attributionName'>European Data Portal</span>.",
+                "_link": "http://www.europeandataportal.eu/"
+        },
+            {
+                "_type": "link",
+                "title": "Sponge UK",
+                "description": "<div align='center'><img alt='Sponge UK' style='border-width:0' src='adapt/css/assets/sponge.png' /></div><br />Learning solutions, content production and eLearning expertise provided by <span xmlns:cc='http://creativecommons.org/ns# property='cc:attributionName'>Sponge UK</span>.",
+                "_link": "http://www.spongeuk.com"
+            },
+            {
+                "_type": "link",
+                "title": "Adapt learning",
+                "description": "<div align='center'><img alt='Adapt learning' style='border-width:0' src='adapt/css/assets/adapt.png' /></div><br />Open source learning platform developed by <span xmlns:cc='http://creativecommons.org/ns# property='cc:attributionName'>Adapt learning</span>.",
+                "_link": "https://community.adaptlearning.org/"
+            }
+            ]
+    }
+]
+}

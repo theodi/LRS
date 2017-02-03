@@ -1,0 +1,200 @@
+{
+    "_id": "course",
+    "_type": "course",
+    "_buttons": {
+        "submit": "Submit",
+        "reset": "Reset",
+        "showCorrectAnswer": "Model Answer",
+        "hideCorrectAnswer": "My Answer"
+    },
+    "_resources": [
+    {
+        "title": "Progress tracker",
+        "description": "Earn all your open data badges",
+        "_filterButtons": {
+            "all": "All",
+            "document": "PDF",
+            "media": "Media",
+            "link": "Link"
+        },
+        "_resourcesItems": [
+            {
+                "_type": "link",
+                "_local": "true",
+		"title": "<svg class='badge-icon-medium'><image class='badge-icon-medium' xmlns:xlink='http://www.w3.org/1999/xlink' xlink:href='adapt/css/assets/badges/pathfinder.svg' src='adapt/css/assets/badges/pathfinder.png'></image></svg><span class='side-badge-title'>Pathfinder</span><p class='sidebar-progress' id='pathfinder-overall-side'>-</p>",
+                "description": ""
+            },
+            {
+                "_type": "link",
+                "_local": "true",
+		"title": "<svg class='badge-icon-medium'><image class='badge-icon-medium' xmlns:xlink='http://www.w3.org/1999/xlink' xlink:href='adapt/css/assets/badges/adventurer.svg' src='adapt/css/assets/badges/adventurer.png'></image></svg><span class='side-badge-title'>Adventurer</span><p class='sidebar-progress' id='adventurer-overall-side'>-</p>",
+                "description": ""
+            },
+            {
+                "_type": "link",
+                "_local": "true",
+		"title": "<svg class='badge-icon-medium'><image class='badge-icon-medium' xmlns:xlink='http://www.w3.org/1999/xlink' xlink:href='adapt/css/assets/badges/planner.svg' src='adapt/css/assets/badges/planner.png'></image></svg><span class='side-badge-title'>Planner</span><p class='sidebar-progress' id='planner-overall-side'>-</p>",
+                "description": ""
+            },
+            {
+                "_type": "link",
+                "_local": "true",
+		"title": "<svg class='badge-icon-medium'><image class='badge-icon-medium' xmlns:xlink='http://www.w3.org/1999/xlink' xlink:href='adapt/css/assets/badges/technician.svg' src='adapt/css/assets/badges/technician.png'></image></svg><span class='side-badge-title'>Technician</span><p class='sidebar-progress' id='technician-overall-side'>-</p>",
+                "description": ""
+            }
+        ]
+    },
+    {
+        "title": "Modules",
+        "description": "Passer à une autre module",
+        "_filterButtons": {
+            "all": "All",
+            "document": "PDF",
+            "media": "Media",
+            "link": "Link"
+        },
+        "_resourcesItems": [
+            {
+                "_type": "link",
+                "_local": "true",
+		"title": "Menu principal",
+                "description": "Menu principal",
+                "_link": "../index.html"
+            },
+            {
+                "_type": "link",
+                "_local": "true",
+		"title": "<svg class='badge-icon-small'><image class='badge-icon-small' xmlns:xlink='http://www.w3.org/1999/xlink' xlink:href='adapt/css/assets/badges/pathfinder.svg' src='adapt/css/assets/badges/pathfinder.png'></image></svg>Pathfinder 1",
+		"description": "L’open data, c’est quoi ?",
+                "_link": "../module1/"
+            },
+            {
+                "_type": "link",
+                "_local": "true",
+		"title": "<svg class='badge-icon-small'><image class='badge-icon-small' xmlns:xlink='http://www.w3.org/1999/xlink' xlink:href='adapt/css/assets/badges/pathfinder.svg' src='adapt/css/assets/badges/pathfinder.png'></image></svg>Pathfinder 2",
+                "description": "Générer de la valeur à partir de l’open data",
+                "_link": "../module2/"
+            },
+            {
+                "_type": "link",
+                "_local": "true",
+		"title": "<svg class='badge-icon-small'><image class='badge-icon-small' xmlns:xlink='http://www.w3.org/1999/xlink' xlink:href='adapt/css/assets/badges/pathfinder.svg' src='adapt/css/assets/badges/pathfinder.png'></image></svg>Pathfinder 3",
+                "description": "L’open data. Agent de changement",
+                "_link": "../module3/"
+            },
+            {
+                "_type": "link",
+                "_local": "true",
+		"title": "<svg class='badge-icon-small'><image class='badge-icon-small' xmlns:xlink='http://www.w3.org/1999/xlink' xlink:href='adapt/css/assets/badges/adventurer.svg' src='adapt/css/assets/badges/adventurer.png'></image></svg>Adventurer 1",
+                "description": "Quelle est l’importance d’une licence ?",
+                "_link": "../module4/"
+            },
+            {
+                "_type": "link",
+                "_local": "true",
+		"title": "<svg class='badge-icon-small'><image class='badge-icon-small' xmlns:xlink='http://www.w3.org/1999/xlink' xlink:href='adapt/css/assets/badges/adventurer.svg' src='adapt/css/assets/badges/adventurer.png'></image></svg>Adventurer 2",
+                "description": "Comment évaluer la qualité de l’open data ?",
+                "_link": "../module5/"
+	    },
+            {
+                "_type": "link",
+                "_local": "true",
+		"title": "<svg class='badge-icon-small'><image class='badge-icon-small' xmlns:xlink='http://www.w3.org/1999/xlink' xlink:href='adapt/css/assets/badges/adventurer.svg' src='adapt/css/assets/badges/adventurer.png'></image></svg>Adventurer 3",
+                "description": "Mesurer le succès d’open data",
+                "_link": "../module6/"
+            },
+            {
+                "_type": "link",
+                "_local": "true",
+		"title": "<svg class='badge-icon-small'><image class='badge-icon-small' xmlns:xlink='http://www.w3.org/1999/xlink' xlink:href='adapt/css/assets/badges/planner.svg' src='adapt/css/assets/badges/planner.png'></image></svg>Planner 1",
+                "description": "Pourquoi se préoccuper de la durabilité ?",
+                "_link": "../module7/"
+            },
+            {
+                "_type": "link",
+                "_local": "true",
+		"title": "<svg class='badge-icon-small'><image class='badge-icon-small' xmlns:xlink='http://www.w3.org/1999/xlink' xlink:href='adapt/css/assets/badges/technician.svg' src='adapt/css/assets/badges/technician.png'></image></svg>Technician 1",
+                "description": "Maîtriser les plateformes d'open data",
+                "_link": "../module8/"
+            },
+            {
+                "_type": "link",
+                "_local": "true",
+		"title": "<svg class='badge-icon-small'><image class='badge-icon-small' xmlns:xlink='http://www.w3.org/1999/xlink' xlink:href='adapt/css/assets/badges/technician.svg' src='adapt/css/assets/badges/technician.png'></image></svg>Technician 2",
+                "description": "Choisir le bon format pour l’open data",
+                "_link": "../module9/"
+            },
+            {
+                "_type": "link",
+                "_local": "true",
+		"title": "<svg class='badge-icon-small'><image class='badge-icon-small' xmlns:xlink='http://www.w3.org/1999/xlink' xlink:href='adapt/css/assets/badges/planner.svg' src='adapt/css/assets/badges/planner.png'></image></svg>Planner 2",
+                "description": "À quel point mes données sont-elles utilisables?",
+                "_link": "../module10/"
+            },
+            {
+                "_type": "link",
+                "_local": "true",
+		"title": "<svg class='badge-icon-small'><image class='badge-icon-small' xmlns:xlink='http://www.w3.org/1999/xlink' xlink:href='adapt/css/assets/badges/technician.svg' src='adapt/css/assets/badges/technician.png'></image></svg>Technician 3",
+                "description": "Comment nettoyer les données",
+                "_link": "../module11/"
+            },
+            {
+                "_type": "link",
+                "_local": "true",
+		"title": "<svg class='badge-icon-small'><image class='badge-icon-small' xmlns:xlink='http://www.w3.org/1999/xlink' xlink:href='adapt/css/assets/badges/technician.svg' src='adapt/css/assets/badges/technician.png'></image></svg>Technician 4",
+                "description": "Trouver les données cachées sur le Web",
+                "_link": "../module12/"
+            },
+            {
+                "_type": "link",
+                "_local": "true",
+		"title": "<svg class='badge-icon-small'><image class='badge-icon-small' xmlns:xlink='http://www.w3.org/1999/xlink' xlink:href='adapt/css/assets/badges/planner.svg' src='adapt/css/assets/badges/planner.png'></image></svg>Planner 3",
+                "description": "Lier le Web des données",
+                "_link": "../module13/"
+            }
+        ]
+    },
+    {
+        "title": "L'open data",
+        "description": "Utiliser le contenu de ce module en tant qu'open data",
+        "_filterButtons": {
+            "all": "All",
+            "document": "PDF",
+            "media": "Media",
+            "link": "Link"
+        },
+        "_resourcesItems": [
+            {
+                "_type": "link",
+                "title": "Open data",
+                "description": "<div align='center'><img alt='Creative Commons Licence' style='border-width:0' src='adapt/css/assets/licence.png' /></div><br /><span xmlns:dct='http://purl.org/dc/terms/' property='dct:title'>Learning open data</span> by <span xmlns:cc='http://creativecommons.org/ns# property='cc:attributionName'>Open Data Institute</span> is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.",
+                "_link": "http://creativecommons.org/licenses/by-sa/4.0/"
+            },
+        {
+                "_type": "link",
+                "title": "Content licence",
+                "description": "The content, including text and structure is available for you to <em>use</em>, <em>reuse</em> and <em>share</em> (including for commercial purposes) subject to the conditions of the license above.",
+                "_link": ""
+        },
+        {
+                "_type": "link",
+                "title": "Exclusions",
+                "description": "This license does not cover: <ul><li>Logos and trade marks belonging to the Open Data Institute</li><li>Third party content (such as images)</li></ul>",
+                "_link": ""
+        },
+        {
+                "_type": "link",
+                "title": "Non-endorsement",
+                "description": "This licence does not grant you any right to use the Information in a way that suggests any official status or that the Information Provider and/or Licensor endorse you or your use of the Information.",
+                "_link": ""
+        },
+        {
+                "_type": "link",
+                "title": "No warranty",
+                "description": "The Information is licensed 'as is'. The Open Data Institute is not liable for any errors or omissions in the Information and shall not be liable for any loss, injury or damage of any kind caused by its use. The Information Provider does not guarantee the continued supply of the Information.",
+                "_link": ""
+        }
+    ]
+    }
+]
+}

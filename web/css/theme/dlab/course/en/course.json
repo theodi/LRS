@@ -1,0 +1,188 @@
+ {
+    "_id": "course",
+    "_type": "course",
+    "_buttons": {
+        "submit": "Submit",
+        "reset": "Reset",
+        "showCorrectAnswer": "Model Answer",
+        "hideCorrectAnswer": "My Answer"
+    },
+    "_resources": [
+    {
+        "title": "Modules",
+        "description": "Switch to another module",
+        "_filterButtons": {
+            "all": "All",
+            "document": "PDF",
+            "media": "Media",
+            "link": "Link"
+        },
+        "_resourcesItems": [
+            {
+                "_type": "link",
+                "_local": "true",
+                "title": "Module 1<span class='sidebar-module-progress' id='ODI_1_tick_sidebar'></span>",
+                "description": "What is open data?",
+                "_link": "../module1/"
+            },
+            {
+                "_type": "link",
+                "_local": "true",
+                "title": "Module 2<span class='sidebar-module-progress' id='ODI_2_tick_sidebar'></span>",
+                "description": "Unlocking value from open data",
+                "_link": "../module2/"
+            },
+            {
+                "_type": "link",
+                "_local": "true",
+                "title": "Module 3<span class='sidebar-module-progress' id='ODI_3_tick_sidebar'></span>",
+                "description": "Open data. Agent of change.",
+                "_link": "../module3/"
+            },
+            {
+                "_type": "link",
+                "_local": "true",
+                "title": "Module 4<span class='sidebar-module-progress' id='ODI_4_tick_sidebar'></span>",
+                "description": "Why do we need to license?",
+                "_link": "../module4/"
+            },
+            {
+                "_type": "link",
+                "_local": "true",
+                "title": "Module 5<span class='sidebar-module-progress' id='ODI_5_tick_sidebar'></span>",
+                "description": "What makes quality open data?",
+                "_link": "../module5/"
+            },
+            {
+                "_type": "link",
+                "_local": "true",
+                "title": "Module 6<span class='sidebar-module-progress' id='ODI_6_tick_sidebar'></span>",
+                "description": "Measuring success for open data",
+                "_link": "../module6/"
+            },
+            {
+                "_type": "link",
+                "_local": "true",
+                "title": "Module 7<span class='sidebar-module-progress' id='ODI_7_tick_sidebar'></span>",
+                "description": "Why should we worry about sustainability?",
+                "_link": "../module7/"
+            },
+            {
+                "_type": "link",
+                "_local": "true",
+                "title": "Module 8<span class='sidebar-module-progress' id='ODI_8_tick_sidebar'></span>",
+                "description": "Getting to grips with platforms",
+                "_link": "../module8/"
+            },
+            {
+                "_type": "link",
+                "_local": "true",
+                "title": "Module 9<span class='sidebar-module-progress' id='ODI_9_tick_sidebar'></span>",
+                "description": "Choosing the right format for open data",
+                "_link": "../module9/"
+            },
+            {
+                "_type": "link",
+                "_local": "true",
+                "title": "Module 10<span class='sidebar-module-progress' id='ODI_10_tick_sidebar'></span>",
+                "description": "How useful is my data?",
+                "_link": "../module10/"
+            },
+            {
+                "_type": "link",
+                "_local": "true",
+                "title": "Module 11<span class='sidebar-module-progress' id='ODI_11_tick_sidebar'></span>",
+                "description": "How to clean your data",
+                "_link": "../module11/"
+            },
+            {
+                "_type": "link",
+                "_local": "true",
+                "title": "Module 12<span class='sidebar-module-progress' id='ODI_12_tick_sidebar'></span>",
+                "description": "Finding hidden data on the web",
+                "_link": "../module12/"
+            },
+            {
+                "_type": "link",
+                "_local": "true",
+                "title": "Module 13<span class='sidebar-module-progress' id='ODI_13_tick_sidebar'></span>",
+                "description": "Linking up the web of data",
+                "_link": "../module13/"
+            }
+        ]
+    },
+    {},{},
+    {
+        "title": "Credits and attribution",
+        "description": "View attribution for licensed content",
+        "_filterButtons": {
+            "all": "All",
+            "document": "PDF",
+            "media": "Media",
+            "link": "Link"
+        },
+        "_resourcesItems": [
+        ]
+    },
+    {
+        "title": "Open data",
+        "description": "Download and use module content",
+        "_filterButtons": {
+            "all": "All",
+            "document": "PDF",
+            "media": "Media",
+            "link": "Link"
+        },
+        "_resourcesItems": [
+            {
+                "_type": "link",
+                "title": "<div align='center'><img class='download-image' src='adapt/css/assets/download.png'><p class='downloadp'>Download menu data</p></div>",
+                "description": "",
+                "_link": "course/en/components.json"
+            },
+            {
+                "_type": "link",
+                "title": "<div align='center'><img class='download-image' src='adapt/css/assets/download.png'><p class='downloadp'>Download sidebar data</p></div>",
+                "description": "",
+                "_link": "course/en/course.json"
+            },
+            {
+                "_type": "link",
+                "title": "",
+                "description": "<div align='center'><img alt='Creative Commons Licence' style='border-width:0' src='adapt/css/assets/licence.png' /></div><br /><span xmlns:dct='http://purl.org/dc/terms/' property='dct:title'>DLab learning</span> by <span xmlns:cc='http://creativecommons.org/ns# property='cc:attributionName'>Open Data Institute</span> is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.",
+                "_link": "http://creativecommons.org/licenses/by-sa/4.0/"
+            }
+    ]
+    },
+    {
+        "title": "About",
+        "description": "Discover how this learning was created",
+        "_filterButtons": {
+            "all": "All",
+            "document": "PDF",
+            "media": "Media",
+            "link": "Link"
+        },
+        "_resourcesItems": [
+            {
+                "_type": "link",
+                "title": "ODI Training Team",
+                "description": "<div align='center'><img alt='ODI' style='border-width:0' src='adapt/css/assets/odi-logo.png' /></div><br />Expert knowledge, content development and learning plans provided by the by <span xmlns:cc='http://creativecommons.org/ns# property='cc:attributionName'>Open Data Institute</span> training team.",
+                "_link": "http://theodi.org/training_team"
+            },
+	    {
+                "_type": "link",
+                "title": "European Data Portal",
+                "description": "<div align='center'><img alt='European Data Portal' style='border-width:0; max-height:150px;' src='adapt/css/assets/edp.png' /></div><br />Initial funding for module development and implementation provided by the <span xmlns:cc='http://creativecommons.org/ns# property='cc:attributionName'>European Data Portal</span>.",
+                "_link": "https://www.europeandataportal.eu/"
+            },
+            {
+                "_type": "link",
+                "title": "Adapt learning",
+                "description": "<div align='center'><img alt='Adapt learning' style='border-width:0' src='adapt/css/assets/adapt.png' /></div><br />Open source learning platform developed by <span xmlns:cc='http://creativecommons.org/ns# property='cc:attributionName'>Adapt learning</span>.",
+                "_link": "https://community.adaptlearning.org/"
+            }
+            ]
+    }
+   ]
+}

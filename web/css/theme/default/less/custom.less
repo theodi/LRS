@@ -1,0 +1,210 @@
+// Separator
+.separator {
+    display: block;
+    border-bottom: 1px solid #fff;
+    width: 100%;
+    clear: both;
+    margin-bottom: 30px;
+    padding-top: 60px;
+}
+
+// Extension tutor
+.extension-tutor .tutor {
+    background: @primary-color;
+    .tutor-inner {
+        padding: 0 30px 30px 30px;
+    }
+}
+
+// Page level progress
+.page-level-progress {
+    .page-level-progress-item-title {
+        background: @drawer-item-color;
+        &:hover {
+            background: #000;
+        }
+    }
+    .page-level-progress-indicator-bar {
+        background: @primary-color;
+    }
+}
+
+// Matching
+.matching-component {
+    .matching-item {
+        border: none;
+    }
+}
+
+// MCQ
+.mcq-component {
+    .mcq-item {
+        label {
+            border: none;
+            .mcq-answer-icon {
+                padding-left: 1px;
+            }
+        }
+        h5 {
+            margin: 0;
+            font-size: 17px;
+            font-weight: @font-weight-light;
+        }
+    }
+    .mcq-widget.disabled .mcq-item label.disabled {
+        background: #ddd;
+        h5 {
+            color: #999;
+        }
+    }
+    .mcq-widget.disabled .mcq-item label.selected.disabled h5 {
+        color: #fff;
+    }
+}
+.no-touch {
+    .inverted {
+        .mcq-component .mcq-widget:not(.disabled) .mcq-item label:hover {
+            background: #f3f3f3;
+        }
+    }
+}
+
+// GMCQ
+.gmcq-component {
+    .gmcq-item {
+        margin-bottom: 20px;
+        label {
+            border: none;
+            .gmcq-item-state {
+                margin-top: -10px;
+                .gmcq-answer-icon {
+                    padding-left: 1px;
+                }
+            }
+            h5 {
+                margin: 0 0 0 38px;
+                font-size: 17px;
+                font-weight: @font-weight-light;
+            }
+            &:hover {
+                background: #f60;
+            }
+        }
+    }
+}
+.no-touch {
+    .inverted {
+        .gmcq-component .gmcq-widget:not(.disabled) .gmcq-item label:hover {
+            background: #f3f3f3;
+        }
+    }
+}
+
+// Graphic component
+.graphic-component {
+    @media all and (max-width:(@device-width-medium - 1px)) {
+        margin: 30px 0;
+    }
+    &.illustration {
+        @media all and (max-width:(@device-width-medium - 1px)) {
+            display: none;
+        }
+    }
+}
+
+// Graphic alignment
+.component-right {
+    .graphic-widget {
+        text-align: center;
+    }
+}
+
+// Slider
+.slider-component {
+     .slider-sliderange {
+        background:#ccc;
+     }
+}
+
+// Narrative
+.narrative-component {
+    .narrative-content {
+        background: @primary-color;
+    }
+    .narrative-strapline-title {
+        h5 {
+            font-size: 17px;
+            margin-bottom: 0;
+            font-weight: @font-weight-light;
+        }
+    }
+}
+
+.button {
+    border: none;
+    border-radius: 3px;
+    padding: 14px 46px;
+}
+
+// Accordion
+.accordion-component {
+    h5 {
+        margin-bottom: 0;
+        font-size: 17px;
+        font-weight: @font-weight-light;
+    }
+}
+.no-touch {
+    .accordion-component .accordion-item-title {
+        border: none;
+    }
+}
+
+// Text input
+.textinput-component {
+    .textinput-item {
+        background: none;
+        padding: 0;
+        border: none;
+        .textinput-item-textbox {
+            border: 1px solid #bbb;
+            padding: 5px 10px;
+        }
+    }
+    .textinput-widget.submitted .textinput-item {
+        background: none;
+    }
+}
+
+.component .component-instruction-inner.validation-error {
+    color: inherit;
+    &:before {
+        font-family: 'vanilla';
+        content: '\e639';
+        //content: '\e629';
+        //content: '\e637';
+        margin-right: 5px;
+    }
+}
+
+// Tutor extension
+.extension-tutor .tutor, .ie8 .extension-tutor .tutor {
+    width: @default-width;
+    left: auto;
+    @media all and (max-width:(@device-width-large - 1px)) {
+        width: 100%;
+    }
+}
+
+// Notify popup
+.notify .notify-popup {
+    width: @default-width;
+    margin: 0 auto;
+    .notify-popup-inner {
+        padding: 0 30px 30px 30px;
+    }
+    @media all and (max-width:(@device-width-large - 1px)) {
+        width: 100%;
+    }
+}
+

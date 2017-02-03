@@ -1,0 +1,24 @@
+{
+  "name": "LGA",
+  "version": "1.2.0",
+  "homepage": "https://github.com/davetaz/adapt-tanzania-theme",
+  "authors": [
+    "Dave Tarrant <davetaz@theodi.org>"
+  ],
+  "displayName": "LGA theme",
+  "theme": "LGA-theme",
+  "description": "Local Government Association Theme.",
+  "main": "js/theme.js",
+  "keywords": [
+    "adapt-plugin",
+    "adapt-theme"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

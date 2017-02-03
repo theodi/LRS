@@ -1,0 +1,263 @@
+object {
+    pointer-events: none;
+}
+.page-level-progress-navigation {
+	padding: 26px 10px;
+    @media all and (max-width:(@device-width-medium - 1px)) {
+	padding: 20px 2px;
+    }
+}
+.email-input {
+	padding: 5px;
+	font-size: 1.5em;
+	color: gray;
+	width: 50%;
+	@media all and (max-width:(@device-width-medium - 1px)) {
+        width: 80%;
+    }
+}
+.save-section-outer {
+	float: left;
+	margin-left: 10px;
+    @media all and (max-width:(@device-width-medium - 1px)) {
+	margin-left: 4px;
+    }
+}
+.save-section {
+	margin-top: 2px;
+	padding-left: 5px;
+    @media all and (max-width:(@device-width-medium - 1px)) {
+        margin-top: 0px;
+    }
+	font-size: 12px;
+	line-height: 1.5em;
+	color: white;
+	min-width: 60px;
+	min-height: 36px;
+	cursor: pointer;
+	display: inline-block;
+	vertical-align: top;
+	padding-left: 5px;
+}
+.saving {
+	background-image: url(assets/cloud_saving.gif);
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: 60px 36px;
+	padding-top: 20px;
+    @media all and (max-width:(@device-width-medium - 1px)) {
+	padding-top: 10px;
+    }
+}
+.slbutton {
+	font-size: 18px;
+	height: 39px;
+	padding: 6px;
+	margin-right: 0.5em;
+    @media all and (max-width:(@device-width-medium - 1px)) {
+        font-size: 12px;
+	height: 33px;
+	padding: 3px;
+	margin-right: 0em;
+    }
+	border: 1px solid #ed39aa;
+	background-color: #ed39aa;
+	text-dectoration:none;
+	color: white;
+	margin-top: 8px;
+}
+.saveLoad {
+	font-size: 24px;
+}
+.saveLoad input {
+	margin-right: 8px;
+}
+.navigation-inner {
+	z-index: 300;
+	backgroun-color: black;
+}
+.cloud-status {
+	display: inline-block;
+	position: absolute;
+	top: 50px;
+	left: 0px;
+	width: 320px;
+	background: black;
+	font-size: 1em;
+	color: white;
+	padding: 10px;
+	z-index: -10;
+	display: none;
+}
+#cloud-status-img {
+	width: 60px;
+	height: 36px;
+	padding-right: 10px;
+	padding-bottom: 10px;
+}
+#appTransferBlock {
+	text-align: center;
+}
+#appTransferBlock img {
+	display: inline-block;
+	max-width: 120px;
+	border-radius: 20px;
+	margin: 10px
+}
+#appTransferBlock div {
+	display: inline-block;
+	width: 50%;
+}
+.odibanner-close {
+	position: absolute;
+	top: 0px;
+	right: 10px;
+}
+.odibanner {
+    position: absolute;
+    width: 95%;
+    background-color: black;
+    display: none;
+    margin-left: 10px;
+    margin-right: 10px;
+    border-bottom-right-radius: 10px;
+    padding: 10px;
+    border-bottom-left-radius: 10px;
+    color: white;
+    z-index: -10;
+}
+.popup-message {
+	text-decoration: underline;
+	cursor: pointer;
+}
+.badge-progress-table {
+	display: inline-table;
+	@media all and (max-width:(@device-width-medium - 1px)) {
+		display: none;
+	}
+}
+.badge-progress-overall {
+	padding-top: 10px;
+	font-size: 0.9em;
+}
+.badge-icon-small {
+	width: 20px;
+	height: 20px;
+	padding-right: 5px;
+	bottom: -4px;
+	position: relative;
+}
+.badge-icon-sm {
+	width: 30px;
+	height: 30px;
+	padding-right: 5px;
+	bottom: -4px;
+	position: relative;
+}
+.badge-icon-medium {
+	width: 60px;
+	height: 60px;
+	padding-right: 5px;
+	bottom: -4px;
+	position: relative;
+}
+.sidebar-progress {
+	float: right;
+	font-size: 2em;
+	padding-top: 20px;
+	padding-right: 5px;
+}
+.sidebar-module-progress {
+	float: right;
+	padding-right: 5px;
+	color: white;
+}
+.side-single-title {
+	font-size: 1.3em;
+	position: relative;
+	left: 10px;
+}
+.side-badge-title {
+	font-size: 1.3em;
+	bottom: 16px;
+	position: relative;
+	left: 10px;
+}
+.user-badge {
+	cursor: pointer;
+	width: 160px;
+	height: 120px;
+	@media all and (max-width:430px) {
+		width: 120px;
+        	height: 90px;
+	}
+}
+.awarded-badge {
+	padding: 10px;
+	font-size: 1.4em;
+	width: 180px;
+	margin-bottom: 20px;
+}
+.progress-badge {
+	cursor: pointer;
+	display: inline-block;
+	text-align: center;
+	padding-top: 20px;
+	padding-bottom: 20px;
+	padding-left: 10px;
+	padding-right: 10px;
+	margin-right: 10px;
+	margin-bottom: 10px;
+	width: 21%;
+	height: 200px;
+	border: 1px solid white;
+	min-width: 174px;
+	@media all and (max-width:(@device-width-medium - 1px)) {
+		min-width: 43%;
+		max-width: 47%;
+		padding-left: 0px;
+		padding-right: 0px;
+    	}
+	@media all and (max-width:430px) {
+		height: 155px;
+	}
+	@media all and (max-width:(@device-width-large - 1px)) and (min-width:(@device-width-medium)) {
+		width: 44%;
+		padding-left: 10px;
+		padding-right: 10px;
+    	}
+    	font-size: 1.4em;
+}
+.awarded {
+	border: 1px solid black;
+}
+.pathfinder-awarded {
+	background-color: @odi-color-four;
+}
+.adventurer-awarded {
+	background-color: @odi-color-two;
+}
+.technician-awarded {
+	background-color: @odi-color-eight;
+}
+.planner-awarded {
+	background-color: @odi-color-seven;
+}
+.user-badge {
+	padding-bottom: 10px;
+}
+.badge-progress-table {
+	width: 100%;
+}
+.badge-progress-table td {
+	padding-top: 10px;
+}
+.progress-table-mod-name {
+	text-align: left;
+}
+.resources-filter {
+	display: none;
+}
+.ticked {
+	font-size: 1.6em;
+}

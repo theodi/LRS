@@ -1,0 +1,42 @@
+// Component styling
+// =================
+
+.component {
+    .component-inner{
+    }
+    .component-title{
+        margin:0;
+    }
+    .component-title-inner {
+        padding:@component-title-padding;
+    }
+    .component-body{
+        margin:@component-body-margin;
+    }
+    .component-body-inner{
+        padding:@component-body-padding;
+	a {
+	   color: inherit;
+	}
+    }
+    .component-instruction {
+        margin:@component-instruction-margin;
+    }
+    .component-instruction-inner {
+        padding:@component-instruction-padding;
+        font-weight:bold;
+        &.validation-error {
+            color: @validation-error-text-color;
+        }
+        @media all and (max-width: @device-width-medium) {
+            .desktop-instruction {
+                display: none;
+            }
+        }
+        @media all and (min-width: @device-width-medium) {
+            .mobile-instruction {
+                display: none;
+            }
+        }
+    }
+}

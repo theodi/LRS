@@ -1,0 +1,23 @@
+{
+  "name": "Mampu",
+  "version": "1.2.0",
+  "description": "A contributed Mampu theme",
+  "main": "",
+  "scripts": {
+    "test": "./node_modules/.bin/karma start --single-run --browsers PhantomJS"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/davetaz/adapt-mampu-theme.git"
+  },
+  "author": "David Tarrant",
+  "license": "CC-BY-SA 4.0",
+  "bugs": {
+    "url": "https://github.com/davetaz/adapt-mampu-theme/issues"
+  },
+  "devDependencies": {
+    "karma": "0.10",
+    "karma-mocha": "0.1.0",
+    "karma-expect": "1.1.0"
+  }
+}
