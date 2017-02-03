@@ -15,10 +15,7 @@ subsection {
 	background-color: rgb(49, 130, 189);
 }
 .question h3 {
-	background: white;
-	width: 100%;
 	margin: 0;
-	margin-bottom: 10px;
 }
 .question table {
 	background: white;
@@ -26,7 +23,7 @@ subsection {
 .questionText {
 	font-size: 0.8em;
 	text-align: left;
-	height: 60px;
+	height: 80px;
 	overflow-y: auto;
 	padding: 10px;
 	color: white;
@@ -45,7 +42,6 @@ subsection {
     float: right;
     background-color: black;
     height: 100px;
-    margin-top: -10px;
 }
 .number-chart {
 	text-align: center;
@@ -105,4 +101,34 @@ subsection {
 }
 .correct .label {
 	background-color: green;
+}
+#chart_block {
+	display: block;
+    clear: both;
+    width: 540px;
+    height: 160px;
+    background-color: white;
+}
+.chart_labels {
+	float: left;
+    width: 150px;
+    height: 100%;
+    background-color: #999999;
+}
+.chart-label {
+	height: 100%;
+	display: table;
+	width: 100%;
+}
+.chart-label-text {
+	display: table-cell;
+	vertical-align: middle;
+}
+#percentage-bar {
+	padding-left: 100px;
+	margin-bottom: -10px;
+}
+#time-bar {
+	padding-left: 100px;
+	margin-bottom: -10px;
 }

@@ -11,7 +11,6 @@
 	var module = "<?php echo $module; ?>";
 	var theme = "<?php echo $theme; ?>";
 	</script>
-    <h1 id="courseTitle" style="text-align: center;">Loading</h1>
 <?php
 	set_include_path(get_include_path() . PATH_SEPARATOR . $path);
 	if ($_GET["format"] == "eLearning") {
@@ -71,7 +70,7 @@ $(document).ready(function() {
         for(i=0;i<data.length;i++){
             course = data[i];
             if (course.ID == module) {
-                $('#courseTitle').html(course.title)
+                $('header .container h1').html(course.title)
             }
         }
     });
