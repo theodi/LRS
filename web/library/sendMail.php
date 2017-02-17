@@ -139,7 +139,9 @@ function processEmailAdapt2($data) {
 
 function sendEmail($id,$email,$eLearning_prefix,$theme) {
 	global $mandrill_key;
-	$theme = strtoupper($theme);
+	if (strlen($theme) < 4) {
+		$theme = strtoupper($theme);
+	}
 	try {
 		$mandrill = new Mandrill($mandrill_key);
 		    $template_name = $theme . ' - eLearning resume email';
