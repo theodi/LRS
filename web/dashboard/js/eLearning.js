@@ -370,13 +370,13 @@ d3.csv('../api/v1/data2.php?module='+module+'&theme='+theme, function (data) {
       for(var part in questions[key]) {
         lkey = key+"_"+part;
         docid = "question_"+lkey;
-        console.log(part);
+
         if (part == "isCorrect") {
           questionIDs[lkey] = dc.numberDisplay('#' + docid);
         } else {
           questionIDs[lkey] = dc.rowChart('#' + docid);
         }
-      
+
         var dimension = ndx.dimension(function(d) {
           if (d[lkey] == "" || typeof d[lkey] == 'undefined') {
             return "";

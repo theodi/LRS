@@ -2,7 +2,7 @@
 // TRY THIS VERSION
 $debug = false;
 //$debugid = "q@q.com";
-$debugid = "01952696-3F84-4636-BD3E-489EB82BD5AD";
+$debugid = "davetaz+lga@gmail.com";
 $access = "public";
 $path = "../../";
 set_include_path(get_include_path() . PATH_SEPARATOR . $path);
@@ -22,6 +22,12 @@ error_reporting(E_ALL ^ E_NOTICE);
 if ($_GET["theme"]) {
    	$theme = $_GET["theme"];
 }
+$module = $_GET["module"];
+if (!$module) {
+	exit(0);
+}
+
+$single_course[] = $module;
 
 $componentItems = getComponents($module);
 
@@ -30,13 +36,6 @@ if ($theme && $theme != "default") {
   $filter = getClientMapping($theme);
   $courses = filterCourses($courses,$filter);
 }
-
-$module = $_GET["module"];
-if (!$module) {
-	exit(0);
-}
-
-$single_course[] = $module;
 
 $tracking = getCourseIdentifiers();
 
@@ -84,6 +83,9 @@ foreach ($cursor as $doc) {
 		$output[] = rotate($id,$data);
     }
 }
+if ($output) {
+	$adapt1_set = true;
+}
 // ADAPT 2
 
 $collection = "adapt2";
@@ -111,13 +113,18 @@ foreach ($cursor as $doc) {
   		$users = removeNullProfiles($users);  
 	}
     foreach ($users as $id => $data) {
+    	$adapt2_set = true;
     	$output[] = rotate2($id,$data);
-    	if ($userid == $debugid && $debug == true) {
+    	if ($id == $debugid && $debug == true) {
 			print_r($output);
 		}
     }
 }
 
+//$complicated = false;
+//if ($adapt1_set && $adapt2_set) {
+//	$output = rotate3($output);
+//}
 outputCSV($output);
 
 // Adapt
@@ -227,6 +234,26 @@ function rotate2($id,$indata) {
 	return $line;
 }
 
+function rotate3($output) {
+	for($i=0;$i<count($output);$i++) {
+		$current = $output[$i];
+		foreach($current as $key => $value) {
+			$headings[$key] = "true";
+		}
+	}
+	$ret = [];
+	for($i=0;$i<count($output);$i++) {
+		$new = [];
+		$current = $output[$i];
+		foreach($headings as $key => $bool) {
+			$new[$key] = $current[$key];
+		}
+		$ret[] = $new;
+	}
+	return($ret);
+}
+
+
 // FIXME DUPLICATED IN GENERATE_USER_SUMMARY
 /* Single course filter functions */
 /*
@@ -269,7 +296,6 @@ function outputCSV($summary) {
 		if (count($summary[$i]) > $longest) {
 			$longest = count($summary[$i]);
 			$first = $summary[$i];
-
 		}
 	}
 	$handle = fopen("php://output","w");
@@ -320,7 +346,7 @@ function addUserAnswer($data) {
 }
 
 function addUserAnswers($courses) {
-	global $componentItems;
+	global $componentItems,$debug;
 	for($i=0;$i<count($courses);$i++) {
 		$answers = $courses[$i]["answers"];
 		foreach($answers as $id => $data) {
@@ -354,6 +380,10 @@ function addUserAnswers($courses) {
             }
           }
           $data["userAnswer"] = $new;
+          if ($item_sources[0]["_adapt2id"]) {
+          	unset($courses[$i]["answers"][$id]);
+          	$id = $item_sources[0]["_adapt2id"];
+          }
           $courses[$i]["answers"][$id] = $data;
         }
     }
