@@ -35,13 +35,8 @@ $module = $_GET["module"];
 if (!$module) {
 	exit(0);
 }
-$single_course[] = $module;
 
-if ($courses[$module]["_trackingHub"]["_pageID"] != "") {
-	$adapt1_course[] = $courses[$module]["_trackingHub"]["_pageID"];
-} else {
-	$adapt1_course[] = $module;
-}
+$single_course[] = $module;
 
 $tracking = getCourseIdentifiers();
 
@@ -73,8 +68,8 @@ foreach ($cursor as $doc) {
 	} elseif ($theme != "default") {
   		$users = filterUsers($users,$filter,"",$theme,$courses);
 	}
-	if ($adapt1_course) {
-  		$users = filterUsersNotTheme($users,$adapt1_course);
+	if ($single_course) {
+  		$users = filterUsersNotTheme($users,$single_course);
 	}
 	if ($theme != "default") {
   		$users = removeNullProfilesBadges($users);

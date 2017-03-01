@@ -201,8 +201,10 @@ function getCoursesData() {
 	foreach ($cursor as $doc) {
    	if ($doc["slug"]) {
 			$id = $doc["slug"];
-		} elseif ($doc["id"]) {
-			$id = $doc["id"];
+    } elseif ($doc["_trackingHub"]["_pageID"]) {
+      $id = $doc["_trackingHub"]["_pageID"];
+    } elseif ($doc["id"]) {
+      $id = $doc["id"];
 		} else {
       $id = $doc["_id"];
     }
