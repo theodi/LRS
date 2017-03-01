@@ -32,7 +32,13 @@
                 <th>First Name</th>
                 <th>Surname</th>
                 <th>email</th>
-                <th>Client</th>
+                <?php
+                    if ($_GET["format"] == "course") {
+                        echo '<th>Date</th>';
+                    } else {
+                        echo '<th>Client</th>';
+                    }
+                ?>
                 <th>Badges</th>
             </tr>
         </thead>
@@ -65,6 +71,7 @@
 <script>
 $(document).ready(function() {
     module = "<?php echo $module; ?>";
+    format = "<?php echo $_GET['format']; ?>";
     $.getJSON( "../api/v1/courses.php", function( data ) {
         data = data["data"];
         for(i=0;i<data.length;i++){
@@ -88,8 +95,14 @@ $(document).ready(function() {
             { "data": "Surname" },
             { "data": "Email" },
             { "data" : function(d) {
-                try { if (d["eLearning"]["complete"][0]["theme"]) { return d["eLearning"]["complete"][0]["theme"]; } } catch(err) {}
-                return "-";
+                if (format == "course") {
+                    try { if (d["courses"]["complete"][0]["date"]) { return d["courses"]["complete"][0]["date"]; } }
+                        catch(err) {}
+                        return "-";   
+                } else {
+                    try { if (d["eLearning"]["complete"][0]["theme"]) { return d["eLearning"]["complete"][0]["theme"]; } } catch(err) {}
+                    return "-";
+                }
             }},
             { "data": function(d) {
                 badgesComplete = "";
