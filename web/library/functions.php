@@ -319,7 +319,7 @@ function filterCourseUser($userdata,$filter,$theme,$email,$courses) {
     // Adapt 2
     if (in_array($courses[$id]["topMenu"],$filter)) {
       $ret[] = $out;
-    } elseif (($filter[$id][0] == "ALL" || in_array($id, $filter)) && (strtolower($out["theme"]) == $theme)) {
+    } elseif (($filter[$id][0] == "ALL" || in_array($id, $filter)) && (strtolower($out["theme"]) == $theme || $out["theme"] == $theme)) {
       $ret[] = $out;
     }
   }
