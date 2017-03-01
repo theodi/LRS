@@ -23,11 +23,6 @@ if ($_GET["theme"]) {
    	$theme = $_GET["theme"];
 }
 
-$module = $_GET["module"];
-$single_course[] = $module;
-if (!$module) {
-	exit(0);
-}
 $componentItems = getComponents($module);
 
 $courses = getCoursesData();
@@ -35,6 +30,19 @@ if ($theme && $theme != "default") {
   $filter = getClientMapping($theme);
   $courses = filterCourses($courses,$filter);
 }
+
+$module = $_GET["module"];
+if (!$module) {
+	exit(0);
+}
+$single_course[] = $module;
+
+if ($courses[$module]["_trackingHub"]["_pageID"] != "") {
+	$adapt1_course[] = $courses[$module]["_trackingHub"]["_pageID"];
+} else {
+	$adapt1_course[] = $module;
+}
+
 $tracking = getCourseIdentifiers();
 
 // IMPORTANT, THIS ALGORITHM HAS TO WORK FROM THE RAW DATA TO REMAIN FAST! 
@@ -65,8 +73,8 @@ foreach ($cursor as $doc) {
 	} elseif ($theme != "default") {
   		$users = filterUsers($users,$filter,"",$theme,$courses);
 	}
-	if ($single_course) {
-  		$users = filterUsersNotTheme($users,$single_course);
+	if ($adapt1_course) {
+  		$users = filterUsersNotTheme($users,$adapt1_course);
 	}
 	if ($theme != "default") {
   		$users = removeNullProfilesBadges($users);
