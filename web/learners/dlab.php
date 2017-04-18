@@ -1,12 +1,11 @@
 <?php
     $access = "viewer";
-    $location = "/learners/index.php";
+	$location = "/learners/index.php";
     $path = "../";
     set_include_path(get_include_path() . PATH_SEPARATOR . $path);
 	include('_includes/header.php');
-
-    if ($theme == "dlab") {
-        $url = "dlab.php";
+    if ($theme != "dlab") {
+        $url = "index.php";
         $string = '<script type="text/javascript">';
         $string .= 'window.location = "' . $url . '"';
         $string .= '</script>';
@@ -37,6 +36,7 @@
             <tr>
                 <th>First Name</th>
                 <th>Surname</th>
+                <th>Gender</th>
                 <th>email</th>
                 <th>Completed F2F courses</th>
                 <th>Completed online modules</th>
@@ -74,6 +74,7 @@ $(document).ready(function() {
        	"columns": [
             { "data": "First Name" },
 	        { "data": "Surname" },
+            { "data": "Gender" },
             { "data": "Email" },
             { "data": function(d) {
                 try {

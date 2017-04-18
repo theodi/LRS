@@ -514,6 +514,7 @@ function processUser($collection,$users,$doc,$email) {
 
   $users[$email]["First Name"] = $doc["First Name"];
   $users[$email]["Surname"] = $doc["Surname"];
+  $users[$email]["Gender"] = $doc["gender"];
   $users[$email]["id"] = $doc["_id"];
   if ($doc["country"] != "") {
     $users[$email]["Country"] = $doc["country"];
