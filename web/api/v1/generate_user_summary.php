@@ -18,6 +18,9 @@ if ($_GET["course"]) {
   $single_course[] = $_GET["course"];
   $courses = filterCourses($courses,$single_course);
 }
+if ($_GET["date"]) {
+  $date = $_GET["date"];
+}
 if ($theme && $theme != "default") {
   $filter = getClientMapping($theme);
   $courses = filterCourses($courses,$filter);
@@ -39,7 +42,9 @@ if ($profile != "") {
 if ($single_course){
   $users = filterUsersNotTheme($users,$single_course);
 }
-
+if ($date) {
+  $users = filterUsersToDate($users,$date);
+}
 if ($single_course || $theme != "default") {
   $users = removeNullProfilesBadges($users);
 } else {
@@ -120,6 +125,28 @@ function filterUsersNotTheme($users,$filter) {
     $users[$email] = $data;
   }
   return $users;
+}
+
+function filterUsersToDate($users,$date) {
+  foreach ($users as $email => $data) {
+    $data["courses"]["complete"] = filterCourseUserToDate($data["courses"]["complete"],$date);
+    $users[$email] = $data;
+  }
+  return $users;
+}
+
+function filterCourseUserToDate($userdata,$date) {
+  if(!$userdata) {
+    return $userdata;
+  }
+  $ret = "";
+  for($i=0;$i<count($userdata);$i++) {
+    $out = $userdata[$i];
+    if ($date == $userdata[$i]["date"]) {
+      $ret[] = $out;
+    }
+  }
+  return $ret;
 }
 
 ?>

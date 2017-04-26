@@ -5,21 +5,28 @@
 	set_include_path(get_include_path() . PATH_SEPARATOR . $path);
 	include('_includes/header.php');
 	$module = $_GET["module"];
+    $date = $_GET["date"];
 	$path = "../";
 ?>
 	<script>
 	var module = "<?php echo $module; ?>";
 	var theme = "<?php echo $theme; ?>";
+    var date = "<?php echo $date; ?>";
 	</script>
 <?php
 	set_include_path(get_include_path() . PATH_SEPARATOR . $path);
 	if ($_GET["format"] == "eLearning") {
 		include('dashboard/board.html');
-	}
+        $title = "Active users table";
+        $content = "<b>Note:</b> This page only shows profiles for learners with known email addresses. It does not show anonymous eLearning profile data.</p>";
+	} else {
+        $title ="Course attendance data";
+        $content = "";
+    }
 ?>
-	<section>
-    <h3>Active users table</h3>
-    <p><b>Note:</b> This page only shows profiles for learners with known email addresses. It does not show anonymous eLearning profile data.</p><br/>
+	<section style="width: 100%;">
+    <h3><?php echo $title;?></h3>
+    <p><?php echo $content;?></p>
     <div id="loading" align="center" style="margin: 2em;">
         <img src="../images/ajax-loader.gif" alt="Loading"/>
         <br/>
@@ -77,13 +84,17 @@ $(document).ready(function() {
         for(i=0;i<data.length;i++){
             course = data[i];
             if (course.ID == module) {
-                $('header .container h1').html(course.title)
+                if (date) {
+                    $('header .container h1').html(course.title + " (" + date + ")");
+                } else {
+                    $('header .container h1').html(course.title);
+                }
             }
         }
     });
     var table = $('#learners').DataTable({
         "responsive": true,
-        "ajax": "../api/v1/generate_user_summary.php?course=<?php echo $module; ?>",
+        "ajax": "../api/v1/generate_user_summary.php?course=<?php echo $module; ?>&date=<?php echo $date; ?>",
         "columns": [
             { "data": function(d) {
                 try { if (d["eLearning"]["complete"][0]["id"] == module) { return "<span id='tick_small'>✔</span>"; } } catch(err) {}
