@@ -10,7 +10,7 @@ getCourses();
 
 function getInstances() {
 	global $instances_collection;
-	$instances_url = "http://contentapi.theodi.org/with_tag.json?type=course_instance";
+	$instances_url = "http://contentapi.theodi.org/with_tag.json?type=course_instances&summary=true&sort=date";
 	$data = file_get_contents($instances_url);
 	$data = str_replace("+00:00","Z",$data);
 	$data = str_replace("+01:00","Z",$data);
@@ -23,7 +23,7 @@ function getInstances() {
 
 function getCourses() {
 	global $courses_collection; 
-	$courses_url = "http://contentapi.theodi.org/with_tag.json?type=course";
+	$courses_url = "http://contentapi.theodi.org/with_tag.json?type=course&summary=true";
 	$data = file_get_contents($courses_url);
 	$json = json_decode($data,true);
 	$results = $json["results"];
