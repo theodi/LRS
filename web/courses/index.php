@@ -20,6 +20,9 @@
 table.dataTable.dtr-inline.collapsed>tbody>tr>td:first-child:before, table.dataTable.dtr-inline.collapsed>tbody>tr>th:first-child:before {
 	margin-top: 21px;
 }
+.dtr-data {
+	display: inline-block;
+}
 </style>
 <div id="loading" align="center" style="margin: 2em;">
 	<img src="../images/ajax-loader.gif" alt="Loading"/>
@@ -34,6 +37,7 @@ table.dataTable.dtr-inline.collapsed>tbody>tr>td:first-child:before, table.dataT
                 <th>Type</th>
                 <th>Dashboard</th>
                 <th class="none">ID</th>
+                <th class="none instances">Instances</th>
                 <th class="none">Description</th>
             </tr>
         </thead>
@@ -66,6 +70,7 @@ function renderCredits(course) {
 	ret += '</div>';
 	return ret;
 }
+var instancesDone = [];
 $(document).ready(function() {
 	var table = $('#courses').DataTable({
 		"responsive": true,
@@ -82,14 +87,14 @@ $(document).ready(function() {
 					output = '<span style="display: none;">'+d["format"]+'</span><img style="max-height: 40px;" src="/images/';
         			output += d["format"];
         			output += '.png"';
-				output += ' title="';
-				if (d["format"] == "course") {
-					output += 'Face to face course';
-				} else {
-					output += d["format"];
-				}
-				output += '"></img>';
-					return output;
+					output += ' title="';
+					if (d["format"] == "course") {
+						output += 'Face to face course';
+					} else {
+						output += d["format"];
+					}
+					output += '"></img>';
+						return output;
             	}},
             	{ "data": function(d) {
 					id = d["id"];
@@ -97,6 +102,14 @@ $(document).ready(function() {
                     return '<a href="../dashboard/index.php?module=' + d["ID"] + '&format='+format+'"><img src="/images/dashboard.png" width="30px"/></a>';
 	    		}},
 	    		{ "data": "ID" },
+	    		{ "data": function(d) {
+	    			if (d["format"] == "course") {
+	    				//getDataForCourse(d["ID"],d["format"]);
+	    				return "<span id='instances" + d["ID"] + "'>Hidden</span>";
+	    			} else {
+	    				return "eLearning";
+	    			}
+	    		}},
 	    		{ "data": function(d) {
 	    			if (d["body"]) {return d["body"];} else {return "";}
 	    		}}
@@ -110,7 +123,50 @@ $(document).ready(function() {
 	});
 	$('#loading').fadeOut();
 	$('#courses').fadeIn("slow");
+	$('#courses tbody').on('click', 'td', function () {
+    	var data = table.row($(this).parents('tr')).data();
+    	$('li #instances' + id).html("Please wait...");
+    	getDataForCourse(data["ID"],data["format"]);
+	});
 });
+
+function getDataForCourse(id,format) {
+	$.getJSON("../api/v1/generate_user_summary.php?course=" + id, function(instances) {
+	    dates = [];
+	    output = "";
+	    instances = instances.data;
+	    for (i=0;i<instances.length;i++) {
+	    	complete = instances[i]["courses"]["complete"];
+	    	for (j=0;j<complete.length;j++) {
+	    		indate = complete[j]["date"].trim();
+	    		var split = indate.split('/');
+					var date = new Date(split[2], split[1] - 1, split[0]); //Y M D
+					dates[date] = true;
+					Object.keys(dates).sort();
+				}
+			}
+			toSort = [];
+			for (var key in dates) {
+				obj = {};
+				obj.date = key;
+				toSort.push(obj);
+			}
+			toSort.sort(function(a, b){
+    			var keyA = new Date(a.date),
+        		keyB = new Date(b.date);
+    			// Compare the 2 dates
+    			if(keyA < keyB) return -1;
+    			if(keyA > keyB) return 1;
+    			return 0;
+			});
+			for(i=0;i<toSort.length;i++) {
+				date = new Date(toSort[i].date);
+				dateString = ("0" + date.getDate()).slice(-2) + "/" + ("0" + (date.getMonth() + 1)).slice(-2) + "/" + date.getFullYear();
+				output += "<a href='../dashboard/index.php?module=" + id + "&format=" +format+"&date="+dateString+"'>" + dateString + "</a><br/>";
+				$('li #instances' + id).html(output);
+			}
+	});
+}
 </script>
 <?php
 
