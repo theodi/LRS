@@ -339,7 +339,7 @@ function filterCourseClient($courses,$filter) {
   foreach($courses as $id => $data) {
     $client = $data["client"];
     if (strtolower($client) == strtolower($filter)) {
-      $ret[] = $id;
+      $ret[] = $data;
     }
   }
   return $ret;
