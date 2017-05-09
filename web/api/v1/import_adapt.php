@@ -15,8 +15,9 @@ $lang = "en";
 if ($_GET["lang"]) {
 	$lang = $_GET["lang"];
 }
+$rewrite = $_GET["rewrite"];
 
-$data = getCourseData($url);
+$data = getCourseData($url,$rewrite);
 $data["_id"] = getModuleId($url);
 $data["id"] = $data["_id"];
 if ($data["title"] == "" || $data["id"] == "") {
@@ -26,13 +27,13 @@ if ($data["title"] == "" || $data["id"] == "") {
 	echo storeDataWithID($data["id"],$data,$courses_collection);
 }
 
-function getCourseData($url) {
+function getCourseData($url,$rewrite) {
 	global $lang;
 	$dataUrl = $url . "/course/".$lang."/course.json";
 	$data = file_get_contents($dataUrl);
 	if (strpos($data,"title") !== false && strpos($data,"_globals") === false) {
 		$data = getAdapt1Data($data);
-		importAdaptComponents($url);
+		importAdaptComponents($url,$rewrite);
 		$data["url"] = $url;
 	} elseif (strpos($data,"_globals") > 0) {
 		$dataUrl = $url . "/course/".$lang."/contentObjects.json";
@@ -86,14 +87,18 @@ function getModuleId($url) {
 	return $data["_moduleId"];
 }
 
-function importAdaptComponents($url) {
+function importAdaptComponents($url,$rewrite) {
 	global $lang;
 	$id = getModuleId($url);
 	$components = json_decode(file_get_contents($url . "/course/".$lang."/components.json"),true);;
 	for ($i=0;$i<count($components);$i++) {
 		$component = $components[$i];
 		$component["_componentId"] = $component["_id"];
+		$orig = $component["_id"];
 		$component["_id"] = $url . '#' . $component["_id"];
+		if ($rewrite) {
+			$component["_id"] = $rewrite . '#' . $orig;
+		}
 		$component["_moduleId"] = $id;
 		$component["_lang"] = $lang;
 		storeDataWithID($component["_id"],$component,"adaptComponents");

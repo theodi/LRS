@@ -212,8 +212,12 @@ function getCoursesData() {
 			$id = $tracking[$id];
 		}
 		if (@$courses[$id] != "") {
+      if ($courses[$id]["_trackingHub"]["_pageID"]) {
+        $tmpurl = $courses[$id]["url"];
+      }
 			$courses[$id] = array_merge($courses[$id],$doc);
 			$courses[$id]["id"] = $id;
+      $courses[$id]["url"] = $tmpurl;
 		} else {
 			$courses[$id] = $doc;
 		}
