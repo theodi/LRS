@@ -102,9 +102,26 @@ $(document).ready(function() {
                 try { if (d["eLearning"]["active"][0]["id"] == module) { return "<span id='tick_small'>✗</span>"; } } catch(err) {}
                 return "-";
             }},
-            { "data": "First Name" },
-            { "data": "Surname" },
-            { "data": "Email" },
+            { "data": function(d) {
+                if (d["user"]["firstname"]) {
+                    return d["user"]["firstname"];
+                } 
+                return "";
+            } },
+            { "data": function(d) {
+                if (d["user"]["lastname"]) {
+                    return d["user"]["lastname"];
+                } 
+                return "";
+            } },
+            { "data": function(d) {
+                try {
+                    return d["user"]["email"];
+                } catch (err) {
+                    return "";
+                }
+                return "";
+            } },
             { "data" : function(d) {
                 if (format == "course") {
                     try { if (d["courses"]["complete"][0]["date"]) { return d["courses"]["complete"][0]["date"]; } }
