@@ -19,6 +19,14 @@ $client = str_getcsv($data[2])[1];
 $source = $id;
 $emails = getColumn($data,0);
 
+// YOU WERE HERE DAVE
+$courseAttendance = getColumn($data,1);
+// Need to import course names into courses table and create identifiers from just one column, always linked to client
+// Need to import course attendance for this course, again linked only to client
+
+// With this done, if there is a specific client set the attendance and courses list is filtered to not show this data in the default all view. This includes for the dashboards and statistics! 
+
+
 $all = "";
 for($i=0;$i<count($emails);$i++) {
   $record = "";
@@ -38,6 +46,9 @@ $ret_keys[] = "theme";
 $ret = storeDatasets($all,"externalAccess",$ret_keys);
 
 echo $ret;
+
+
+
 
 function getColumn($lines,$index) {
   $array = "";
