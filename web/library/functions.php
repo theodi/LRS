@@ -474,12 +474,11 @@ function getUsers($collection,$users) {
 
 function processAdapt2User($users,$doc,$email) {
   $details = $doc["user"];
-  if (!$users[$email]["First Name"]) { $users[$email]["First Name"] = $details["First Name"]; } 
-  if (!$users[$email]["Surname"]) { $users[$email]["Surname"] = $details["Surname"]; }
-  if (!$users[$email]["Location"]) { 
-    $users[$email]["Location"] = $details["Country"]; 
-    if ($details["Region"] != "") {
-      $users[$email]["Location"] .= ' (' . $details["Region"] . ')';
+  $users[$email]["user"] = $details;
+  if (!$users[$email]["user"]["location"]) { 
+    $users[$email]["user"]["location"] = $details["country"]; 
+    if ($details["region"] != "" && $details["region"] != "null") {
+      $users[$email]["user"]["location"] .= ' (' . $details["region"] . ')';
     }
   }
 
@@ -512,21 +511,25 @@ function processAdapt2User($users,$doc,$email) {
 function processUser($collection,$users,$doc,$email) {
   global $courses,$tracking;
 
-  $users[$email]["First Name"] = $doc["First Name"];
-  $users[$email]["Surname"] = $doc["Surname"];
-  $users[$email]["Gender"] = $doc["gender"];
+  $users[$email]["user"]["firstname"] = $doc["First Name"];
+  $users[$email]["user"]["lastname"] = $doc["Surname"];
+  $users[$email]["user"]["gender"] = $doc["gender"];
+  $users[$email]["user"]["email"] = $email;
+  $users[$email]["user"]["id"] = $doc["_id"];
   $users[$email]["id"] = $doc["_id"];
   if ($doc["country"] != "") {
-    $users[$email]["Country"] = $doc["country"];
+    $users[$email]["user"]["location"] = $doc["country"];
+    $users[$email]["user"]["country"] = $doc["country"];
   }
-  if ($doc["region"] != "") {
-      $users[$email]["Region"] = $doc["region"];
+  if ($doc["region"] != "" && $doc["region"] != "null") {
+      $users[$email]["user"]["region"] = $doc["region"];
+      $users[$email]["user"]["location"] .= ' (' . $doc["region"] . ')';
   }
   if ($collection = "eLearning") {
     $users[$email]["eLearning"] = geteLearningCompletion($doc,$courses,$users[$email]["eLearning"]);
-    if ($users[$email]["First Name"] == "") {
-	    $users[$email]["First Name"] = $doc["firstname"];
-    	$users[$email]["Surname"] = $doc["lastname"];
+    if ($users[$email]["user"]["firstname"] == "") {
+	    $users[$email]["user"]["firstname"] = $doc["firstname"];
+    	$users[$email]["user"]["lastname"] = $doc["lastname"];
     }
   }
   if ($collection = "courseAttendance") {

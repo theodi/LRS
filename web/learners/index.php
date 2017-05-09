@@ -72,9 +72,26 @@ $(document).ready(function() {
 		"responsive": true,
 		"ajax": "../api/v1/generate_user_summary.php",
        	"columns": [
-            { "data": "First Name" },
-	        { "data": "Surname" },
-            { "data": "Email" },
+            { "data": function(d) {
+                if (d["user"]["firstname"]) {
+                    return d["user"]["firstname"];
+                } 
+                return "";
+            } },
+            { "data": function(d) {
+                if (d["user"]["lastname"]) {
+                    return d["user"]["lastname"];
+                } 
+                return "";
+            } },
+            { "data": function(d) {
+                try {
+                    return d["user"]["email"];
+                } catch (err) {
+                    return "";
+                }
+                return "";
+            } },
             { "data": function(d) {
                 try {
 					return Object.keys(d["courses"]["complete"]).length;
@@ -92,14 +109,16 @@ $(document).ready(function() {
             { "data": "totalCredits" },
             { "data" : function(d) {
                 try { 
-                    if (d["Country"] && d["Region"]) {
-                        img = '<img src="../images/blank.gif" class="flag ' + d["Country"] + ' fnone"><br/>'; 
-                        return img + countries[d["Country"]]["name"] + " (" + d["Region"] + ")"; 
-                    } else if (d["Country"]) {
-                        img = '<img src="../images/blank.gif" class="flag ' + d["Country"] + ' fnone"><br/>'; 
-                        return img + countries[d["Country"]]["name"];
+                    if (d["user"]["country"] != "" && d["user"]["region"]) {
+                        img = '<img src="../images/blank.gif" class="flag ' + d["user"]["country"] + ' fnone"><br/>'; 
+                        return img + countries[d["user"]["country"]]["name"] + " (" + d["user"]["region"] + ")"; 
+                    } else if (d["user"]["country"]) {
+                        img = '<img src="../images/blank.gif" class="flag ' + d["user"]["country"] + ' fnone"><br/>'; 
+                        return img + countries[d["user"]["country"]]["name"];
                     }
-                } catch(err) {}
+                } catch(err) {
+                    return "";
+                }
                 
                 return "";
             }},
