@@ -195,8 +195,8 @@ function storeDatasets($datasets,$collection,$ret_keys) {
  * 			  profile/index.php
  */
 function getCoursesData() {
-	global $courses_collection;
-	$cursor = getDataFromCollection($courses_collection);
+	global $courses_collection,$theme;
+  $cursor = getDataFromCollection($courses_collection);
 	$tracking = getCourseIdentifiers();
 	$courses = "";
 	foreach ($cursor as $doc) {
@@ -218,7 +218,12 @@ function getCoursesData() {
       }
 			$courses[$id] = array_merge($courses[$id],$doc);
 			$courses[$id]["id"] = $id;
-      $courses[$id]["url"] = $tmpurl;
+      if ($courses[$id["url"]] == "") {
+        $courses[$id]["url"] = $tmpurl;
+      } 
+      if ($doc["theme"] == $theme) {
+        $courses[$id]["url"] = $doc["url"];
+      }
 		} else {
 			$courses[$id] = $doc;
 		}

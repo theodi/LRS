@@ -27,7 +27,8 @@
 	Please enter the url of the course homepage in the box below, it must be publically accessible. (e.g. http://accelerate.theodi.org/en/module1 or http://training.theodi.org/inaday).<br/><br/>
 	<input type="text" id="course_url"></input></br>
 	<input type="text" id="course_lang" value="en" style="width:20px;"></input></br/>
-	<input type="text" id="course_rewrite"></input> (rewrite url - DO NOT USE)</br/>
+	<input type="text" id="course_rewrite"></input> (Adapt 1 import rewrite url - DO NOT USE)</br/>
+	<input type="text" id="course_client"></input> (Client theme for LRS)</br/>
 	<button id="import_adapt_course">Import adapt course</button>
 </section>
 
@@ -140,12 +141,13 @@ function import_adapt() {
 	url = $('#course_url').val();
 	lang = $('#course_lang').val();
 	rewrite = $('#course_rewrite').val();
+	client = $('#course_client').val();
 	if (url == "") {
 		alert("please enter a course url!");
 		return;
 	} 
 	$('#add_adapt_course').html('Please wait');
-	$.get('../api/v1/import_adapt.php?url=' + encodeURI(url) + '&lang=' + lang + '&rewrite=' + encodeURI(rewrite), function(data) {
+	$.get('../api/v1/import_adapt.php?url=' + encodeURI(url) + '&lang=' + lang + '&rewrite=' + encodeURI(rewrite) + '&client=' + client, function(data) {
 		$('#add_adapt_course').html(data);
 	});
 }

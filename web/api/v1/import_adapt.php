@@ -16,8 +16,9 @@ if ($_GET["lang"]) {
 	$lang = $_GET["lang"];
 }
 $rewrite = $_GET["rewrite"];
+$client = $_GET["client"];
 
-$data = getCourseData($url,$rewrite);
+$data = getCourseData($url,$rewrite,$client);
 $data["_id"] = getModuleId($url);
 $data["id"] = $data["_id"];
 if ($data["title"] == "" || $data["id"] == "") {
@@ -27,7 +28,7 @@ if ($data["title"] == "" || $data["id"] == "") {
 	echo storeDataWithID($data["id"],$data,$courses_collection);
 }
 
-function getCourseData($url,$rewrite) {
+function getCourseData($url,$rewrite,$client) {
 	global $lang;
 	$dataUrl = $url . "/course/".$lang."/course.json";
 	$data = file_get_contents($dataUrl);
@@ -38,7 +39,7 @@ function getCourseData($url,$rewrite) {
 	} elseif (strpos($data,"_globals") > 0) {
 		$dataUrl = $url . "/course/".$lang."/contentObjects.json";
 		$data = file_get_contents($dataUrl);
-		setAdapt2Data($data,$url);
+		setAdapt2Data($data,$url,$client);
 		importAdapt2Components($url);
 		exit(1);
 	}
@@ -52,15 +53,15 @@ function getAdapt1Data($data) {
 	return $data;
 }
 
-function setAdapt2Data($data,$url) {
+function setAdapt2Data($data,$url,$client) {
 	$data = json_decode($data,true);
 	for($i=0;$i<count($data);$i++) {
 		$module = $data[$i];
-		importAdapt2Module($module,$url);
+		importAdapt2Module($module,$url,$client);
 	}
 }
 
-function importAdapt2Module($module,$url) {
+function importAdapt2Module($module,$url,$client) {
 	global $courses_collection;
 	if ($module["_classes"] == "hidden") {
 		return;
@@ -71,6 +72,9 @@ function importAdapt2Module($module,$url) {
 	unset($module["_parentID"]);
 	unset($module["_isLockedBy"]);
 	$module["topMenu"] = $url;
+	if ($client != "") {
+		$module["theme"] = $client;
+	}
 	if (substr($url,-1) == "/") {
 		$module["url"] = $url . "#/id/" . $module["_id"];
 	} else {
