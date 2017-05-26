@@ -31,6 +31,7 @@ $users = "";
 $users = getUsers("elearning",$users);
 $users = getUsers("externalBadges",$users);
 $users = getUsers("courseAttendance",$users);
+
 $profile = getLMSProfile($theme);
 $client = $profile["client"];
 
@@ -39,6 +40,7 @@ if ($profile != "") {
 } elseif ($theme != "default") {
   $users = filterUsers($users,$filter,"",$theme,$courses);
 } 
+
 if ($single_course){
   $users = filterUsersNotTheme($users,$single_course);
 }

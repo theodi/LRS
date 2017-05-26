@@ -173,6 +173,7 @@ function storeDatasets($datasets,$collection,$ret_keys) {
     $m->close();
     return $ret;
   } catch ( Exception $e ) {
+    return "CAUGHT AN ERROR! " . $e->getMessage();
     syslog(LOG_ERR,'Error: ' . $e->getMessage());
   }
 }
@@ -358,15 +359,19 @@ function filterCourseClient($courses,$filter) {
  * 			  api/v1/trained_stats.php
  */
 function getClientMapping($theme) {
+    $ret = [];
     $courseIdentifiers = getDataFromCollection("courseIdentifiers");
     foreach ($courseIdentifiers as $doc) {
    		$doc = $doc["mapping"];
    		foreach ($doc as $key => $value) {
    			if ($key == $theme) {
-   				return $value;
+          $ret = array_merge($ret,$value);
    			}
     	}
    	}
+    if ($ret) {
+      return $ret;
+    }
    	return false;
 }
 
@@ -517,17 +522,31 @@ function processUser($collection,$users,$doc,$email) {
 
   $users[$email]["user"]["firstname"] = $doc["First Name"];
   $users[$email]["user"]["lastname"] = $doc["Surname"];
-  $users[$email]["user"]["gender"] = $doc["gender"];
+  $gender = $doc["gender"]; if($doc["Gender"]) $gender = $doc["Gender"];
+  $users[$email]["user"]["gender"] = $gender;
   $users[$email]["user"]["email"] = $email;
   $users[$email]["user"]["id"] = $doc["_id"];
   $users[$email]["id"] = $doc["_id"];
-  if ($doc["country"] != "") {
-    $users[$email]["user"]["location"] = $doc["country"];
-    $users[$email]["user"]["country"] = $doc["country"];
+  
+
+  $country = $doc["country"]; 
+  if($doc["Country"]) {
+      $country = $doc["Country"];
   }
-  if ($doc["region"] != "" && $doc["region"] != "null") {
-      $users[$email]["user"]["region"] = $doc["region"];
-      $users[$email]["user"]["location"] .= ' (' . $doc["region"] . ')';
+  
+  if ($country != "") {
+    $users[$email]["user"]["location"] = $country;
+    $users[$email]["user"]["country"] = $country;
+  }
+
+  $region = $doc["region"]; 
+  if($doc["Region"]) {
+      $region = $doc["Region"];
+  }
+
+  if ($region != "" && $region != "null") {
+      $users[$email]["user"]["region"] = $region;
+      $users[$email]["user"]["location"] .= ' (' . $region . ')';
   }
   if ($collection = "eLearning") {
     $users[$email]["eLearning"] = geteLearningCompletion($doc,$courses,$users[$email]["eLearning"]);

@@ -132,6 +132,7 @@ $(document).ready(function() {
 
 function getDataForCourse(id,format) {
 	$.getJSON("../api/v1/generate_user_summary.php?course=" + id, function(instances) {
+		console.log(instances);
 	    dates = [];
 	    output = "";
 	    instances = instances.data;
