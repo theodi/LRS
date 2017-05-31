@@ -21,6 +21,9 @@
 ?>
 	<img src="images/user.png" width="100px" size="100px" /><br/>
         <a class='login' href='<?php echo $authUrl; ?>'><img class='login' src="images/sign-in-with-google.png" width="250px" size="54px" /></a>
+        <script>
+        window.localStorage.removeItem('clientUpdateDone');
+        </script>
 <?php
 	} else {
 ?>

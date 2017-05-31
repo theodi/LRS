@@ -54,6 +54,9 @@ if (isset($_REQUEST['logout'])) {
   unset($_SESSION['access_token']);
   unset($_SESSION['userData']);
   unset($userData);
+  unset($_SESSION['isAdmin']);
+  unset($_SESSION['isViewer']);
+  unset($_SESSION);
   $client->revokeToken();
   header('Location: ' . filter_var($redirect_uri, FILTER_SANITIZE_URL)); //redirect user back to page
 }
@@ -105,7 +108,6 @@ if ($client->getAccessToken()) {
 } else {
   $authUrl = $client->createAuthUrl();
 }
-
 
 $site_title = "ODI Learning Management System";
 $pages = getMenuPages($redirect_path);
@@ -160,6 +162,9 @@ if ($access == "public") {
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 <script src="/js/nav.js"></script>
 <?php
+ 	if (strtolower($theme) == "dlab" && $userData['email']) {
+		echo '<script src="/js/updateDLab.js"></script>' ."\n";
+  	}
 	require_once('library/lessify.inc.php');
 
 	$css = file_get_contents("https://raw.githubusercontent.com/theodi/ODI-eLearning/master/src/theme/$theme/less/variables.less");

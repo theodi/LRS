@@ -1,5 +1,5 @@
 <?php
-$access = "admin";
+$access = "viewer";
 $path = "../../";
 set_include_path(get_include_path() . PATH_SEPARATOR . $path);
 include_once('library/functions.php');
