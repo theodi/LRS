@@ -29,11 +29,11 @@
                 <th>Surname</th>
                 <th>Gender</th>
                 <th>email</th>
-                <th>Completed F2F courses</th>
-                <th>Completed online modules</th>
-                <th>Credits</th>
+                <th>Age</th>
+                <th>Sector</th>
                 <th>Location</th>
-                <th>Badges</th>
+                <th>Completed F2F courses</th>
+                <th>Completed online modules</th>     
         <th class="none">Theme</th>
         <th class="none">F2F courses complete</th>
 		<th class="none">eLearning modules complete</th>
@@ -90,20 +90,19 @@ $(document).ready(function() {
                 return "";
             } },
             { "data": function(d) {
-                try {
-					return Object.keys(d["courses"]["complete"]).length;
-                } catch (err) {
-                    return 0;
+                if (typeof d["user"]["age"] != 'undefined'){
+                    return d["user"]["age"];
+                } else {
+                    return "";
                 }
             } },
-            { "data": function(d) {
-                try {
-					return Object.keys(d["eLearning"]["complete"]).length;
-				} catch(err) {
-					return 0;
-				}
-            } },
-            { "data": "totalCredits" },
+            {  "data": function(d) {
+                if (typeof d["user"]["sector"] != 'undefined'){
+                    return d["user"]["sector"];
+                } else {
+                    return "";
+                }}
+            },
             { "data" : function(d) {
                 try { 
                     if (d["user"]["country"] != "" && d["user"]["region"]) {
@@ -120,16 +119,19 @@ $(document).ready(function() {
                 return "";
             }},
             { "data": function(d) {
-            	badgesComplete = "";
-            	if (typeof(d["badges"]) != "undefined") {
-			         badges = d["badges"]["complete"];
-			         for(i=0;i<badges.length;i++) {
-				        badgesComplete += "<img src='"+badges[i]['url']+"' alt='"+badges[i]['id']+"'/>";
-			         }
-			         return badgesComplete;
-		        }
-		        return "";
-            }},
+                try {
+					return Object.keys(d["courses"]["complete"]).length;
+                } catch (err) {
+                    return 0;
+                }
+            } },
+            { "data": function(d) {
+                try {
+					return Object.keys(d["eLearning"]["complete"]).length;
+				} catch(err) {
+					return 0;
+				}
+            } },
             { "data" : function(d) {
                 try { if (d["eLearning"]["theme"]) { return d["eLearning"]["theme"]; } } catch(err) {}
                 return "-";

@@ -529,6 +529,10 @@ function processUser($collection,$users,$doc,$email) {
   $users[$email]["user"]["lastname"] = $doc["Surname"];
   $gender = $doc["gender"]; if($doc["Gender"]) $gender = $doc["Gender"];
   $users[$email]["user"]["gender"] = $gender;
+  $age = $doc["age"]; if($doc["Age"]) $age = $doc["Age"]; if (!$age || $age == null) $age = "";
+  $users[$email]["user"]["age"] = $age;
+  $sector = $doc["sector"]; if($doc["Sector"]) $sector = $doc["Sector"]; if (!$sector || $sector == null) $sector = "";
+  $users[$email]["user"]["sector"] = $sector;
   $users[$email]["user"]["email"] = $email;
   $users[$email]["user"]["id"] = $doc["_id"];
   $users[$email]["id"] = $doc["_id"];
