@@ -7,15 +7,6 @@
 	$module = $_GET["module"];
     $date = $_GET["date"];
 	$path = "../";
-    if ($theme == "dlab") {
-        $url = "dlab.php";
-        $string = '<script type="text/javascript">';
-        $string .= 'window.location = "' . $url . '?' . $_SERVER['QUERY_STRING'] . '"';
-        $string .= '</script>';
-
-        echo $string;
-        exit(1);
-    }
 ?>
 	<script>
 	var module = "<?php echo $module; ?>";
@@ -45,9 +36,6 @@
         <thead>
             <tr>
                 <th>Complete</th>
-                <th>First Name</th>
-                <th>Surname</th>
-                <th>email</th>
                 <?php
                     if ($_GET["format"] == "course") {
                         echo '<th>Date</th>';
@@ -55,7 +43,13 @@
                         echo '<th>Client</th>';
                     }
                 ?>
-                <th>Badges</th>
+                <th>First Name</th>
+                <th>Surname</th>
+                <th>Gender</th>
+                <th>email</th>
+                <th>Age</th>
+                <th>Sector</th>
+                <th>Location</th>
             </tr>
         </thead>
         <tbody id="tableBody">
@@ -101,6 +95,7 @@ $(document).ready(function() {
             }
         }
     });
+    console.log("../api/v1/generate_user_summary.php?course=<?php echo $module; ?>&date=<?php echo $date; ?>");
     var table = $('#learners').DataTable({
         "responsive": true,
         "ajax": "../api/v1/generate_user_summary.php?course=<?php echo $module; ?>&date=<?php echo $date; ?>",
@@ -110,6 +105,16 @@ $(document).ready(function() {
                 try { if (d["courses"]["complete"][0]["id"] == module) { return "<span id='tick_small'>✔</span>"; } } catch(err) {}
                 try { if (d["eLearning"]["active"][0]["id"] == module) { return "<span id='tick_small'>✗</span>"; } } catch(err) {}
                 return "-";
+            }},
+            { "data" : function(d) {
+                if (format == "course") {
+                    try { if (d["courses"]["complete"][0]["date"]) { return d["courses"]["complete"][0]["date"]; } }
+                        catch(err) {}
+                        return "-";   
+                } else {
+                    try { if (d["eLearning"]["complete"][0]["theme"]) { return d["eLearning"]["complete"][0]["theme"]; } } catch(err) {}
+                    return "-";
+                }
             }},
             { "data": function(d) {
                 if (d["user"]["firstname"]) {
@@ -124,6 +129,12 @@ $(document).ready(function() {
                 return "";
             } },
             { "data": function(d) {
+                if (d["user"]["gender"]) {
+                    return d["user"]["gender"];
+                } 
+                return "";
+            } },
+            { "data": function(d) {
                 try {
                     return d["user"]["email"];
                 } catch (err) {
@@ -131,26 +142,34 @@ $(document).ready(function() {
                 }
                 return "";
             } },
-            { "data" : function(d) {
-                if (format == "course") {
-                    try { if (d["courses"]["complete"][0]["date"]) { return d["courses"]["complete"][0]["date"]; } }
-                        catch(err) {}
-                        return "-";   
-                } else {
-                    try { if (d["eLearning"]["complete"][0]["theme"]) { return d["eLearning"]["complete"][0]["theme"]; } } catch(err) {}
-                    return "-";
-                }
-            }},
             { "data": function(d) {
-                badgesComplete = "";
-                if (typeof(d["badges"]) != "undefined") {
-            		badges = d["badges"]["complete"];
-            		for(i=0;i<badges.length;i++) {
-                		badgesComplete += "<img style='max-height: 50px;' src='"+badges[i]['url']+"' alt='"+badges[i]['id']+"'/>";
-            		}
-            		return badgesComplete;
-        		}
-        		return "";
+                if (typeof d["user"]["age"] != 'undefined'){
+                    return d["user"]["age"];
+                } else {
+                    return "";
+                }
+            } },
+            {  "data": function(d) {
+                if (typeof d["user"]["sector"] != 'undefined'){
+                    return d["user"]["sector"];
+                } else {
+                    return "";
+                }}
+            },
+            { "data" : function(d) {
+                try { 
+                    if (d["user"]["country"] != "" && d["user"]["region"]) {
+                        img = '<img src="../images/blank.gif" class="flag ' + d["user"]["country"] + ' fnone"><br/>'; 
+                        return img + countries[d["user"]["country"]]["name"] + " (" + d["user"]["region"] + ")"; 
+                    } else if (d["user"]["country"]) {
+                        img = '<img src="../images/blank.gif" class="flag ' + d["user"]["country"] + ' fnone"><br/>'; 
+                        return img + countries[d["user"]["country"]]["name"];
+                    }
+                } catch(err) {
+                    return "";
+                }
+                
+                return "";
             }}
        ],
        "pageLength": 50,

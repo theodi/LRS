@@ -99,7 +99,7 @@ $(document).ready(function() {
             	{ "data": function(d) {
 					id = d["id"];
 					format = d["format"];
-                    return '<a href="../dashboard/index.php?module=' + d["ID"] + '&format='+format+'"><img src="/images/dashboard.png" width="30px"/></a>';
+                    return '<a class="dt-button" href="../dashboard/index.php?module=' + d["ID"] + '&format='+format+'">View Dashboard</a>';
 	    		}},
 	    		{ "data": "ID" },
 	    		{ "data": function(d) {
