@@ -30,10 +30,11 @@
                 <th>Gender</th>
                 <th>email</th>
                 <th>Age</th>
-                <th>Sector</th>
                 <th>Location</th>
+                <th>Last active</th>
                 <th>Completed F2F courses</th>
                 <th>Completed online modules</th>     
+        <th class="none">Sector</th>
         <th class="none">Theme</th>
         <th class="none">F2F courses complete</th>
 		<th class="none">eLearning modules complete</th>
@@ -96,13 +97,7 @@ $(document).ready(function() {
                     return "";
                 }
             } },
-            {  "data": function(d) {
-                if (typeof d["user"]["sector"] != 'undefined'){
-                    return d["user"]["sector"];
-                } else {
-                    return "";
-                }}
-            },
+
             { "data" : function(d) {
                 try { 
                     if (d["user"]["country"] != "" && d["user"]["region"]) {
@@ -119,6 +114,22 @@ $(document).ready(function() {
                 return "";
             }},
             { "data": function(d) {
+                if (typeof d["user"]["lastSave"] != 'undefined'){
+                    m = new Date(d["user"]["lastSave"]);
+                    var dateString =
+                        m.getUTCFullYear() + "/" +
+                        ("0" + (m.getUTCMonth()+1)).slice(-2) + "/" +
+                        ("0" + m.getUTCDate()).slice(-2) + " " +
+                        ("0" + m.getUTCHours()).slice(-2) + ":" +
+                        ("0" + m.getUTCMinutes()).slice(-2) + ":" +
+                        ("0" + m.getUTCSeconds()).slice(-2);
+                    return dateString;
+                    return d["user"]["lastSave"];
+                } else {
+                    return "";
+                }
+            } },
+            { "data": function(d) {
                 try {
 					return Object.keys(d["courses"]["complete"]).length;
                 } catch (err) {
@@ -132,6 +143,13 @@ $(document).ready(function() {
 					return 0;
 				}
             } },
+            {  "data": function(d) {
+                if (typeof d["user"]["sector"] != 'undefined'){
+                    return d["user"]["sector"];
+                } else {
+                    return "";
+                }}
+            },
             { "data" : function(d) {
                 try { if (d["eLearning"]["theme"]) { return d["eLearning"]["theme"]; } } catch(err) {}
                 return "-";
@@ -180,7 +198,7 @@ $(document).ready(function() {
         }}
 	   ],
 	   "pageLength": 50,
-	   "order": [[ 5, "desc" ], [0, "asc"]],
+	   "order": [[ 6, "desc" ], [0, "asc"]],
        "dom": 'Bfrtip',
        "buttons": [
             'copy', 'csv', 'excel', 'pdf', 'print'

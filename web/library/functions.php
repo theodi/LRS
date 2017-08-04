@@ -534,9 +534,9 @@ function processUser($collection,$users,$doc,$email) {
   $sector = $doc["sector"]; if($doc["Sector"]) $sector = $doc["Sector"]; if (!$sector || $sector == null) $sector = "";
   $users[$email]["user"]["sector"] = $sector;
   $users[$email]["user"]["email"] = $email;
+  $users[$email]["user"]["lastSave"] = $doc["ODI_lastSave"];
   $users[$email]["user"]["id"] = $doc["_id"];
   $users[$email]["id"] = $doc["_id"];
-  
 
   $country = $doc["country"]; 
   if($doc["Country"]) {
