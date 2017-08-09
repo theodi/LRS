@@ -1,5 +1,6 @@
 config-local.inc.php
 web/_includes/config.inc.php
+web/_includes/config.inc.php_backup
 vendor/
 composer.phar
 client_secret.json
