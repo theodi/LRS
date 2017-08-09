@@ -1,0 +1,6 @@
+0 * * * * /usr/bin/wget -O /dev/null -q -t 1 --no-check-certificate https://lms2.learndata.info/api/v1/trained_stats.php?theme=default
+5 * * * * /usr/bin/wget -O /dev/null -q -t 1 --no-check-certificate https://lms2.learndata.info/api/v1/trained_stats.php?theme=LGA
+10 * * * * /usr/bin/wget -O /dev/null -q -t 1 --no-check-certificate https://lms2.learndata.info/api/v1/trained_stats.php?theme=eu
+15 * * * * /usr/bin/wget -O /dev/null -q -t 1 --no-check-certificate https://lms2.learndata.info/api/v1/trained_stats.php?theme=tz
+20 * * * * /usr/bin/wget -O /dev/null -q -t 1 --no-check-certificate https://lms2.learndata.info/api/v1/trained_stats.php?theme=Sainsburys
+25 * * * * /usr/bin/wget -O /dev/null -q -t 1 --no-check-certificate https://lms2.learndata.info/api/v1/trained_stats.php?theme=dlab
