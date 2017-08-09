@@ -24,7 +24,7 @@ function archive_profile($doc) {
 }
 
 function archive_empty_profiles() {
-   global $collection_url, $db_name;
+   global $connection_url, $db_name;
    $collection = "elearning";
    try {
 	 // create the mongo connection object
