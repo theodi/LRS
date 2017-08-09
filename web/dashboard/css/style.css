@@ -140,3 +140,13 @@ subsection {
     color: white;
     text-decoration: underline;
 }
+.lastModified {
+	padding-right: 15%;
+    text-align: right;
+    font-size: 0.8em;
+
+}
+.refreshData {
+	color: white;
+    text-decoration: underline;
+}

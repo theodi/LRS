@@ -22,7 +22,34 @@ var completeBar = dc.barChart('#percentage-bar');
 var timeBar = dc.barChart('#time-bar');
 var questionIDs = [];
 
-d3.csv('../api/v1/data2.php?module='+module+'&theme='+theme, function (data) {
+var url = '../api/v1/data2.php?module='+module+'&theme='+theme;
+
+function processLastModified() {
+    $.ajax({
+        type: "HEAD",
+        async: true,
+        url: url,
+    }).done(function(message,text,jqXHR){
+        $("#lastModified").html(jqXHR.getResponseHeader('Last-Modified'));
+    });
+}
+
+function forceRefresh() {
+  $("#lastModifiedOuter").html("Reloading data, please wait! Page will automatically reload.");
+  url = url + '&force=true';
+  $.ajax({
+      type: "HEAD",
+      async: true,
+      url: url,
+  }).done(function(message,text,jqXHR){
+      location.reload();
+   });
+}
+
+d3.csv(url, function (data) {
+
+    processLastModified();
+
     var ndx = crossfilter(data);
     var all = ndx.groupAll();
     var doneLabels = [];
@@ -86,7 +113,6 @@ d3.csv('../api/v1/data2.php?module='+module+'&theme='+theme, function (data) {
         $('#table_'+key).append(questionsHTML);
       }
       $.getJSON( "../api/v1/getComponent.php?id="+key+"&module="+module, function( data ) {
-        console.log(data);
         questionData[data["_id"]] = data;
         title = "<div class='questionText'><h3>" + data["title"] +"</h3>" + data["body"] + "</div>";
         $('#question_'+data["_id"]).prepend(title);
@@ -117,10 +143,18 @@ d3.csv('../api/v1/data2.php?module='+module+'&theme='+theme, function (data) {
     }
 
     var complete = ndx.dimension(function(d) {
+        if (d.complete == "true") {
+          return "Complete";
+        }
+        if (d.complete == "false" || d.complete == "") {
+          return "Incomplete";
+        }
         return d.complete;
     });
     
     var completeGroup = complete.group();
+    completeGroup = remove_empty_bins(completeGroup);
+
     doneLabels["complete"] = [];
 
     completeLine
@@ -131,9 +165,8 @@ d3.csv('../api/v1/data2.php?module='+module+'&theme='+theme, function (data) {
     .margins({top: 0, left: 0, right: 10, bottom: -1})
     .renderLabel(true)
     .label(function (d) {
-      labelText = "Incomplete";
-      if (d.key == "true") { labelText = "Complete"; }
       if (!doneLabels["complete"][d.key]) {
+        labelText = d.key;
         $('#complete-labels').append("<div class='chart-label complete-label'><div class='chart-label-text label'>"+labelText+"</div></div>");
         doneLabels["complete"][d.key] = true;
         height = 100 / Object.keys(doneLabels["complete"]).length;
@@ -145,10 +178,20 @@ d3.csv('../api/v1/data2.php?module='+module+'&theme='+theme, function (data) {
     .xAxis().ticks(0);
 
     var passed = ndx.dimension(function(d) {
+        if (d.passed == "true") {
+          return "Passed";
+        }
+        if (d.passed == "false") {
+          return "Failed";
+        }
+        if (d.passed == "") {
+          return "not attempted";
+        }
         return d.passed;
     });
 
     var passedGroup = passed.group();
+    passedGroup = remove_empty_bins(passedGroup);
 
     doneLabels["passed"] = [];
     passedLine
@@ -160,9 +203,7 @@ d3.csv('../api/v1/data2.php?module='+module+'&theme='+theme, function (data) {
     .renderLabel(true)
     .label(function (d) {
       if (!doneLabels["passed"][d.key]) {
-        labelText = "Not attempted";
-        if (d.key == "true") { labelText = "Passed";}
-        if (d.key == "false") {labelText = "Failed";}
+        labelText = d.key;
         $('#assessment-labels').append("<div class='chart-label assessment-label'><div class='chart-label-text label'>"+labelText+"</div></div>");
         doneLabels["passed"][d.key] = true;
         height = 100 / Object.keys(doneLabels["passed"]).length;
@@ -239,6 +280,12 @@ d3.csv('../api/v1/data2.php?module='+module+'&theme='+theme, function (data) {
 
 
     var email = ndx.dimension(function(d) {
+        if (d.email == "" || d.email == "false") {
+          return "No";
+        }
+        if (d.email == "true") {
+          return "Yes";
+        }
         return d.email;
     });
 
@@ -254,8 +301,7 @@ d3.csv('../api/v1/data2.php?module='+module+'&theme='+theme, function (data) {
     .renderLabel(true)
     .label(function (d) {
       if (!doneLabels["email"][d.key]) {
-        labelText = "No";
-        if (d.key == "true") { labelText = "Yes"; }
+        labelText = d.key;
         $('#email-labels').append("<div class='chart-label email-label'><div class='chart-label-text label'>"+labelText+"</div></div>");
         doneLabels["email"][d.key] = true;
         height = 100 / Object.keys(doneLabels["email"]).length;
@@ -269,9 +315,8 @@ d3.csv('../api/v1/data2.php?module='+module+'&theme='+theme, function (data) {
     var theme = ndx.dimension(function(d) {
       if (d.theme == "" || typeof d.theme == 'undefined') {
         return "ODI";
-      } else {
-        return d.theme;
-      }
+      } 
+      return ((d.theme).toUpperCase());
     });
 
     var themeGroup = theme.group();
@@ -365,7 +410,7 @@ d3.csv('../api/v1/data2.php?module='+module+'&theme='+theme, function (data) {
     });
 
 
-
+    var tmpcount = 0;
     for (var key in questions) {
       for(var part in questions[key]) {
         lkey = key+"_"+part;
@@ -378,10 +423,10 @@ d3.csv('../api/v1/data2.php?module='+module+'&theme='+theme, function (data) {
         }
 
         var dimension = ndx.dimension(function(d) {
-          if (d[lkey] == "" || typeof d[lkey] == 'undefined') {
+          if (d[lkey] == "" || typeof d[lkey] == 'undefined' || d[lkey] == 0 || d[lkey] == "0") {
             return "";
           } else {
-            return d[lkey];
+            return "correct";
           }
         });
         var group = dimension.group();

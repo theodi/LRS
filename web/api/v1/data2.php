@@ -19,12 +19,16 @@ if ($_SERVER["HTTP_HOST"] == "localhost") {
 
 error_reporting(E_ALL ^ E_NOTICE);
 
+$force = false;
 if ($_GET["theme"]) {
    	$theme = $_GET["theme"];
 }
 $module = $_GET["module"];
 if (!$module) {
 	exit(0);
+}
+if ($_GET["force"] == "true") {
+	$force = true;
 }
 
 $single_course[] = $module;
@@ -35,6 +39,22 @@ $courses = getCoursesData();
 if ($theme && $theme != "default") {
   $filter = getClientMapping($theme);
   $courses = filterCourses($courses,$filter);
+}
+
+
+$date = date("Y-m-d");
+$statsid = "Dashboard_" . $module . "_" . $theme;
+
+if (!$force) {
+	$stats = getCachedStats($statsid,$date);
+	if ($stats) {
+		$lastModified = ($stats["lastModified"]);
+		unset($stats["id"]);
+		unset($stats["date"]);
+		unset($stats["lastModified"]);
+		outputCSV($stats, $lastModified);
+		exit();
+	}
 }
 
 $tracking = getCourseIdentifiers();
@@ -125,7 +145,11 @@ foreach ($cursor as $doc) {
 //if ($adapt1_set && $adapt2_set) {
 //	$output = rotate3($output);
 //}
-outputCSV($output);
+$output["id"] = $statsid;
+$output["date"] = $date;
+$output["lastModified"] = gmdate('D, d M Y H:i:s');
+storeDataWithID($statsid,$output,"statisticsCache");
+outputCSV($output,gmdate('D, d M Y H:i:s'));
 
 // Adapt
 
@@ -290,7 +314,7 @@ function filterUsersNotTheme($users,$filter) {
 }
 
 
-function outputCSV($summary) {
+function outputCSV($summary,$lastModified) {
 	$longest = 0;
 	for($i=0;$i<count($summary);$i++) {
 		if (count($summary[$i]) > $longest) {
@@ -301,6 +325,7 @@ function outputCSV($summary) {
 	$handle = fopen("php://output","w");
 
 	header('Content-Type: text/csv');
+	header('Last-Modified: '.$lastModified.' GMT', true, 200);
 	header('Content-Disposition: attachment; filename="data.csv"');
 
 	foreach ($first as $key => $value) {
@@ -388,6 +413,41 @@ function addUserAnswers($courses) {
         }
     }
     return $courses;
+}
+
+function getCachedStats($id,$date) {
+   $collection = "statisticsCache";
+   global $connection_url, $db_name;
+   try {
+	 // create the mongo connection object
+	$m = new MongoClient($connection_url);
+
+	// use the database we connected to
+	$col = $m->selectDB($db_name)->selectCollection($collection);
+	
+	$query = array('id' => $id, 'date' => $date);
+	$res = $col->find($query);
+	$ret = "";
+	foreach ($res as $doc) {
+		return $doc;
+	}
+	$m->close();
+	return false;
+   } catch ( MongoConnectionException $e ) {
+//	return false;
+	echo "1) SOMETHING WENT WRONG" . $e->getMessage() . "<br/><br/>";
+	syslog(LOG_ERR,'Error connecting to MongoDB server ' . $connection_url . ' - ' . $db_name . ' <br/> ' . $e->getMessage());
+   } catch ( MongoException $e ) {
+//	return false;
+	echo "2) SOMETHING WENT WRONG" . $e->getMessage() . "<br/><br/>\n\n";
+	echo "<br/><br/>\n\n";
+	syslog(LOG_ERR,'Mongo Error: ' . $e->getMessage());
+   } catch ( Exception $e ) {
+	echo "3) SOMETHING WENT WRONG" . $e->getMessage() . "<br/><br/>\n\n";
+	echo "<br/><br/>\n\n";
+//	return false;
+	syslog(LOG_ERR,'Error: ' . $e->getMessage());
+   }
 }
 
 ?>
