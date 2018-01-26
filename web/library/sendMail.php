@@ -17,7 +17,7 @@ function getMailLock($version) {
 	$m->close();
 	if ($count > 0) {
 		foreach ($cursor as $doc) {
-			if ($doc["Timestamp"] < (time()-7200)) {
+			if ($doc["Timestamp"] < (time()-300)) {
 				setMailLock(false,$version);
 				return false;
 			}
@@ -73,10 +73,11 @@ function findEmailsCollection($collection,$version) {
 			processEmail($doc,$version);
 		}
 	} catch ( Exception $e ) {
-		setMailLock(false,$version);
 		syslog(LOG_ERR,'Error: ' . $e->getMessage());
 	}
-	setMailLock(false,$version);
+	if ($version == 1) {
+		setMailLock(false,$version);	
+	}
 }
 
 function markDone($collection,$id) {
