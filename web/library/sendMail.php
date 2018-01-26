@@ -8,13 +8,21 @@ if ($_SERVER["HTTP_HOST"] == "localhost") {
 }
 
 function getMailLock($version) {
-   global $connection_url, $db_name;
+    global $connection_url, $db_name;
 	$m = new MongoClient($connection_url);
 	$col = $m->selectDB($db_name)->selectCollection("emailLocks");
 	$query = array('Version' => $version);
 	$count = $col->count($query);
+	$cursor = $col->find($query);
 	$m->close();
 	if ($count > 0) {
+		foreach ($cursor as $doc) {
+			if ($doc["Timestamp"] < (time()-7200)) {
+				setMailLock(false,$version);
+				return false;
+			}
+			return true;
+		}
 		return true;
 	} else {
 		return false;
@@ -25,7 +33,11 @@ function setMailLock($state,$version) {
    global $connection_url, $db_name;
 	$m = new MongoClient($connection_url);
 	$col = $m->selectDB($db_name)->selectCollection("emailLocks");
-	$query = array("Version" => $version);
+	if($state) {
+		$query = array("Version" => $version, "Timestamp" => time());
+	} else {
+		$query = array("Version" => $version);
+	}
 	$count = $col->count($query);
 	if ($state && $count > 0) {
 		return;
@@ -61,6 +73,7 @@ function findEmailsCollection($collection,$version) {
 			processEmail($doc,$version);
 		}
 	} catch ( Exception $e ) {
+		setMailLock(false,$version);
 		syslog(LOG_ERR,'Error: ' . $e->getMessage());
 	}
 	setMailLock(false,$version);
@@ -110,7 +123,7 @@ function processEmailAdapt1($data) {
 	}
 	if ($email && $sent == "false") {
 		$email = str_replace("．",".",$email);
-		sendEmail($id,$email,$prefix,$theme);
+		sendEmail($id,$email,$prefix,$theme,"");
 		markDone($collection,$id);
 	}
 }
@@ -127,25 +140,36 @@ function processEmailAdapt2($data) {
 	foreach($modules as $uid => $values) {
 		$prefix = $values["courseID"];
 		$theme = $values["theme"];
-		$lang = "en";
+		$lang = "";
+		if ($values["lang"]) {
+			$lang = $values["lang"]; 
+		}
 		if (!$done[$prefix]) {
-			if (sendEmail($id,$email,$prefix,$theme)) {
-				markDone("adapt2",$id);			
+			$indate = substr($data["user"]["lastSave"],0,strpos($data["user"]["lastSave"],"(")-1);
+			$date = strtotime($indate);
+			if ($date > (time()-86400)) {
+				if (sendEmail($id,$email,$prefix,$theme,$lang)) {
+					markDone("adapt2",$id);			
+				}
 			}
 			$done[$prefix] = true;
 		}
 	}
 }
 
-function sendEmail($id,$email,$eLearning_prefix,$theme) {
+function sendEmail($id,$email,$eLearning_prefix,$theme,$lang) {
 	global $mandrill_key;
 	if (strlen($theme) < 4) {
 		$theme = strtoupper($theme);
 	}
 	try {
 		$mandrill = new Mandrill($mandrill_key);
-		    $template_name = $theme . ' - eLearning resume email';
-		    $template_content = array();
+		$template_name = $theme . ' - eLearning resume email';
+		if ($lang != "") {
+			$template_name = $theme . ' (' . $lang . ') - eLearning resume email';
+		}
+		   
+		$template_content = array();
 
 		$message = array(
 			'subject' => 'Welcome to ' . $theme . ' eLearning',

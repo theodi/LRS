@@ -14,7 +14,7 @@ if ($_SERVER["HTTP_HOST"] == "localhost") {
 
 require_once('library/sendMail.php');
 
-function store($data) {
+function store($data) {#
    global $connection_url, $db_name;
    $collection = "adapt2";
    try {
@@ -36,7 +36,7 @@ function store($data) {
 	}
 	$m->close();
 
-	if (!getMailLock(2)) {
+    if (!getMailLock(2)) {
 		findEmailsCollection("adapt2",2);
 	}
 
