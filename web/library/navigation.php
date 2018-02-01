@@ -5,7 +5,7 @@ function getMenuPages($redirect_path) {
 	
 	$page['url'] = $redirect_path . '/';
 	$page['title'] = 'Home';
-	$page['long_title'] = "Learning Management System";
+	$page['long_title'] = "Learning Records System";
 	$pages[] = $page;
 	
 	$page['url'] = $redirect_path . '/courses/index.php';
