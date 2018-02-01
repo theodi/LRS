@@ -1,5 +1,6 @@
 <?php
-error_reporting(E_ALL & ~E_NOTICE);
+#error_reporting(E_ALL & ~E_NOTICE);
+error_reporting(E_ERROR | E_PARSE);
 
 if($_SERVER['HTTP_X_FORWARDED_PROTO'] != "https" && $_SERVER["HTTP_HOST"] != "localhost")  {
     $redirect = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];

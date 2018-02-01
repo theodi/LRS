@@ -19,7 +19,7 @@
 	function dashboard_nightly($client,$courses_url,$cmd,$writer) {
 		$data = ""; $content = "";
 		$url = $courses_url . $client;
-		$content = file_get_contents($url);
+		$content = file_get_contents(trim($url));
 		$data = json_decode($content,true);
 		$data = $data["data"];
 		for($i=0;$i<count($data);$i++) {

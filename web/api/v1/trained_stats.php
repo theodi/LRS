@@ -6,6 +6,7 @@ $path = "../../";
 set_include_path(get_include_path() . PATH_SEPARATOR . $path);
 include_once('library/functions.php');
 include_once('header.php');
+error_reporting(0);
 
 if ($_GET["theme"]) {
    	$theme = $_GET["theme"];
