@@ -109,7 +109,7 @@ if ($client->getAccessToken()) {
   $authUrl = $client->createAuthUrl();
 }
 
-$site_title = "ODI Learning Management System";
+$site_title = "ODI Learning Records System";
 $pages = getMenuPages($redirect_path);
 $pages = getUserStatusLink($redirect_path,$pages);
 
