@@ -21,16 +21,6 @@ if (!$id) {
 	echo "";
 	exit(0);
 }
-$module = $_GET["module"];
-$collection = "adaptComponents";
-$query = array("_componentId" => $id,"_moduleId" => $module,"_lang" => "en");
-$res = executeQuery($connection_url,$db_name,$collection,$query);
-foreach ($res as $doc) {
-	$doc["_id"] = $doc["_componentId"];
-	header('Content-Type: application/json');
-	echo json_encode($doc);
-	exit(0);
-}
 $query = array('_id' => $id);
 $collection = "adapt2Components";
 $res = executeQuery($connection_url,$db_name,$collection,$query);

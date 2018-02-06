@@ -10,10 +10,12 @@ $format = $_GET["format"];
 
 $courses = getCoursesData();
 
+/*
 if ($theme && $theme != "default") {
 	$filter = getClientMapping($theme);
 	$courses = filterCourses($courses,$filter);
 }
+*/
 
 $output = array();
 foreach ($courses as $id => $course) {

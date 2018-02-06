@@ -1,5 +1,5 @@
 <?php
-error_reporting(E_ALL & ~E_NOTICE);
+error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
 require_once('library/mandrill/Mandrill.php');
 if ($_SERVER["HTTP_HOST"] == "localhost") {
 	include_once('_includes/config-local.inc.php');
@@ -80,15 +80,21 @@ function findEmailsCollection($collection,$version) {
 	}
 }
 
-function markDone($collection,$id) {
+function markDone($collection,$id,$courseID) {
 	global $connection_url, $db_name;
 	try {
 		$m = new MongoClient($connection_url);
 		$col = $m->selectDB($db_name)->selectCollection($collection);
+		if ($courseID) {
+			//error_log('LRS.' . $courseID . '.email_sent');
+			$newdata = array('$set' => array("LRS." . $courseID . '.email_sent' => "true"));
+			$col->update(array("_id"=>$id),$newdata);
+		}
 		$newdata = array('$set' => array("email_sent" => "true"));
 		$col->update(array("_id"=>$id),$newdata);
 		$m->close();
 	} catch ( Exception $e ) {
+		error_log($e->getMessage());
 		syslog(LOG_ERR,'Error: ' . $e->getMessage());
 	}
 }
@@ -97,7 +103,12 @@ function processEmail($data,$version) {
 	if ($version == 1) {
 		processEmailAdapt1($data);
 	} elseif ($version == 2) {
-		processEmailAdapt2($data);
+		$data = json_decode($data,true);
+		if ($data["email_sent"] == "false") {
+			foreach ($data["LRS"] as $courseID => $values) {
+				processEmailAdapt2($data,$courseID);		
+			}
+		}
 	}
 }
 
@@ -125,20 +136,24 @@ function processEmailAdapt1($data) {
 	if ($email && $sent == "false") {
 		$email = str_replace("．",".",$email);
 		sendEmail($id,$email,$prefix,$theme,"");
-		markDone($collection,$id);
+		markDone($collection,$id,null);
 	}
 }
 
-function processEmailAdapt2($data) {
-	$data = json_decode($data,true);
+function processEmailAdapt2($data,$courseID) {
 	$id = $data["_id"];
-	if (!$data["user"]["email"] || !$id) {
+	if ($data["LRS"][$courseID]["email_sent"] == "true") {
+		return;
+	}
+	$data = $data[$courseID];
+	if (!$data["user"]["email"]) {
 		return;
 	}
 	$email = $data["user"]["email"];
 	$modules = $data["progress"];
 	$done = [];
 	foreach($modules as $uid => $values) {
+		if (!is_array($values)) {continue;}
 		$prefix = $values["courseID"];
 		$theme = $values["theme"];
 		$lang = "";
@@ -149,8 +164,9 @@ function processEmailAdapt2($data) {
 			$indate = substr($data["user"]["lastSave"],0,strpos($data["user"]["lastSave"],"(")-1);
 			$date = strtotime($indate);
 			if ($date > (time()-86400)) {
+				//error_log("send message to " . $email . " " . $prefix . " " . $theme . " " . $lang);
 				if (sendEmail($id,$email,$prefix,$theme,$lang)) {
-					markDone("adapt2",$id);			
+					markDone("adapt2",$id,$courseID);			
 				}
 			}
 			$done[$prefix] = true;

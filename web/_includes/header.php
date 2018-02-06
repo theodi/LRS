@@ -15,6 +15,7 @@ if ($_SERVER["HTTP_HOST"] == "localhost") {
 } else {
 	include_once('_includes/config.inc.php');
 }
+
 //Google API PHP Library includes
 require_once 'src/Google/autoload.php';
 require_once 'src/Google/Client.php';
