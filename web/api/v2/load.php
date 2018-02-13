@@ -24,10 +24,21 @@ function load($id,$courseID) {
 	$m->close();
 	foreach ($res as $doc) {
 		if ($courseID) {
+			error_log("returning by courseID");
  	   		return json_encode($doc[$courseID]);
+ 	   	} elseif ($doc[$_SERVER["HTTP_REFERER"]]) {
+ 	   		error_log("returning by referer");
+ 	   		return json_encode($doc[$_SERVER["HTTP_REFERER"]]);
  	   	} else {
- 	   		return json_decode($doc);
- 	   	}
+ 	   		foreach ($doc as $module => $parts) {
+ 	   			if (isset($parts["components"])) {
+ 	   				error_log("returning by object");
+ 	   				return json_encode($doc[$module]);
+ 	   			}
+ 	   		}
+ 	   		error_log("returning whole doc");
+ 	   		return json_encode($doc);
+ 	 	}
 	}
    } catch ( Exception $e ) {
 	syslog(LOG_ERR,'Error: ' . $e->getMessage());

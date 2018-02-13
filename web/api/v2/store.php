@@ -17,17 +17,27 @@ require_once('library/sendMail.php');
 function store($data,$courseID) {
    global $connection_url, $db_name;
    $collection = "adapt2";
-   $courseID = str_replace(".", "_", $courseID);
    $id = $data["user"]["id"];
    $overall = 0; $count = 0;
+   $data["progress"]["_isComplete"] = true;
    foreach($data["progress"] as $module => $progress) {
    	 if (!is_array($progress)) {
    	 	continue;
    	 }
+   	 if ($progress["_isComplete"] == false) {
+		$data["progress"]["_isComplete"] = false;
+	 }
    	 $overall = $overall + $progress["progress"]; 
    	 $count = $count + 1;
+   	 if (!$courseID || $courseID == "") {
+     	$courseID = $progress["courseID"];
+     }
    }
-   $data["progress"]["_overall"] = round($overall / $count);
+   $data["progress"]["progress"] = round($overall / $count);
+   if (!$data["progress"]["courseID"]) {
+   	$data["progress"]["courseID"] = $courseID;
+   }
+   $courseID = str_replace(".", "_", $courseID);
    try {
    	if ($courseID) {
    		$toSet[$courseID] = $data;
