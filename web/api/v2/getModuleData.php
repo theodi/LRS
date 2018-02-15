@@ -66,6 +66,10 @@ function processUser($user,$courseID,$moduleID,$csvData) {
 	
 	$output["session_time"] = gmdate("H:i:s", $moduleData["sessionTime"]);
 
+	if ($moduleData["progress"] > 99 || $moduleData["_isComplete"] == true || $moduleData["answers"]["_assessmentState"] == "Passed" || $moduleData["answers"]["_assessmentState"] == "Failed") {
+		$output["complete"] = "true";
+	}
+
 	$output["passed"] = $moduleData["answers"]["_assessmentState"] ?: "";
 	unset($moduleData["answers"]["_assessmentState"]);
 
