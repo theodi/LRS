@@ -28,7 +28,8 @@ function load($id,$courseID) {
  	   		return json_encode($doc[$courseID]);
  	   	} elseif ($doc[$_SERVER["HTTP_REFERER"]]) {
  	   		error_log("returning by referer");
- 	   		return json_encode($doc[$_SERVER["HTTP_REFERER"]]);
+			$courseID = str_replace(".","_",$_SERVER["HTTP_REFERER"]);
+ 	   		return json_encode($doc[$courseID]);
  	   	} else {
  	   		foreach ($doc as $module => $parts) {
  	   			if (isset($parts["components"])) {
