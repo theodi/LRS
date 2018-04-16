@@ -22,7 +22,7 @@ var completeBar = dc.barChart('#percentage-bar');
 var timeBar = dc.barChart('#time-bar');
 var questionIDs = [];
 
-var url = '../api/v1/data2.php?module='+module+'&theme='+theme;
+var url = '../api/v2/getModuleData.php?module='+module+'&theme='+theme;
 
 function processLastModified() {
     $.ajax({

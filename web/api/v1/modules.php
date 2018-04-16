@@ -15,19 +15,12 @@ if ($theme && $theme != "default") {
 	$courses = filterCourses($courses,$filter);
 }
 
+$modules = getDataFromCollection("modules");
 
 $output = array();
-foreach ($courses as $id => $course) {
-  $courseData = getCourseData($id);
-  if ($courseData) {
-  	$courseData["ID"] = $id;
-  	$courseData["format"] = "eLearning";
-  	$output[] = $courseData;
-  } else {
-  	$course["ID"] = $id;
-  	if ($course["format"] == $format || !$format) {
-	   	$output[] = $course;
-  	}
+foreach ($modules as $id => $module) {
+  if (is_array($courses[$module["_parentId"]])) {
+  	$output[$id] = $module;
   }
 }
 

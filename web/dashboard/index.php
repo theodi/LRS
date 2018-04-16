@@ -44,18 +44,10 @@
     <table id="learners" class="display" cellspacing="0" width="100%" style="display: none;">
         <thead>
             <tr>
+                <th>email/id</th>
                 <th>Complete</th>
                 <th>First Name</th>
                 <th>Surname</th>
-                <th>email</th>
-                <?php
-                    if ($_GET["format"] == "course") {
-                        echo '<th>Date</th>';
-                    } else {
-                        echo '<th>Client</th>';
-                    }
-                ?>
-                <th>Badges</th>
             </tr>
         </thead>
         <tbody id="tableBody">
@@ -88,27 +80,23 @@
 $(document).ready(function() {
     module = "<?php echo $module; ?>";
     format = "<?php echo $_GET['format']; ?>";
-    $.getJSON( "../api/v1/courses.php", function( data ) {
-        data = data["data"];
-        for(i=0;i<data.length;i++){
-            course = data[i];
-            if (course.ID == module) {
-                if (date) {
-                    $('header .container h1').html(course.title + " (" + date + ")");
-                } else {
-                    $('header .container h1').html(course.title);
-                }
-            }
-        }
+    $.getJSON( "../api/v2/getModule.php?module=<?php echo $module; ?>", function( data ) {
+        $('header .container h1').html(data["title"]);
     });
     var table = $('#learners').DataTable({
         "responsive": true,
-        "ajax": "../api/v1/generate_user_summary.php?course=<?php echo $module; ?>&date=<?php echo $date; ?>",
+        "ajax": "../api/v2/getModuleUsers.php?module=<?php echo $module; ?>",
         "columns": [
             { "data": function(d) {
-                try { if (d["eLearning"]["complete"][0]["id"] == module) { return "<span id='tick_small'>✔</span>"; } } catch(err) {}
-                try { if (d["courses"]["complete"][0]["id"] == module) { return "<span id='tick_small'>✔</span>"; } } catch(err) {}
-                try { if (d["eLearning"]["active"][0]["id"] == module) { return "<span id='tick_small'>✗</span>"; } } catch(err) {}
+                if (d["user"]["email"]) {
+                    return d["user"]["email"];
+                } else {
+                    return d["user"]["id"];
+                }
+            } },
+            { "data": function(d) {
+                try { if (d["progress"]["isComplete"] === true) { return '<progress max="100" value="100">100</progress>'; }} catch(err) {}
+                try { if (d["progress"]["progress"]) { return '<progress max="100" value="'+d["progress"]["progress"]+'">'+d["progress"]["progress"]+'</progress>'; }} catch(err) {}
                 return "-";
             }},
             { "data": function(d) {
@@ -122,39 +110,11 @@ $(document).ready(function() {
                     return d["user"]["lastname"];
                 } 
                 return "";
-            } },
-            { "data": function(d) {
-                try {
-                    return d["user"]["email"];
-                } catch (err) {
-                    return "";
-                }
-                return "";
-            } },
-            { "data" : function(d) {
-                if (format == "course") {
-                    try { if (d["courses"]["complete"][0]["date"]) { return d["courses"]["complete"][0]["date"]; } }
-                        catch(err) {}
-                        return "-";   
-                } else {
-                    try { if (d["eLearning"]["complete"][0]["theme"]) { return d["eLearning"]["complete"][0]["theme"]; } } catch(err) {}
-                    return "-";
-                }
-            }},
-            { "data": function(d) {
-                badgesComplete = "";
-                if (typeof(d["badges"]) != "undefined") {
-            		badges = d["badges"]["complete"];
-            		for(i=0;i<badges.length;i++) {
-                		badgesComplete += "<img style='max-height: 50px;' src='"+badges[i]['url']+"' alt='"+badges[i]['id']+"'/>";
-            		}
-            		return badgesComplete;
-        		}
-        		return "";
-            }}
+            } }
+            
        ],
-       "pageLength": 50,
-       "order": [[ 0, "asc" ], [1, "asc"]],
+       "pageLength": 20,
+       "order": [[ 1, "desc" ], [0, "asc"]],
        "dom": 'Bfrtip',
        "buttons": [
             'copy', 'csv', 'excel', 'pdf', 'print'

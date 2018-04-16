@@ -33,12 +33,13 @@ table.dataTable.dtr-inline.collapsed>tbody>tr>td:first-child:before, table.dataT
 	<thead>
             <tr>
                 <th>Course name</th>
-                <th>Credits</th>
+                <!--<th>Credits</th>-->
                 <th>Type</th>
                 <th>Dashboard</th>
                 <th class="none">ID</th>
                 <th class="none instances">Instances</th>
                 <th class="none">Description</th>
+                <th class="none">Modules</th>
             </tr>
         </thead>
         <tbody id="tableBody">
@@ -46,6 +47,7 @@ table.dataTable.dtr-inline.collapsed>tbody>tr>td:first-child:before, table.dataT
 </table>
 
 <script>
+/*
 function renderCredits(course) {
 	if (course["credits"] == "") {
 		course["credits"] = new Array();
@@ -70,6 +72,7 @@ function renderCredits(course) {
 	ret += '</div>';
 	return ret;
 }
+*/
 var instancesDone = [];
 $(document).ready(function() {
 	var table = $('#courses').DataTable({
@@ -80,9 +83,14 @@ $(document).ready(function() {
             		if (d["url"]) {
             			return "<a href='"+d["url"]+"' target='_blank'>" + d["title"] + "</a>"
             		}
+            		try {
+            			if (d["_trackingHub"]["_courseID"]) {
+            				return "<a href='"+d["_trackingHub"]["_courseID"]+"' target='_blank'>" + d["title"] + "</a>"	
+            			}
+            		} catch (err) {}
             		return d["title"];
             	}},
-            	{ "data": function(d) { return renderCredits(d); } },
+            	//{ "data": function(d) { return renderCredits(d); } },
             	{ "data": function(d) {
 					output = '<span style="display: none;">'+d["format"]+'</span><img style="max-height: 40px;" src="/images/';
         			output += d["format"];
@@ -99,7 +107,7 @@ $(document).ready(function() {
             	{ "data": function(d) {
 					id = d["id"];
 					format = d["format"];
-                    return '<a class="dt-button" href="../dashboard/index.php?module=' + d["ID"] + '&format='+format+'">View Dashboard</a>';
+                    return '<a class="dt-button" href="../dashboard/course.php?course=' + d["ID"] + '&format='+format+'">View Dashboard</a>';
 	    		}},
 	    		{ "data": "ID" },
 	    		{ "data": function(d) {
@@ -112,6 +120,15 @@ $(document).ready(function() {
 	    		}},
 	    		{ "data": function(d) {
 	    			if (d["body"]) {return d["body"];} else {return "";}
+	    		}},
+	    		{ "data": function(d) {
+	    			ret = "";
+	    			if (d["modules"]) {
+	    				for (m=0;m<d["modules"].length;m++) {
+	    					ret += d["modules"][m]["title"] + ' (<a href="../dashboard/index.php?module=' + d["modules"][m]["_id"] + '&format='+d["format"]+'">View Dashboard</a>)<br/>';		
+	    				}
+	    			}
+	    			return ret;
 	    		}}
 	   	],
 	   	"pageLength": 25,

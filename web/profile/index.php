@@ -16,8 +16,54 @@
 	}
 	$user = getProfileData();
 	$courses = getCoursesData();
+
+?>
+<script src="../js/jquery-2.1.4.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/t/dt/dt-1.10.11,r-2.0.2/datatables.min.js"></script>
+<script type='text/javascript' src="https://cdn.datatables.net/buttons/1.2.2/js/dataTables.buttons.min.js"></script>
+<script type='text/javascript' src="//cdn.datatables.net/buttons/1.2.2/js/buttons.flash.min.js"></script>
+<script type='text/javascript' src="//cdnjs.cloudflare.com/ajax/libs/jszip/2.5.0/jszip.min.js"></script>
+<script type='text/javascript' src="//cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/pdfmake.min.js"></script>
+<script type='text/javascript' src="//cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/vfs_fonts.js"></script>
+<script type='text/javascript' src="//cdn.datatables.net/buttons/1.2.2/js/buttons.html5.min.js"></script>
+<script type='text/javascript' src="//cdn.datatables.net/buttons/1.2.2/js/buttons.print.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.2.2/css/buttons.dataTables.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/t/dt/dt-1.10.11,r-2.0.2/datatables.min.css"/>
+<script>
+$(document).ready( function () {
+    $('#profile_table').DataTable({
+		"dom": 'Bfrtip',
+        "buttons": [
+          'copy', 'csv', 'excel', 'pdf', 'print'
+        ],
+        "searching": true,
+        "responsive": true
+    });
+} );
+</script>
+<style>
+table.dataTable.dtr-inline.collapsed>tbody>tr>td:first-child:before, table.dataTable.dtr-inline.collapsed>tbody>tr>th:first-child:before {
+	top: 1.3em;
+	text-indent: 2px;
+    line-height: 18px;
+}
+</style>
+<?php
+
 	drawProfile($user,$courses);
 	include('_includes/footer.html');
+
+function getModulesData() {
+	$modules = getDataFromCollection("modules");
+	$courses = getCoursesData();
+	$output = array();
+	foreach ($modules as $id => $module) {
+  		if (is_array($courses[$module["_parentId"]])) {
+	  		$output[$id] = $module;
+  		}
+	}
+	return $output;
+}
 
 function enableSelectUser() {
 	global $userData;
@@ -38,7 +84,7 @@ function getProfileData() {
 		$userid = $userData["email"];
 	}
 	$data = getUser($userid);
-	$user = $data[$userid]["eLearning"];
+	$user = $data[$userid]["eLearning_courses"];
 	$user = getF2FCompletion($userid,$user);
 	$user = getExternalBadges($userid,$user);
 	return $user;
@@ -49,12 +95,17 @@ function drawProfile($user,$courses) {
 	echo outputUserBadges($user["externalBadges"]);
 	echo outputUserCredits($userBadgeCredits);
 	$complete = $user["complete"];
-	$in_progress = $user["in_progress"];
+	for ($i=0;$i<count($user["in_progress"]);$i++) {
+		$in_progress[] = $user["in_progress"][$i];
+	}
+	for ($i=0;$i<count($user["active"]);$i++) {
+		$in_progress[] = $user["active"][$i];
+	}
 	if (count($complete)>0) {
 		echo '<h2 class="profile_h2">Completed courses</h2>';
 		outputCourses($complete,"Complete",$courses);
 	}
-	if (count($in_progress)>0) {
+	if (count($in_progress)>0 || count($active)>0) {
 		echo '<h2 class="profile_h2">Courses in progress</h2>';
 		outputCourses($in_progress,"Progress",$courses);
 	}
@@ -149,17 +200,36 @@ function outputUserBadges($badges) {
 }
 
 function outputCourses($data,$heading,$courses) {
-	echo '<table style="width: 100%;">';
-    echo '<tr><th width="50%"></th><th style="width:150px;">Credits</th><th width="20%">Type</th><th width="20%">'.$heading.'</th></tr>';
+	echo '<table id="profile_table" style="width: 100%;">';
+    echo '<thead><tr><th width="50%">Course</th><th style="width:150px;">Credits</th><th width="20%">Type</th><th width="20%">'.$heading.'</th><th class="none">Modules</th></tr></thead><tbody>';
 	foreach ($data as $course) {
 	        echo outputCourse($course,$course["progress"],$courses);
 	}
-	echo '</table>';
+	echo '</tbody></table>';
 }
 
 function outputCourse($doc,$progress,$courses) {
 	$output = "";
 	$course = $courses[$doc["id"]];
+	if (!$course) {
+		$course = $courses[$doc["courseID"]];
+	}
+	if (!$course) {
+		$doc["courseID"] = str_replace("_", ".", $doc["courseID"]);
+		$course = $courses[$doc["courseID"]];
+		if (!$course) {
+			foreach($courses as $id => $data) {
+				if ($data["_trackingHub"]["_courseID"] == $doc["courseID"]) {
+					$course = $data;
+				}
+			}
+		}
+	}
+	if(!$course && $doc["courseID"]) {
+		$course["title"] = $doc["courseID"];
+		$course["format"] = "eLearning";
+	}
+
 	if ($course["web_url"]) { $url = $course["web_url"]; }
 	if ($course["url"]) { $url = $course["url"]; }
    	if ($url) {
@@ -167,14 +237,14 @@ function outputCourse($doc,$progress,$courses) {
 	} else {
 		$output .= '<tr><td id="course_name">' . $course["title"] . '</td>';
 	}
-     	$output .= '<td style="text-align: center;">';
+    $output .= '<td style="text-align: center;">';
 	$output .= outputCredits($course);
 	$output .= '</td>';
 	$output .= '<td style="text-align: center;"><img style="max-height: 40px;" src="/images/';
 	$output .= $course["format"]; 
 	$output .= '.png"></img></td>';
 	$output .= '<td style="text-align: center;">';
-	if ($progress == "") {
+	if (!is_numeric($progress)) {
 		if (substr($course["id"],0,4) == "ODI_") {
 			$dashId = str_replace("ODI_","",$course["id"]);
 			$output .= '<a href="/dashboard/index.php?module=' . $dashId . '"><img src="/images/dashboard.png" width="30px"/></a>';
@@ -187,8 +257,38 @@ function outputCourse($doc,$progress,$courses) {
 		$output .= '<progress max="100" value="'.$progress.'"></progress>';
 	}
 	$output .= '</td>';
-	$output .= '</tr>';
-        return $output;
+	$output .= outputModules($doc,$progress,$courses);
+    return $output;
+}
+
+function outputModules($doc,$progress,$courses) {
+	$modules = getModulesData();
+	$ret = '<td><table width="100%" style="margin-left: 1em;">';
+	foreach($doc as $id => $data) {
+		if (!is_array($data)) {
+			continue;
+		}
+		$ret .= '<tr style="line-height: 3em;">';
+		$ret .= '<td style="font-size: 1.2em;">';
+		if ($modules[$id]['title']) {
+			$ret .= $modules[$id]['title'];
+		} else {
+			$ret .= $id;
+		}
+		$ret .= '</td>';
+		$ret .= '<td width="20%">';
+		if ($data["progress"] > 99 || $data["answers"]["_assessmentState"] == "Passed" || $data["answers"]["_assessmentState"] == "Failed") {
+            $ret .= '<span id="tick">&#10004;</span>';
+        } elseif ($data["progress"] > 99) {
+            $ret .= '<span id="tick">&#10004;</span>';
+        } else {
+            $ret .= '<progress max="100" value="'.$data["progress"].'"></progress>';
+        }
+		$ret .= '</td>';
+		$ret .= '</tr>';
+	}
+	$ret .= '</td></tr></table></td>';
+	return $ret;
 }
 
 function outputUserCredits($data) {

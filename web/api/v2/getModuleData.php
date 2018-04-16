@@ -10,7 +10,7 @@ $path = "../../";
 
 set_include_path(get_include_path() . PATH_SEPARATOR . $path);
 
-//include_once('library/functions.php');
+include_once('library/functions.php');
 include_once('header.php');
 
 header("Access-Control-Allow-Origin: *");
@@ -29,15 +29,13 @@ if (!$moduleID) {
 $csvData = [];
 
 $parentID = getValueFromDoc($moduleID,"modules","_parentId");
-$courseID = getValueFromDoc($parentID,"courses","_trackingHub")["_courseID"];
-
-$courseID = str_replace(".", "_", $courseID);
+$courseID = getValueFromDoc($parentID,"courses","_id");
 
 $csvData = getUsersWithCourseModuleData($csvData,$courseID,$moduleID);
 
 outputCSV($csvData);
 
-function processUser($user,$courseID,$moduleID,$csvData) {
+function processUserLocal($user,$courseID,$moduleID,$csvData) {
 
 	$output["email"] = "false";
 	$output["platform"] = "web";
@@ -141,7 +139,7 @@ function getUsersWithCourseModuleData($csvData,$courseID,$moduleID) {
 		$res = $col->find($query);
 		$ret = "";
 		foreach ($res as $doc) {
-			$csvData = processUser($doc,$courseID,$moduleID,$csvData);
+			$csvData = processUserLocal($doc,$courseID,$moduleID,$csvData);
 		}
 		$m->close();
 		return $csvData;

@@ -38,16 +38,16 @@
                 <th>First Name</th>
                 <th>Surname</th>
                 <th>email</th>
-                <th>Completed F2F courses</th>
-                <th>Completed online modules</th>
-                <th>Credits</th>
+                <th>Completed Courses</th>
+                <th>Courses in Progress</th>
+                <th>eLearning modules completed/active</th>
                 <th>Location</th>
                 <th>Badges</th>
+        <th class="none">Credits</th>
         <th class="none">Theme</th>
-        <th class="none">F2F courses complete</th>
-		<th class="none">eLearning modules complete</th>
-        <th class="none">eLearning modules active</th>
-            </tr>
+        <th class="none">Completed courses</th>
+        <th class="none">Courses in progress</th>
+        </tr>
         </thead>
         <tbody id="tableBody">
         </tbody>
@@ -57,16 +57,59 @@
 /*
 TODO: Convert this to use more of the courses data and provide links.
 */
+function getModuleTable(d,data,modules) {
+    append = "";
+    $.each(data, function (modid,moddata) {
+        if (typeof moddata === "object") {
+            append += '<tr><td>';
+            try {
+                append += modules[modid]["displayTitle"];
+            } catch(err) {
+                append += modid;
+            }
+            append += '</td><td>';
+            try {
+                done = false;
+                if (typeof moddata["answers"] !== "undefined") {
+                    if (moddata["progress"] > 99 || moddata["answers"]["_assessmentState"] == "Passed" || moddata["answers"]["_assessmentState"] == "Failed") {
+                        append += '<span id="tick">&#10004;</span>';
+                        done = true;
+                    }
+                }
+                if (moddata["progress"] > 99 && !done) {
+                        append += '<span id="tick">&#10004;</span>';
+                } else if (!done) {
+                    append += '<progress max="100" value="'+moddata["progress"]+'"></progress>';
+                }
+            } catch(err) {
+                console.log(err);
+                append += '<progress max="100" value="0"></progress>';
+            }
+            append += '</td></tr>';
+        }
+    });
+    return append;
+}
+
 $(document).ready(function() {
   countries = {};
+  modules = {};
   $.getJSON("../api/v1/countries.php", function(data) {
     countries = data;
+  });
+  modules = {};
+  $.getJSON( "../api/v1/modules.php", function( data ) {
+    modules = data["data"];
   });
   $.getJSON( "../api/v1/courses.php", function( data ) {
   	data = data["data"];
   	var courses = {};
   	$.each(data, function(key,val) {
-  		courses[val['ID']] = val['title'];
+  		courses[val['ID']] = val;
+        try {
+            courses[val['_trackingHub']['_courseID'].replace(/\./g,'_')] = val;
+        } catch(err) {
+        }
   	});
 	var table = $('#learners').DataTable({
 		"responsive": true,
@@ -94,19 +137,33 @@ $(document).ready(function() {
             } },
             { "data": function(d) {
                 try {
-					return Object.keys(d["courses"]["complete"]).length;
+					return Object.keys(d["courses"]["complete"]).length + Object.keys(d["eLearning_courses"]["complete"]).length;
                 } catch (err) {
                     return 0;
                 }
             } },
             { "data": function(d) {
                 try {
-					return Object.keys(d["eLearning"]["complete"]).length;
+					return Object.keys(d["eLearning_courses"]["active"]).length;
 				} catch(err) {
 					return 0;
 				}
             } },
-            { "data": "totalCredits" },
+            { "data": function(d) {
+                completed = 0;
+                active = 0;
+                in_progress = 0;
+                try {
+                    completed = Object.keys(d["eLearning"]["complete"]).length;
+                } catch(err) {}
+                try {
+                    active = Object.keys(d["eLearning"]["active"]).length;
+                } catch(err) {}
+                try {
+                    in_progress = Object.keys(d["eLearning"]["in_progress"]).length;
+                } catch(err) {}
+                return completed + " / " + (active + in_progress);
+            } },
             { "data" : function(d) {
                 try { 
                     if (d["user"]["country"] != "" && d["user"]["region"]) {
@@ -122,6 +179,7 @@ $(document).ready(function() {
                 
                 return "";
             }},
+            { "data": "totalCredits" },
             { "data": function(d) {
             	badgesComplete = "";
             	if (typeof(d["badges"]) != "undefined") {
@@ -137,60 +195,67 @@ $(document).ready(function() {
                 try { if (d["eLearning"]["theme"]) { return d["eLearning"]["theme"]; } } catch(err) {}
                 return "-";
             }},
-	    { "data": function(d) {
-    		ret = "<ul>";
-		    try {
-    			$.each(d["courses"]["complete"], function(item,data) {
-    				if (courses[data["id"]]) {
-    					ret += "<li>" + courses[data["id"]] + "</li>";
-    				} else {
-    					ret += "<li>" + value + "</li>";
-    				}
-    			});
-    		} catch (err) {}
-    		ret +="</ul>";
-		return ret;
-	    }},
-	    { "data": function(d) {
-    		ret = "<ul>";
-		    try {
-			    $.each(d["eLearning"]["complete"], function(item,data) {
-    				if (courses[data["id"]]) {
-                        ret += "<li>" + courses[data["id"]] + "</li>";
-                    } else {
-                        ret += "<li>" + value + "</li>";
-                    }
-    			});
-		    } catch (err) {}
-    		ret +="</ul>";
-	    	return ret;
-	    }},
-        { "data": function(d) {
-            ret = "<ul>";
-            try {
-                $.each(d["eLearning"]["active"], function(item,data) {
-                    if (courses[data["id"]]) {
-                        ret += "<li>" + courses[data["id"]] + "</li>";
-                    } else {
-                        ret += "<li>" + value + "</li>";
-                    }
-                });
-            } catch (err) {}
-            ret +="</ul>";
-            return ret;
-        }}
-	   ],
-	   "pageLength": 50,
-	   "order": [[ 5, "desc" ], [0, "asc"]],
-       "dom": 'Bfrtip',
-       "buttons": [
-            'copy', 'csv', 'excel', 'pdf', 'print'
-       ]
-	});
-	$('#loading').fadeOut();
-	$('#learners').fadeIn("slow");
-  });
-});
+    	    { "data": function(d) {
+        		ret = "<ul>";
+    		    try {
+        			$.each(d["courses"]["complete"], function(item,data) {
+        				if (courses[data["id"]]) {
+        					ret += "<li>" + courses[data["id"]]['title'] + "</li>";
+        				} else {
+        					ret += "<li>" + value + "</li>";
+        				}
+        			});
+        		} catch (err) {}
+                try {
+                    ret = "<ul>";
+                    append = "";
+                    $.each(d["eLearning_courses"]["complete"], function(item,data) {
+                        if (courses[data["courseID"]]) {
+                            ret += "<li>" + courses[data["courseID"]]["title"];
+                            ret += "<br/><table><tr><th>Module</th><th>Progress</th></tr>";
+                            ret += getModuleTable(d,data,modules);
+                            ret += "</table>";                        
+                            ret += "</li>";
+                        } else {
+                            ret += "<li>" + data["courseID"].replace(/_/g,'.') + "</li>";
+                        }
+                    });
+                } catch (err) {}
+        		ret +="</ul>";
+    		return ret;
+    	    }},
+            { "data": function(d) {
+                ret = "<ul>";
+                append = "";
+                try {
+                    $.each(d["eLearning_courses"]["active"], function(item,data) {
+                        if (courses[data["courseID"]]) {
+                            ret += "<li>" + courses[data["courseID"]]["title"];
+                        } else {
+                            ret += "<li>" + data["courseID"].replace(/_/g,'.');
+                        }
+                        ret += "<br/><table><tr><th>Module</th><th>Progress</th></tr>";
+                        ret += getModuleTable(d,data,modules);
+                        ret += "</table>";                        
+                        ret += "</li>";
+                    });
+                } catch (err) {
+                }
+                ret +="</ul>";
+                return ret;
+            }}
+    	   ],
+    	   "pageLength": 50,
+    	   "order": [[ 5, "desc" ], [0, "asc"]],
+           "dom": 'Bfrtip',
+           "buttons": [
+                'copy', 'csv', 'excel', 'pdf', 'print'
+           ]
+    	});
+    	$('#loading').fadeOut();
+    	$('#learners').fadeIn("slow");
+      });
+    });
 </script>
 <?php
 

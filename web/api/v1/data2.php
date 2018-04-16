@@ -66,7 +66,7 @@ $tracking = getCourseIdentifiers();
 
 $profile = getLMSProfile($theme);
 $client = $profile["client"];
-
+/*
 $collection = "elearning";
 $cursor = getDataFromCollection($collection); 
 foreach ($cursor as $doc) {
@@ -108,7 +108,7 @@ if ($output) {
 	$adapt1_set = true;
 }
 // ADAPT 2
-
+*/
 $collection = "adapt2";
 $cursor = getDataFromCollection($collection); 
 foreach ($cursor as $doc) {
@@ -183,6 +183,7 @@ function rotate($id,$indata) {
 
 	$line["completion"] = $data["progress"] / 100;
 	$line["session_time"] = gmdate("H:i:s", $data["time"]);
+	
 	foreach ($data["answers"] as $aid => $adata) {
 		$line[$aid."_isCorrect"] = $adata["correct"];
 		$i=0;

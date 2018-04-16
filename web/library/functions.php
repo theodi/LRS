@@ -274,6 +274,43 @@ function getCourseIdentifiers() {
    	}
    	return $tracking;
 }
+/*
+ * getCourseData($id)
+ * Get all the course data for a course (top level + modules/lessons)
+ *              
+ * Called by: dashboard/course.php
+ */
+function getCourseData($id) {
+  global $courses_collection,$connection_url, $db_name;
+  $query = array('_id' => $id);
+  $res = executeQuery($connection_url,$db_name,$courses_collection,$query);
+  foreach ($res as $doc) {
+    $course = $doc;
+  }
+  $query = array('_parentId' => $id);
+  $res = executeQuery($connection_url,$db_name,"modules",$query);
+  foreach ($res as $doc) {
+    $course["modules"][] = $doc;
+  }
+  return $course;
+}
+
+/*
+ * getCourseData($id)
+ * Get all the course data for a course (top level + modules/lessons)
+ *              
+ * Called by: dashboard/course.php
+ */
+function getLearnerData($courseID) {
+  global $connection_url, $db_name;
+  $query = array($courseID => array('$exists' => true));
+  $res = executeQuery($connection_url,$db_name,"adapt2",$query);
+  foreach ($res as $doc) {
+    $learners[] = $doc;
+  }
+  return $learners;
+}
+
 
 /*
  * filterUsers($users,$filter,$client) 
@@ -366,7 +403,7 @@ function filterCourseClient($courses,$filter) {
  */
 function getClientMapping($theme) {
     $ret = [];
-    $courseIdentifiers = getDataFromCollection("courseIdentifiers");
+    $courseIdentifiers = getDataFromCollection("clientCourses");
     foreach ($courseIdentifiers as $doc) {
    		$doc = $doc["mapping"];
    		foreach ($doc as $key => $value) {
@@ -502,17 +539,39 @@ function processAdapt2User($users,$doc,$email) {
       $users[$email][$key] = $value;
     }
   }
-  $progress = $doc["progress"];
-  foreach ($progress as $module => $data) {
-    $data["id"] = $module;
-    if ($data["progress"] > 99 || $data["answers"]["_assessmentState"] == "Passed" || $data["answers"]["_assessmentState"] == "Failed") {
-        $users[$email]["eLearning"]["complete"][] = $data;
-    } elseif ($data["progress"] > 50 && $data["sessionTime"] > 299) {
-        $users[$email]["eLearning"]["active"][] = $data;
-    } elseif ($data["progress"] > 0) {
-        $users[$email]["eLearning"]["in_progress"][] = $data;
+
+  foreach ($doc as $key => $values) {
+    $complete_flag = false;
+    if (is_array($doc[$key]["progress"])) {
+      $progress = $doc[$key]["progress"];
+      if ($progress["_isComplete"] || $progress["progress"] > 99) {
+        $users[$email]["eLearning_courses"]["complete"][] = $progress;
+        $complete_flag = true;
+      }
+      foreach ($progress as $module => $data) {
+        $data["id"] = $module;
+        if ($data["progress"] > 99 || $data["answers"]["_assessmentState"] == "Passed" || $data["answers"]["_assessmentState"] == "Failed") {
+            $users[$email]["eLearning"]["complete"][] = $data;
+            if (!$complete_flag) {
+              $users[$email]["eLearning_courses"]["active"][] = $progress;
+              $complete_flag = true;
+            }
+        } elseif ($data["progress"] > 50 && $data["sessionTime"] > 299) {
+            $users[$email]["eLearning"]["active"][] = $data;
+            if (!$complete_flag) {
+              $users[$email]["eLearning_courses"]["active"][] = $progress;
+              $complete_flag = true;
+            }
+        } elseif ($data["progress"] > 0) {
+           $users[$email]["eLearning"]["in_progress"][] = $data;
+           if (!$complete_flag) {
+              $users[$email]["eLearning_courses"]["active"][] = $progress;
+              $complete_flag = true;
+          }
+        }
+      }
     }
-  }
+   }
   $users[$email] = filterUnique($users[$email]);
   return $users;
 }
