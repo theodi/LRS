@@ -137,10 +137,14 @@ function store($data,$courseID) {
      }
    }
    
-    if (!$data["progress"]["courseID"]) {
-      $data["progress"]["courseID"] = $courseID;
-    }
+   if (!$data["progress"]["courseID"]) {
+    $data["progress"]["courseID"] = $courseID;
+   }
+   if($data["progress"]["trackingHubID"]) {
+    $courseID = $data["progress"]["courseID"];
+   } else {
     $courseID = getCourseID($courseID);
+   }
 
    //Handle legacy trackingHub
    if (!$data["progress"]["theme"]) {
