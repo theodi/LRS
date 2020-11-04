@@ -124,8 +124,8 @@ function processEmailAdapt1($data) {
 	}
 	if ($email && $sent == "false") {
 		$email = str_replace("．",".",$email);
-		sendEmail($id,$email,$prefix,$theme,"");
-		markDone($collection,$id);
+		#sendEmail($id,$email,$prefix,$theme,"");
+		#markDone($collection,$id);
 	}
 }
 
@@ -149,9 +149,9 @@ function processEmailAdapt2($data) {
 			$indate = substr($data["user"]["lastSave"],0,strpos($data["user"]["lastSave"],"(")-1);
 			$date = strtotime($indate);
 			if ($date > (time()-86400)) {
-				if (sendEmail($id,$email,$prefix,$theme,$lang)) {
-					markDone("adapt2",$id);			
-				}
+				#if (sendEmail($id,$email,$prefix,$theme,$lang)) {
+				#	markDone("adapt2",$id);			
+				#}
 			}
 			$done[$prefix] = true;
 		}

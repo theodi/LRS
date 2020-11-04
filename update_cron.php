@@ -1,5 +1,11 @@
 <?php
-	
+	$arrContextOptions=array(
+	    "ssl"=>array(	
+        	"verify_peer"=>false,
+	        "verify_peer_name"=>false,
+	    ),
+	);  
+
 	$stats_min = 0;
 
 	$stats_cmd = "/usr/bin/wget -O /dev/null -q -t 1 --no-check-certificate https://lms2.learndata.info/api/v1/trained_stats.php?theme=";
@@ -17,9 +23,10 @@
 	fclose($cron_writer);
 
 	function dashboard_nightly($client,$courses_url,$cmd,$writer) {
+		global $arrContextOptions;
 		$data = ""; $content = "";
 		$url = $courses_url . $client;
-		$content = file_get_contents(trim($url));
+		$content = file_get_contents(trim($url),false,stream_context_create($arrContextOptions));
 		$data = json_decode($content,true);
 		$data = $data["data"];
 		for($i=0;$i<count($data);$i++) {
