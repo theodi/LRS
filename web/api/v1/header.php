@@ -2,7 +2,6 @@
 error_reporting(E_ALL & ~E_NOTICE);
 session_start();
 require_once(realpath(dirname(__FILE__)) . '/../../../vendor/autoload.php');
-echo (realpath(dirname(__FILE__)));
 if ($_SERVER["HTTP_HOST"] == "localhost") {
   include_once('../../_includes/config-local.inc.php');
 } else {
