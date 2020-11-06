@@ -14,15 +14,17 @@ error_reporting(E_ALL & ~E_NOTICE);
  * 			  _includes/header.php
  */
 function getTheme($host) {
-	$host = str_replace(".","_",$host);
+	  $host = str_replace(".","_",$host);
     $courseIdentifiers = getDataFromCollection("courseIdentifiers");
     foreach ($courseIdentifiers as $doc) {
    		$doc = $doc["hosts"];
-   		foreach ($doc as $key => $value) {
-   			if ($key == $host) {
+      if ($doc) {
+   		 foreach ($doc as $key => $value) {
+   		 	if ($key == $host) {
    				return $value[0];
    			}
-   		}
+   		 }  
+      }
    	}
    	return false;
 }
@@ -50,13 +52,13 @@ function getExternalAccess($email,$theme) {
  *
  */
 
+
 function executeQuery($connection_url,$db_name,$collection,$query) {
 	try {
-		$m = new MongoClient($connection_url);
-		$col = $m->selectDB($db_name)->selectCollection($collection);
-		$res = $col->find($query);
-		$m->close();
-		return $res;
+    $m = new MongoDB\Client($connection_url);
+    $col = $m->selectDatabase($db_name)->selectCollection($collection);
+    $cursor = $col->find($query);
+		return $cursor;
 	} catch ( Exception $e ) {
 		syslog(LOG_ERR,'Error: ' . $e->getMessage());
 		return false;
@@ -67,14 +69,13 @@ function executeQuery($connection_url,$db_name,$collection,$query) {
 function getDataFromCollection($collection) {
     global $connection_url, $db_name;
     try {
-		$m = new MongoClient($connection_url);
-		$col = $m->selectDB($db_name)->selectCollection($collection);
-		$cursor = $col->find();
-		return $cursor;
-		$m->close();
+      $m = new MongoDB\Client($connection_url);
+      $col = $m->selectDatabase($db_name)->selectCollection($collection);
+      $cursor = $col->find();
+		  return $cursor;
     } catch ( Exception $e ) {
-		syslog(LOG_ERR,'Error: ' . $e->getMessage());
-		return false;
+		  syslog(LOG_ERR,'Error: ' . $e->getMessage());
+		  return false;
     }
     return false;
 }
@@ -82,14 +83,14 @@ function getDataFromCollection($collection) {
 function getNumberOfRecords($collection) {
     global $connection_url, $db_name;
     try {
-   		$m = new MongoClient($connection_url);
-		$col = $m->selectDB($db_name)->selectCollection($collection);
-		$count = $col->count();
-		$m->close();
-		return $count;
+   		$m = new MongoDB\Client($connection_url);
+      $col = $m->selectDatabase($db_name)->selectCollection($collection);
+      $cursor = $col->find();
+		  $count = $col->count();
+		  return $count;
     } catch ( Exception $e ) {
-		syslog(LOG_ERR,'Error: ' . $e->getMessage());
-		return false;
+		  syslog(LOG_ERR,'Error: ' . $e->getMessage());
+		  return false;
     }
     return false;
 }
@@ -104,20 +105,18 @@ function storeDataWithID($id,$data,$collection) {
   $ret = "";
   global $connection_url, $db_name;
   try {
-    $m = new MongoClient($connection_url);
-    $col = $m->selectDB($db_name)->selectCollection($collection);
-	
+    $m = new MongoDB\Client($connection_url);
+    $col = $m->selectDatabase($db_name)->selectCollection($collection);
     $query = array('id' => $id);
     $count = $col->count($query);
     if ($count > 0) {
 		  $newdata = array('$set' => $data);
-		  $col->update($query,$newdata);
+		  $col->updateOne($query,$newdata);
 		  $ret .= "Updated " . $data["title"] . "<br/>";
     } else {
-		  $col->save($data);
+		  $col->insertOne($data);
 		  $ret .= "Imported " . $data["title"] . "<br/>";
     }
-    $m->close();
     return $ret;
   } catch ( Exception $e ) {
     $ret .= "SOMETHING WENT WRONG" . $e->getMessage() . "<br/><br/>\n\n";
@@ -136,11 +135,11 @@ function storeDataWithID($id,$data,$collection) {
 function removeByQuery($query,$collection) {
   global $connection_url, $db_name;
   try {
-    $m = new MongoClient($connection_url);
-    $col = $m->selectDB($db_name)->selectCollection($collection);
+    $m = new MongoDB\Client($connection_url);
+    $col = $m->selectDatabase($db_name)->selectCollection($collection);
     $cursor = $col->find($query);
     foreach ($cursor as $doc) {
-      $col->remove($doc);
+      $col->deleteOne($doc);
     }
   } catch ( Exception $e ) {
     syslog(LOG_ERR,'Error: ' . $e->getMessage());
@@ -158,20 +157,17 @@ function storeDatasets($datasets,$collection,$ret_keys) {
   global $connection_url, $db_name;
   $ret = "";
   try {
-  // create the mongo connection object
-    $m = new MongoClient($connection_url);
-    // use the database we connected to
-    $col = $m->selectDB($db_name)->selectCollection($collection);
+    $m = new MongoDB\Client($connection_url);
+    $col = $m->selectDatabase($db_name)->selectCollection($collection);
     for($i=0;$i<count($datasets);$i++) {
       $record = $datasets[$i];
-      $col->save($datasets[$i]);
+      $col->insertOne($datasets[$i]);
       $ret .= "Imported record for ";
       for ($j=0;$j<count($ret_keys);$j++) {
       	$ret .= $datasets[$i][$ret_keys[$j]] . " ";
       }
       $ret .= "<br/>";
     }
-    $m->close();
     return $ret;
   } catch ( Exception $e ) {
     return "CAUGHT AN ERROR! " . $e->getMessage();
@@ -199,8 +195,9 @@ function getCoursesData() {
 	global $courses_collection,$theme;
   $cursor = getDataFromCollection($courses_collection);
 	$tracking = getCourseIdentifiers();
-	$courses = "";
+	$courses = array();
 	foreach ($cursor as $doc) {
+    $doc = json_decode(json_encode($doc),true);
    	if ($doc["slug"]) {
 			$id = $doc["slug"];
     } elseif ($doc["_trackingHub"]["_pageID"]) {
@@ -219,7 +216,7 @@ function getCoursesData() {
       }
 			$courses[$id] = array_merge($courses[$id],$doc);
 			$courses[$id]["id"] = $id;
-      if ($courses[$id["url"]] == "") {
+      if ($courses[$id]["url"] == "") {
         $courses[$id]["url"] = $tmpurl;
       } 
       if ($doc["theme"] == $theme) {
@@ -232,19 +229,23 @@ function getCoursesData() {
     //Adapt 2 backport
     if (!$los) {
       $los = $courses[$id]["_skillsFramework"]["_skills"];
-      for ($i=0;$i<count($los);$i++) {
-        $lo = $los[$i];
-        $los[$i]["badge"] = $lo["level"];
+      if ($los) {
+        for ($i=0;$i<count($los);$i++) {
+          $lo = $los[$i];
+          $los[$i]["badge"] = $lo["level"];
+        }
+        $courses[$id]["_learningOutcomes"] = $los;
       }
-      $courses[$id]["_learningOutcomes"] = $los;
     }
-		$badge = "";
+		$badge = array();
 		$total = 0;
-		for ($i=0;$i<count($los);$i++) {
-			$lo = $los[$i];
-			$badge[$lo["badge"]] += $lo["credits"];
-			$total += $lo["credits"];
-		}
+    if ($los) {
+		  for ($i=0;$i<count($los);$i++) {
+  			$lo = $los[$i];
+			 $badge[$lo["badge"]] += $lo["credits"];
+			 $total += $lo["credits"];
+		  }
+    }
     if (!$courses[$id]["format"]) {
       $courses[$id]["format"] = "eLearning";
     }
@@ -266,11 +267,13 @@ function getCourseIdentifiers() {
     $courseIdentifiers = getDataFromCollection("courseIdentifiers");
     foreach ($courseIdentifiers as $doc) {
    		$doc = $doc["identifiers"];
-   		foreach ($doc as $key => $value) {
-   			for($i=0;$i<count($value);$i++) {
-	 	  		$tracking[$value[$i]] = $key;
-   			}
-   		}
+      if ($doc) {
+   		 foreach ($doc as $key => $value) {
+   			  for($i=0;$i<count($value);$i++) {
+  	 	  		$tracking[$value[$i]] = $key;
+   			  }
+   		 }
+      }
    	}
    	return $tracking;
 }
@@ -391,7 +394,7 @@ function getClientMapping($theme) {
 function getLMSProfile($theme) {
 	global $connection_url, $db_name;
 	$collection = "externalAccess";
-	$query = array('theme' => new MongoRegex('/^' .  $theme . '$/i'));
+	$query = array('theme' => new MongoDB\BSON\Regex('^'.$theme.'$', 'i'));
 	$res = executeQuery($connection_url,$db_name,$collection,$query);
 	foreach ($res as $doc) {
 		return $doc;
@@ -605,46 +608,54 @@ function filtereLearningUnique($user) {
   $el = $user["eLearning"];
   $complete = $el["complete"];
   $done = [];
-  for($i=0;$i<count($complete);$i++) {
-    if (!$done[$complete[$i]["id"]]) {
-      $done[$complete[$i]["id"]] = true;
-      $out[] = $complete[$i];
+  if($complete) {
+    for($i=0;$i<count($complete);$i++) {
+      if (!$done[$complete[$i]["id"]]) {
+        $done[$complete[$i]["id"]] = true;
+        $out[] = $complete[$i];
+      }
     }
+    $user["eLearning"]["complete"] = $out;
   }
-  $user["eLearning"]["complete"] = $out;
   
   $out = [];
   $active = $el["active"];
-  for($i=0;$i<count($active);$i++) {
-    if (!$done[$active[$i]["id"]]) {
-      $done[$active[$i]["id"]] = true;
-      $out[] = $active[$i];
+  if($active) {
+    for($i=0;$i<count($active);$i++) {
+      if (!$done[$active[$i]["id"]]) {
+        $done[$active[$i]["id"]] = true;
+        $out[] = $active[$i];
+      }
     }
+    $user["eLearning"]["active"] = $out;
   }
-  $user["eLearning"]["active"] = $out;
 
   $out = [];
   $in_progress = $el["in_progress"];
-  for($i=0;$i<count($in_progress);$i++) {
-    if (!$done[$in_progress[$i]["id"]]) {
-      $done[$in_progress[$i]["id"]] = true;
-      $out[] = $in_progress[$i];
+  if ($in_progress) {
+    for($i=0;$i<count($in_progress);$i++) {
+      if (!$done[$in_progress[$i]["id"]]) {
+        $done[$in_progress[$i]["id"]] = true;
+        $out[] = $in_progress[$i];
+      }
     }
+    $user["eLearning"]["in_progress"] = $out;
   }
-  $user["eLearning"]["in_progress"] = $out;
   return $user;
 }
 
 function filterCoursesUnique($user) {
   $cs = $user["courses"]["complete"];
   $out = [];
+  if ($cs) {
     for($i=0;$i<count($cs);$i++) {
-    if (!$done[$cs[$i]["id"]]) {
-      $done[$cs[$i]["id"]] = true;
-      $out[] = $cs[$i];
+      if (!$done[$cs[$i]["id"]]) {
+        $done[$cs[$i]["id"]] = true;
+        $out[] = $cs[$i];
+      }
     }
+    $user["courses"]["complete"] = $out;
   }
-  $user["courses"]["complete"] = $out;
   return $user;
 }
 
@@ -694,9 +705,11 @@ function geteLearningCompletion($user,$courses,$ret) {
           $courses[$course]["assessmentPassed"] = "not attempted";
         }
         $out = [];
-        foreach ($answers as $id => $data) {
-          unset($data["userAnswer"]);
-          $out[$id] = $data;
+        if ($answers) {
+          foreach ($answers as $id => $data) {
+            unset($data["userAnswer"]);
+            $out[$id] = $data;
+          }
         }
         $object = [];
         $object["id"] = $courses[$course]["id"];
@@ -729,6 +742,9 @@ function geteLearningCompletion($user,$courses,$ret) {
  * Called by geteLearningCompletion (above)
  */
 function getTime($time) {
+  if (!is_numeric($time)) {
+    return 0;
+  }
 	$time = str_replace("．",".",$time);
 	$time = @substr($time,0,strpos($time,"."));
 	$bits = explode(":",$time);
@@ -780,11 +796,13 @@ function getProgress($course,$progress) {
 function getModuleBadgeData($course) {
 	global $userBadgeCredits;
 	$los = $course["_learningOutcomes"];
-	for ($i=0;$i<count($los);$i++) {
-		$lo = $los[$i];
-		$badge[$lo["badge"]] += $lo["credits"];
-		$userBadgeCredits[$lo["badge"]] += $lo["credits"];
-	}
+  if ($los) {
+  	for ($i=0;$i<count($los);$i++) {
+  		$lo = $los[$i];
+  		$badge[$lo["badge"]] += $lo["credits"];
+  		$userBadgeCredits[$lo["badge"]] += $lo["credits"];
+  	}
+  }
 	return $badge;
 }
 
@@ -797,7 +815,7 @@ function getModuleBadgeData($course) {
  *			  library/functions.php
  */
 function removeNullProfiles($users) {
-  $ret = "";
+  $ret = array();
   foreach ($users as $email => $data) {
     if ($data["courses"]["complete"] != null || $data["eLearning"]["complete"] !=null || $data["eLearning"]["in_progress"] !=null || $data["badges"]["complete"] != null || $data["eLearning"]["active"] !=null ) {
       $ret[$email] = $data;

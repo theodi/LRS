@@ -69,8 +69,10 @@ $client = $profile["client"];
 
 $collection = "elearning";
 $cursor = getDataFromCollection($collection); 
-foreach ($cursor as $doc) {
-	$users = "";
+
+try {
+  foreach ($cursor as $doc) {
+	$users = array();
     if ($doc["email"]) {
         $email = $doc["email"];
       } elseif ($doc["Email"]) {
@@ -83,19 +85,23 @@ foreach ($cursor as $doc) {
     foreach ($users as $id => $data) {
     	$userid = $id;
     }
+    
     if ($profile != "") {
   		$users = filterUsers($users,$filter,$client,$theme,$courses);
 	} elseif ($theme != "default") {
   		$users = filterUsers($users,$filter,"",$theme,$courses);
 	}
+
 	if ($single_course) {
   		$users = filterUsersNotTheme($users,$single_course);
 	}
+	
 	if ($theme != "default") {
   		$users = removeNullProfilesBadges($users);
 	} else {
   		$users = removeNullProfiles($users);  
 	}
+	
     foreach ($users as $id => $data) {
 		$data = addUserAnswer($data);
     	if ($id == $debugid && $debug == true) {
@@ -103,16 +109,21 @@ foreach ($cursor as $doc) {
 		}
 		$output[] = rotate($id,$data);
     }
+    //print_r($output);
+  }
+} catch (MongoDB\Driver\Exception\UnexpectedValueException $e) {
+
 }
 if ($output) {
 	$adapt1_set = true;
 }
+
 // ADAPT 2
 
 $collection = "adapt2";
 $cursor = getDataFromCollection($collection); 
 foreach ($cursor as $doc) {
-	$users = "";
+	$users = array();
     if ($doc["user"]["email"]) {
     	$email = $doc["user"]["email"];
     } else {
@@ -135,7 +146,9 @@ foreach ($cursor as $doc) {
 	}
     foreach ($users as $id => $data) {
     	$adapt2_set = true;
-    	$output[] = rotate2($id,$data);
+    	$collection = "adapt2Components";
+		$adapt2Components = getDataFromCollection("adapt2Components");
+    	$output[] = rotate2($id,$data,$adapt2Components);
     	if ($id == $debugid && $debug == true) {
 			print_r($output);
 		}
@@ -198,7 +211,7 @@ function rotate($id,$indata) {
 
 // Adapt 2
 
-function rotate2($id,$indata) {
+function rotate2($id,$indata,$adapt2Components) {
 	global $debug,$debugid;
 	global $connection_url, $db_name;
 	$line = [];
@@ -231,28 +244,27 @@ function rotate2($id,$indata) {
 
 	$line["completion"] = $data["progress"] / 100;
 	$line["session_time"] = gmdate("H:i:s", $data["sessionTime"]);
-
-	$collection = "adapt2Components";
-	$adapt2Components = getDataFromCollection("adapt2Components");
 	foreach ($adapt2Components as $doc) {
 		if ($doc["_items"] && $doc["_component"] == "mcq") {
 			$comps[$doc["_id"]] = $doc;	
 		}
 	}
-	foreach ($data["answers"] as $aid => $data) {
-		$items = $comps[$aid]["_items"];
-		if (is_array($data["_userAnswer"])) {
-			if ($items) {
-				if ($data["_isCorrect"]) {
-					$line[$aid."_isCorrect"] = $data["_isCorrect"];
-				} elseif (count($data["_userAnswer"]) > 0) {
-					$line[$aid."_isCorrect"] = "0";
-				} else {
-					$line[$aid."_isCorrect"] = "";
+	if ($data["answers"]) {
+		foreach ($data["answers"] as $aid => $data) {
+			$items = $comps[$aid]["_items"];
+			if (is_array($data["_userAnswer"])) {
+				if ($items) {
+					if ($data["_isCorrect"]) {
+						$line[$aid."_isCorrect"] = $data["_isCorrect"];
+					} elseif (count($data["_userAnswer"]) > 0) {
+						$line[$aid."_isCorrect"] = "0";
+					} else {
+						$line[$aid."_isCorrect"] = "";
+					}
 				}
-			}
-			for ($i=0;$i<count($items);$i++) {
-				$line[$aid."_".$i] = $data["_userAnswer"][$i] || "0";
+				for ($i=0;$i<count($items);$i++) {
+					$line[$aid."_".$i] = $data["_userAnswer"][$i] || "0";
+				}
 			}
 		}
 	}
@@ -289,17 +301,19 @@ function rotate3($output) {
  *            api/v1/generate_user_summary.php
  */
 function filterCourseUserNotTheme($userdata,$filter) {
-  $ret = "";
-  for($i=0;$i<count($userdata);$i++) {
-    $out = $userdata[$i];
-    $id = $userdata[$i]["id"];
-    if (is_array($id)) {
-      $id = $id["id"];
-    }
-    // Adapt 2
-    if (in_array($id, $filter)) {
-      $ret[] = $out;
-    }
+  $ret = array();
+  if ($userdata) {
+  	for($i=0;$i<count($userdata);$i++) {
+    	$out = $userdata[$i];
+    	$id = $userdata[$i]["id"];
+    	if (is_array($id)) {
+      	$id = $id["id"];
+    	}
+    	// Adapt 2
+    	if (in_array($id, $filter)) {
+      	$ret[] = $out;
+    	}
+  	}
   }
   return $ret;
 }
@@ -336,7 +350,7 @@ function outputCSV($summary,$lastModified) {
 	fputcsv($handle,$keys);
 	fputcsv($handle,$values);
 	for($i=1;$i<count($summary);$i++) {
-		$values = "";
+		$values = array();
 		$line = $summary[$i];
 		for($k=0;$k<count($keys);$k++) {
 			$values[] = $line[$keys[$k]];
@@ -379,7 +393,7 @@ function addUserAnswers($courses) {
 	      $componentId = $id;
           $item_sources = $componentItems[$componentId];
           $min = 10000;
-          $pointer = "";
+          $pointer = array();
           for($ci=0;$ci<count($item_sources);$ci++) {
           	$items = $item_sources[$ci]["_items"];
           	$data["items"][$ci] = $items;
@@ -421,18 +435,17 @@ function getCachedStats($id,$date) {
    global $connection_url, $db_name;
    try {
 	 // create the mongo connection object
-	$m = new MongoClient($connection_url);
+	$m = new MongoDB\Client($connection_url);
 
 	// use the database we connected to
-	$col = $m->selectDB($db_name)->selectCollection($collection);
+	$col = $m->selectDatabase($db_name)->selectCollection($collection);
 	
 	$query = array('id' => $id, 'date' => $date);
 	$res = $col->find($query);
-	$ret = "";
+	$ret = array();
 	foreach ($res as $doc) {
 		return $doc;
 	}
-	$m->close();
 	return false;
    } catch ( MongoConnectionException $e ) {
 //	return false;

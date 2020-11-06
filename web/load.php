@@ -1,5 +1,6 @@
 <?php
 header("Access-Control-Allow-Origin: *");
+require_once '../vendor/autoload.php';
 if ($_SERVER["HTTP_HOST"] == "localhost") {
 	include_once('_includes/config-local.inc.php');
 } else {
@@ -9,21 +10,19 @@ if ($_SERVER["HTTP_HOST"] == "localhost") {
 function load($id) {
    global $connection_url, $db_name, $collection;
    try {
+
 	 // create the mongo connection object
-	$m = new MongoClient($connection_url);
-	
+   	$m = new MongoDB\Client($connection_url);
+    
 	// use the database we connected to
-	$col = $m->selectDB($db_name)->selectCollection($collection);
+	$col = $m->selectDatabase($db_name)->selectCollection($collection);
 	
 	$query = array('_id' => $id);
 
-	$res = $col->find($query);	
+    $doc = $col->findOne($query);
+
+    return json_encode($doc);
 	
-	$m->close();
-	
-	foreach ($res as $doc) {
- 	   return json_encode($doc);
-	}
    } catch ( MongoConnectionException $e ) {
 //	return false;
 	syslog(LOG_ERR,'Error connecting to MongoDB server ' . $connection_url . ' - ' . $db_name . ' <br/> ' . $e->getMessage());

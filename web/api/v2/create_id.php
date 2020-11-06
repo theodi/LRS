@@ -2,6 +2,9 @@
 header("Access-Control-Allow-Origin: *");
 $path = "../../";
 set_include_path(get_include_path() . PATH_SEPARATOR . $path);
+
+require_once '../../../vendor/autoload.php';
+
 if ($_SERVER["HTTP_HOST"] == "localhost") {
   include_once('_includes/config-local.inc.php');
 } else {
@@ -10,23 +13,31 @@ if ($_SERVER["HTTP_HOST"] == "localhost") {
 function existsID($id) {
    global $connection_url, $db_name, $collection;
    try {
-	$m = new MongoClient($connection_url);
-	$col = $m->selectDB($db_name)->selectCollection($collection);
+   	// create the mongo connection object
+   	$m = new MongoDB\Client($connection_url);
+    
+	// use the database we connected to
+	$col = $m->selectDatabase($db_name)->selectCollection($collection);
+	
 	$query = array('_id' => $id);
+	
 	$count = $col->count($query);
+	
 	if ($count > 0) {
-		$m->close();
 		return true;
 	}
-	$col = $m->selectDB($db_name)->selectCollection("adapt2");
+	$col = $m->selectDatabase($db_name)->selectCollection("adapt2");
+
 	$query = array('_id' => $id);
+
 	$count = $col->count($query);
+
 	if ($count > 0) {
-		$m->close();
 		return true;
 	}
-	$m->close();
+
 	return false;
+	
    } catch ( Exception $e ) {
 		return false;
    }

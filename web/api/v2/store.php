@@ -11,8 +11,7 @@ if ($_SERVER["HTTP_HOST"] == "localhost") {
 } else {
   include_once('_includes/config.inc.php');
 }
-
-require_once('library/sendMail.php');
+require_once '../../../vendor/autoload.php';
 
 function store($data) {#
    global $connection_url, $db_name;
@@ -23,23 +22,24 @@ function store($data) {#
    	if (!$id || $id == "" || $id == null) {
 		return false;
 	}
-	$m = new MongoClient($connection_url);
-	$col = $m->selectDB($db_name)->selectCollection($collection);
+	// create the mongo connection object
+   	$m = new MongoDB\Client($connection_url);
+	// use the database we connected to
+	$col = $m->selectDatabase($db_name)->selectCollection($collection);
 	$query = array('_id' => $id);
     $count = $col->count($query);
     if ($count > 0) {
 		$newdata = array('$set' => $data);
-		$col->update($query,$newdata);
+		$col->updateOne($query,$newdata);
 	} else {
 		$data["email_sent"] = "false";
-		$col->save($data);
+		$col->insertOne($data);
 	}
-	$m->close();
-
+/*
     if (!getMailLock(2)) {
 		findEmailsCollection("adapt2",2);
 	}
-
+*/
 	return true;
    } catch ( Exception $e ) {
 	syslog(LOG_ERR,'Error: ' . $e->getMessage());

@@ -1,6 +1,8 @@
 <?php
+
 error_reporting(E_ALL & ~E_NOTICE);
-//error_reporting(E_ERROR | E_PARSE);
+require_once(realpath(dirname(__FILE__)) . '/../../vendor/autoload.php');
+error_reporting(E_ERROR | E_PARSE);
 
 if($_SERVER['HTTP_X_FORWARDED_PROTO'] != "https" && $_SERVER["HTTP_HOST"] != "localhost")  {
     $redirect = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
@@ -16,9 +18,6 @@ if ($_SERVER["HTTP_HOST"] == "localhost") {
 	include_once('_includes/config.inc.php');
 }
 //Google API PHP Library includes
-require_once 'src/Google/autoload.php';
-require_once 'src/Google/Client.php';
-require_once 'src/Google/Service/Oauth2.php';
 include_once('library/functions.php');
 include_once('library/navigation.php');
 
@@ -41,12 +40,11 @@ if ($_SERVER["HTTP_HOST"] == "localhost") {
 }
 
 //Create Client Request to access Google API
-$client = new Google_Client();
-$client->setApplicationName("PHP Google OAuth Login Example");
-$client->setClientId($client_id);
-$client->setClientSecret($client_secret);
-$client->setRedirectUri($redirect_uri);
+$client = new Google\Client();
+$client->setAuthConfig(realpath(dirname(__FILE__)) . '/../../client_secret.json');
 $client->addScope("https://www.googleapis.com/auth/userinfo.email");
+$client->setRedirectUri($redirect_uri);
+
 //Send Client Request
 $objOAuthService = new Google_Service_Oauth2($client);
 
@@ -155,16 +153,16 @@ if ($access == "public") {
 <link href="http://assets.theodi.org/css/odi-bootstrap-orange.css" rel="stylesheet">
 <link href="http://assets.theodi.org/css/odi-bootstrap-pomegranate.css" rel="stylesheet">
 <link href="http://assets.theodi.org/css/odi-bootstrap-red.css" rel="stylesheet">-->
-<link href="/css/odi-bootstrap.css" rel="stylesheet">
-<link href="/css/style.css" rel="stylesheet">
-<link href="/css/nav.css" rel="stylesheet">
-<link href="/css/flags.css" rel="stylesheet">
+<link href="css/odi-bootstrap.css" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+<link href="css/nav.css" rel="stylesheet">
+<link href="css/flags.css" rel="stylesheet">
 <link rel="shortcut icon" href="/images/odifavicon32.ico">
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-<script src="/js/nav.js"></script>
+<script src="js/nav.js"></script>
 <?php
  	if (strtolower($theme) == "dlab" && $userData['email']) {
-		echo '<script src="/js/updateDLab.js"></script>' ."\n";
+		echo '<script src="js/updateDLab.js"></script>' ."\n";
   	}
 	require_once('library/lessify.inc.php');
 

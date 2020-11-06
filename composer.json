@@ -1,8 +1,12 @@
 {
+  "provide" : {
+      "ext-mongo": "*"
+  },
   "require" : {
     "ext-mongo": "*",
     "mandrill/mandrill": "1.0.*",
-    "google/apiclient": "^1.1"
+    "google/apiclient": "^2.7",
+    "mongodb/mongodb": "^1.7"
   },
   "require-dev": {
     "heroku/heroku-buildpack-php": "*"

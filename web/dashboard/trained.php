@@ -1,30 +1,11 @@
 <?php
+
 $access = "viewer";
+$path = "../:./../";
 
-$path = "../";
-set_include_path(get_include_path() . PATH_SEPARATOR . $path);
+set_include_path($path . PATH_SEPARATOR . get_include_path());
+
 include('_includes/header.php');
-
-function getCachedCompletionStats($theme,$type,$date,$collection) {
-   global $connection_url, $db_name;
-   try {
-    $m = new MongoClient($connection_url);
-    $col = $m->selectDB($db_name)->selectCollection($collection);
-    $query = array('theme' => new MongoRegex('/^' .  $theme . '$/i'), 'type' => $type, 'date' => $date);
-    $res = $col->find($query);
-    $ret = "";
-    foreach ($res as $doc) {
-        $ret =  $doc["modules"]["completeCount"];
-    }
-    $m->close();
-    return $ret;
-   } catch ( Exception $e ) { syslog(LOG_ERR,'Error: ' . $e->getMessage()); }
-}
-
-$date = date("Y-m-d");
-$type = "trained";
-$complete = getCachedCompletionStats($theme,$type,$date,"statisticsCache");
-ksort($complete);
 
 ?>
 <style>
@@ -74,24 +55,6 @@ ksort($complete);
 <svg style="height:500px"></svg>
 </div>
 <script src="js/stack.js"></script>
-<h2>Completed modules breakdown</h2>
-<p>The table below shows how many people have completed at least X modules. All those who have completed 2 will have completed 1 but are not included in this count. Everyone in this table has completed at least 1 module. It is not possible to tell from this data which modules have been completed, just the count.</p>
-<div align="center">
-<table style="width: 400px; text-align: center; line-height:20px;">
-<tr><th>Number of modules completed</th><th>Number of people</th></tr>
-<?php
-  foreach ($complete as $key => $value) {
-    $max = $key;
-  }
-	for($i=1;$i<=$max;$i++) {
-    if (!is_numeric($complete[$i])) {
-      $complete[$i] = 0;
-    }
-		echo '<tr><td>' . $i . '</td><td>' . $complete[$i] . '</td></tr>';
-	}
-?>
-</table>
-</div>
 <script>
 $( document ).ready(function() {
 	if (!$('#active').text()) { $('#active_box').hide(); }	

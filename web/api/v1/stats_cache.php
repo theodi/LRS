@@ -10,9 +10,9 @@ include_once('library/functions.php');
 include_once('header.php');
 
 $allStats = getCachedStats($theme,"trained","statisticsCache");
-$out = "";
-for($i=0;$i<count($allStats);$i++) {
-	$out[$allStats[$i]["date"]] = $allStats[$i];
+$out = array();
+foreach ($allStats as $doc) {
+	$out[$doc["date"]] = json_decode(json_encode($doc));
 }
 //$out[$all["date"]] = $all;
 ksort($out);
@@ -21,12 +21,12 @@ $handle = fopen('php://output', 'w');
 $headings = array("Date","Attended_Training","eLearning_Complete","eLearning_Active","eLearning_Modules_Complete");	
 fputcsv($handle,$headings);
 foreach ($out as $date => $values) {
-	$line = "";
+	$line = array();
 	$line[] = $date;
-	$line[] = $values["trained"]["attendance"];
-	$line[] = $values["trained"]["eLearning"];
-	$line[] = $values["active"]["eLearning"];
-	$line[] = $values["modules"]["eLearning"];
+	$line[] = $values->trained->attendance;
+	$line[] = $values->trained->eLearning;
+	$line[] = $values->active->eLearning;
+	$line[] = $values->modules->eLearning;
 	$foo[0] = $line;
 	fputcsv($handle,$foo[0]);
 }
@@ -35,21 +35,22 @@ fclose($handle);
 function getCachedStats($theme,$type,$collection) {
    global $connection_url, $db_name;
    try {
-	 // create the mongo connection object
-	$m = new MongoClient($connection_url);
-
+	// create the mongo connection object
+   	$m = new MongoDB\Client($connection_url);
+    
 	// use the database we connected to
-	$col = $m->selectDB($db_name)->selectCollection($collection);
+	$col = $m->selectDatabase($db_name)->selectCollection($collection);
 	
-	$query = array('theme' => new MongoRegex('/^' .  $theme . '$/i'), 'type' => $type);
+	$query = array('theme' => new MongoDB\BSON\Regex('^'.$theme.'$', 'i'), 'type' => $type);
 	$res = $col->find($query);
-	$ret = "";
+	return $res;
+	/*
+	$ret = array();
 	foreach ($res as $doc) {
-		$ret[] = $doc;
+		$ret[] = $doc->toArray();
 	}
 	return $ret;
-	$m->close();
-	return $res;
+	*/
    } catch ( MongoConnectionException $e ) {
 //	return false;
 	echo "1) SOMETHING WENT WRONG" . $e->getMessage() . "<br/><br/>";

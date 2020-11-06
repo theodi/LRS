@@ -6,7 +6,6 @@ $path = "../../";
 set_include_path(get_include_path() . PATH_SEPARATOR . $path);
 include_once('library/functions.php');
 include_once('header.php');
-error_reporting(0);
 
 if ($_GET["theme"]) {
    	$theme = $_GET["theme"];
@@ -30,9 +29,9 @@ $profile = getLMSProfile($theme);
 $client = $profile["client"];
 
 $collection = "elearning";
-$cursor = getDataFromCollection($collection); 
+$cursor = getDataFromCollection($collection);
 foreach ($cursor as $doc) {
-	$users = "";
+	$users = array();
     if ($doc["email"]) {
         $email = $doc["email"];
       } elseif ($doc["Email"]) {
@@ -81,12 +80,13 @@ foreach ($cursor as $doc) {
 $collection = "adapt2";
 $cursor = getDataFromCollection($collection); 
 foreach ($cursor as $doc) {
-	$users = "";
+	$users = array();
     if ($doc["user"]["email"]) {
     	$email = $doc["user"]["email"];
     } else {
     	$email = $doc["_id"];
     }
+    //$doc = json_decode(json_encode($doc),true);
     $users = processAdapt2User($users,$doc,$email);
 
     if ($profile != "") {
@@ -124,7 +124,7 @@ foreach ($cursor as $doc) {
     }
 }
 
-$users = "";
+$users = array();
 $users = getUsers("courseAttendance",$users);
 
 if ($profile != "") {
@@ -163,7 +163,7 @@ $all["theme"] = $theme;
 
 $allStats = getCachedStats($theme,"trained","statisticsCache");
 store($all,"statisticsCache");
-$out = "";
+$out = array();
 for($i=0;$i<count($allStats);$i++) {
 	$out[$allStats[$i]["date"]] = $allStats[$i];
 }
@@ -174,7 +174,7 @@ $handle = fopen('php://output', 'w');
 $headings = array("Date","Attended_Training","eLearning_Complete","eLearning_Active","eLearning_Modules_Complete");	
 fputcsv($handle,$headings);
 foreach ($out as $date => $values) {
-	$line = "";
+	$line = array();
 	$line[] = $date;
 	$line[] = $values["trained"]["attendance"];
 	$line[] = $values["trained"]["eLearning"];
@@ -188,26 +188,24 @@ fclose($handle);
 function getCachedStats($theme,$type,$collection) {
    global $connection_url, $db_name;
    try {
-	 // create the mongo connection object
-	$m = new MongoClient($connection_url);
-
+	// create the mongo connection object
+	$m = new MongoDB\Client($connection_url);
+    
 	// use the database we connected to
-	$col = $m->selectDB($db_name)->selectCollection($collection);
+	$col = $m->selectDatabase($db_name)->selectCollection($collection);
 	
 	$query = array('theme' => $theme, 'type' => $type);
 	$res = $col->find($query);
-	$ret = "";
+	$ret = array();
 	foreach ($res as $doc) {
 		$ret[] = $doc;
 	}
 	return $ret;
-	$m->close();
-	return $res;
-   } catch ( MongoConnectionException $e ) {
+   } catch ( Exception $e ) {
 //	return false;
 	echo "1) SOMETHING WENT WRONG" . $e->getMessage() . "<br/><br/>";
 	syslog(LOG_ERR,'Error connecting to MongoDB server ' . $connection_url . ' - ' . $db_name . ' <br/> ' . $e->getMessage());
-   } catch ( MongoException $e ) {
+   } catch ( Exception $e ) {
 //	return false;
 	echo "2) SOMETHING WENT WRONG" . $e->getMessage() . "<br/><br/>\n\n";
 	echo "<br/><br/>\n\n";
@@ -223,29 +221,24 @@ function getCachedStats($theme,$type,$collection) {
 function store($data,$collection) {
    global $connection_url, $db_name;
    try {
-	 // create the mongo connection object
-	$m = new MongoClient($connection_url);
-
-	// use the database we connected to
-	$col = $m->selectDB($db_name)->selectCollection($collection);
+	$m = new MongoDB\Client($connection_url);
+	$col = $m->selectDatabase($db_name)->selectCollection($collection);
 	
 	$id = $data["id"];
 	$query = array('id' => $id);
     $count = $col->count($query);
     if ($count > 0) {
 		$newdata = array('$set' => $data);
-		$col->update($query,$newdata);
+		$col->updateOne($query,$newdata);
 	} else {
-		$col->save($data);
+		$col->insertOne($data);
 	}
-
-	$m->close();
 	return true;
-   } catch ( MongoConnectionException $e ) {
+   } catch ( Exception $e ) {
 //	return false;
 	echo "1) SOMETHING WENT WRONG" . $e->getMessage() . "<br/><br/>";
 	syslog(LOG_ERR,'Error connecting to MongoDB server ' . $connection_url . ' - ' . $db_name . ' <br/> ' . $e->getMessage());
-   } catch ( MongoException $e ) {
+   } catch ( Exception $e ) {
 //	return false;
 	echo "2) SOMETHING WENT WRONG" . $e->getMessage() . "<br/><br/>\n\n";
 	print_r($data);

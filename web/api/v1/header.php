@@ -1,20 +1,18 @@
-<?php
+<?php 
 error_reporting(E_ALL & ~E_NOTICE);
 session_start();
-require_once '../../src/Google/autoload.php';
-require_once '../../src/Google/Client.php';
-require_once '../../src/Google/Service/Oauth2.php';
+require_once(realpath(dirname(__FILE__)) . '/../../../vendor/autoload.php');
 if ($_SERVER["HTTP_HOST"] == "localhost") {
   include_once('../../_includes/config-local.inc.php');
 } else {
   include_once('../../_includes/config.inc.php');
 }
-$client = new Google_Client();
-$client->setApplicationName("PHP Google OAuth Login Example");
-$client->setClientId($client_id);
-$client->setClientSecret($client_secret);
-$client->setRedirectUri($redirect_uri);
+//Create Client Request to access Google API
+$client = new Google\Client();
+$client->setAuthConfig(realpath(dirname(__FILE__)) . '/../../../client_secret.json');
 $client->addScope("https://www.googleapis.com/auth/userinfo.email");
+$client->setRedirectUri($redirect_uri);
+
 //Send Client Request
 $objOAuthService = new Google_Service_Oauth2($client);
 
