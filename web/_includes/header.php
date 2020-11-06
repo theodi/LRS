@@ -153,10 +153,10 @@ if ($access == "public") {
 <link href="http://assets.theodi.org/css/odi-bootstrap-orange.css" rel="stylesheet">
 <link href="http://assets.theodi.org/css/odi-bootstrap-pomegranate.css" rel="stylesheet">
 <link href="http://assets.theodi.org/css/odi-bootstrap-red.css" rel="stylesheet">-->
-<link href="css/odi-bootstrap.css" rel="stylesheet">
-<link href="css/style.css" rel="stylesheet">
-<link href="css/nav.css" rel="stylesheet">
-<link href="css/flags.css" rel="stylesheet">
+<link href="/css/odi-bootstrap.css" rel="stylesheet">
+<link href="/css/style.css" rel="stylesheet">
+<link href="/css/nav.css" rel="stylesheet">
+<link href="/css/flags.css" rel="stylesheet">
 <link rel="shortcut icon" href="/images/odifavicon32.ico">
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 <script src="js/nav.js"></script>
